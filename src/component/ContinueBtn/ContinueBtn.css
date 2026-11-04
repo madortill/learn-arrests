@@ -1,0 +1,74 @@
+/* עיצוב כפתור ההמשך - קפסולה בלבלנדר/תכלת בהיר בדיוק לפי התמונה */
+.continue-btn {
+    background: #dce6ed; /* צבע רקע תכלת-אפרפר בהיר תואם */
+    border: none;
+    border-radius: 40px;
+    padding: 8px 24px 8px 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    direction: rtl;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .continue-btn-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  /* גודל ואפקטים ליהלום */
+  .continue-diamond-svg {
+    width: 38px;
+    height: 32px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+    transition: transform 0.3s ease;
+  }
+  
+  /* הטקסט "המשך" - פונט מודגש, מוטה וכהה */
+  .continue-text {
+    font-family: sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    font-style: italic;
+    color: #3f5569; /* צבע טקסט כהה תואם */
+    letter-spacing: 0.5px;
+  }
+  
+  /* אפקטי Hover ו-Active */
+  .continue-btn:hover {
+    background-color: #cfdee8;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  }
+  
+  .continue-btn:hover .continue-diamond-svg {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  
+  .continue-btn:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* ========================================================= */
+  /* התאמה רספונסיביות למחשב (Desktop)                         */
+  /* ========================================================= */
+  @media (min-width: 1024px) {
+    .continue-btn {
+      padding: 10px 30px 10px 22px;
+      border-radius: 50px;
+    }
+  
+    .continue-diamond-svg {
+      width: 48px;
+      height: 40px;
+    }
+  
+    .continue-text {
+      font-size: 26px;
+    }
+  }

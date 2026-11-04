@@ -1,0 +1,750 @@
+{
+  "title": "לומדת איסוף ממעצרים",
+  "version": 0.2,
+  "status": "טיוטה לעריכה",
+  "description": "גיסון להגדרת מסכי הלומדה, הרקעים, הקומפוננטות והתוכן שלהן. שיוכים שטרם אומתו נשארים זמניים.",
+  "backgroundMovement": {
+    "supported": true,
+    "default": null,
+    "description": "ניתן להגדיר תנועת רקע לכל מסך בנפרד, כאשר הרקע רחב מהמסך ונחשף חלק נוסף בעקבות פעולה."
+  },
+  "pages": [
+    {
+      "step": 0,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "BookendScreen",
+        "props": {
+          "isStart": true
+        }
+      }
+    },
+    {
+      "step": 1,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "text": "לורם איפסום דולור סיט אמט קונסקטטור.\nאיפסום מגנה פאסלוס אגת ארקו אגסטס פורוס אליקוואם. אוגה אלייפנד אדיפיסינג אולטריסייס נון נונק האביטנט ויוורה. נולה אין ניסי טלוס ריסוס אגסטס סיט ביבנדום נון.\nיוצאים צוותי ליווי לאיסוף מן המעצרים.",
+          "typeAnimation": true,
+          "tailPosition": "left-top",
+          "position": {
+            "top": "15%",
+            "right": "10%"
+          }
+        }
+      }
+    },
+    {
+      "step": 2,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "type": "WhatsAppChat"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "LocationMap",
+          "locations": [
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0,
+              "importantPoint": "Lorem ipsum dolor sit amet consectetur. Placerat facilisis dolor pharetra urna mauris ac eget suspendisse...",
+              "popupPoint": "Lorem ipsum dolor sit amet consectetur. Viverra tellus volutpat..."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים מתקיימים"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "answers": [
+                "מעצר ענתות",
+                "מעצר ענתות",
+                "מעצר ענתות",
+                "מעצר ענתות"
+              ],
+              "correctAnswerIndex": 1,
+              "explanation": "אכככככ..."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 5,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "regular",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "compare",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Pellentesque felis amet."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "חשוב שגם נכיר מי הם צוותי צח”ם"
+        }
+      }
+    },
+    {
+      "step": 7,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "LocationMap",
+          "locations": [
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            },
+            {
+              "name": "Lorem",
+              "x": 0,
+              "y": 0
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים של מצ”ח מתקיימים"
+        }
+      }
+    },
+    {
+      "step": 8,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "WhatsAppChat",
+          "part": 2,
+          "message": "*דיווח עצורה:*\n*שם מלא:* שי כהן\n*מ.א:* 9476041\n*ת.ז:* 218641473\n*מגדר- זכר/נקבה:* זכר\n*סוג עצור:* על”מ\n*התייצבות/נעצר:* נעצרה במחסום מגב\n*תאריך תחילת עבירה:* 13.01.26\n*מקום המעצר/התייצבות:* ---\n*בסיס מ״צ המטפל על בעצור* : מצ”ח חוף\n*ייצוג סנגורי- צבאי/פרטי:* -\n*תאריך מעצר* 05.07.26\n*שעת מעצר:* 18:20\n*שעת קבלה למעצר:* ייעודכן\n*רמס:* 4\n*הערות*:"
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "זו העצור שאנחנו נלווה היום."
+        }
+      }
+    },
+    {
+      "step": 9,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 10,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Checklist",
+        "props": {
+          "items": [
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": "path/to/image1.png"
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": "path/to/image2.png"
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי"
+        }
+      }
+    },
+    {
+      "step": 11,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "Checklist",
+        "props": {
+          "items": [
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח"
+        }
+      }
+    },
+    {
+      "step": 12,
+      "background": "bg-1",
+      "primaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": true,
+          "text": "כל הכבוד עכשיו אלינו לצאת על השטח וללות את העצור."
+        }
+      },
+      "secondaryComponent": {
+        "type": "transition",
+        "props": {}
+      }
+    },
+    {
+      "step": 13,
+      "background": "bg-2",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "regular",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך"
+        }
+      }
+    },
+    {
+      "step": 14,
+      "background": "bg-2",
+      "primaryComponent": {
+        "type": "DepositsBtn",
+        "props": {}
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "השלב השני הוא לקיחת האחריות על פיקדונות העצורים מסגל המעצר"
+        }
+      }
+    },
+    {
+      "step": 15,
+      "background": "bg-2",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 16,
+      "background": "bg-3",
+      "primaryComponent": {
+        "type": "Checklist",
+        "props": {
+          "items": [
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": "path/to/image3.png"
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": "path/to/image4.png"
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet",
+              "image": null
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "השלב הרביעי בתהליך הוא לבצע חיפושים יסודיים"
+        }
+      }
+    },
+    {
+      "step": 17,
+      "background": "bg-4",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "compare",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean..."
+            },
+            {
+              "image": "path/to/handcuffs.png"
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "השלב ההחמישי הוא האזיקה"
+        }
+      }
+    },
+    {
+      "step": 18,
+      "background": "bg-2",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 19,
+      "background": "bg-5",
+      "primaryComponent": {
+        "type": "ParkingButton",
+        "props": {
+          "parkingData": {
+            "intro": [
+              {
+                "title": "הרכב יציאה לליוי",
+                "type": "Checklist",
+                "content": [
+                  "Lorem ipsum...",
+                  "Lorem ipsum...",
+                  "Lorem ipsum..."
+                ]
+              },
+              {
+                "title": "זו היא טבלת תקן הליווי ברכב הליווי",
+                "type": "image",
+                "content": "path/to/table.png"
+              },
+              {
+                "title": "רכב ליווי לא מדוגם",
+                "type": "text",
+                "content": "Lorem ipsum dolor sit amet consectetur..."
+              }
+            ],
+            "vehicles": [
+              {
+                "title": "מיניבוס אזרחי",
+                "details": [
+                  "Lorem ipsum...",
+                  "Lorem ipsum...",
+                  "Lorem ipsum..."
+                ]
+              },
+              {
+                "title": "מיניבוס אזרחי",
+                "details": [
+                  "Lorem ipsum...",
+                  "Lorem ipsum...",
+                  "Lorem ipsum..."
+                ]
+              },
+              {
+                "title": "מיניבוס אזרחי",
+                "details": [
+                  "Lorem ipsum...",
+                  "Lorem ipsum...",
+                  "Lorem ipsum..."
+                ]
+              },
+              {
+                "title": "מיניבוס אזרחי",
+                "details": [
+                  "Lorem ipsum...",
+                  "Lorem ipsum...",
+                  "Lorem ipsum..."
+                ]
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "step": 20,
+      "background": "bg-6",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 21,
+      "background": "bg-6",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "regular",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "הגענו לשלב האחרון של תהליך איסוף במעצר"
+        }
+      }
+    },
+    {
+      "step": 22,
+      "background": "bg-7",
+      "primaryComponent": {
+        "type": "DrivingScreen",
+        "props": {}
+      }
+    },
+    {
+      "step": 23,
+      "background": "bg-7",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 24,
+      "background": "bg-8",
+      "primaryComponent": {
+        "type": "DoorsScreen",
+        "props": {}
+      }
+    },
+    {
+      "step": 25,
+      "background": "bg-9",
+      "primaryComponent": {
+        "type": "FlipCards",
+        "props": {
+          "cardType": "regular",
+          "cards": [
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            },
+            {
+              "text": "Lorem ipsum dolor sit amet consectetur..."
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך"
+        }
+      }
+    },
+    {
+      "step": 26,
+      "background": "bg-10",
+      "primaryComponent": {
+        "type": "Whiteboard",
+        "props": {}
+      }
+    },
+    {
+      "step": 27,
+      "background": "bg-10",
+      "primaryComponent": {
+        "type": "Checklist",
+        "props": {
+          "items": [
+            {
+              "text": "Lorem ipsum...",
+              "image": null
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "typeAnimation": false,
+          "text": "כעט נעבור על ההדגישים המיוחדים לקליטת עצור מצ”ח"
+        }
+      }
+    },
+    {
+      "step": 28,
+      "background": "bg-10",
+      "primaryComponent": {
+        "type": "Tablet",
+        "props": {
+          "tabletType": "QuizScreen",
+          "questions": [
+            {
+              "question": "סמן שני מעצרים...",
+              "answers": [],
+              "correctAnswerIndex": 1,
+              "explanation": ""
+            }
+          ]
+        }
+      }
+    },
+    {
+      "step": 29,
+      "background": "bg-10",
+      "primaryComponent": {
+        "type": "BookendScreen",
+        "props": {
+          "isStart": false
+        }
+      }
+    }
+  ]
+}

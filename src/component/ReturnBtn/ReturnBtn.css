@@ -1,0 +1,79 @@
+/* מיקום הכפתור - בצד שמאל למעלה, מותאם רספונסיבית */
+.return-btn {
+    position: fixed;
+    top: 3vh;
+    left: 3vw;
+    z-index: 9995;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    /* צבעי רקע וטקסט בדיוק לפי התמונה */
+    background-color: #d8c5ed; /* סגול בהיר/לבלנדר */
+    color: #4a2175;           /* סגול כהה לטקסט ולחץ */
+    border: none;
+    border-radius: 30px;
+    
+    padding: 10px 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    
+    font-family: sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    font-style: italic;
+    
+    /* מעברים חלקים לאנימציות */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    direction: rtl;
+    user-select: none;
+  }
+  
+  /* גודל האיקון */
+  .return-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+  }
+  
+  /* טקסט הכפתור */
+  .return-text {
+    white-space: nowrap;
+  }
+  
+  /* אפקטים בלחיצה ובמעבר עכבר (Hover & Active) */
+  .return-btn:hover {
+    background-color: #cbaff0;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+  }
+  
+  .return-btn:hover .return-icon {
+    transform: translateX(3px); /* החץ זז קצת ימינה ב-hover */
+  }
+  
+  /* מראה בלחיצה (מצב שקוע בדיוק כמו האיקון השלישי בתמונה) */
+  .return-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.25);
+    background-color: #c0a1e8;
+    color: #381659;
+  }
+  
+  /* ========================================================= */
+  /* התאמה רספונסיבית מיוחדת למסכי מחשב (Desktop)          */
+  /* ========================================================= */
+  @media (min-width: 1024px) {
+    .return-btn {
+      top: 3.5vh;
+      left: 3.5vw;
+      padding: 12px 22px;
+      font-size: 21px;
+      border-radius: 35px;
+    }
+  
+    .return-icon {
+      width: 28px;
+      height: 28px;
+    }
+  }

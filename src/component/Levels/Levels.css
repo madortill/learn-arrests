@@ -1,0 +1,317 @@
+/* ==========================================
+   הגדרות מעטפת ומודאל (Overlay & Card)
+   ========================================== */
+   .levels-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9990;
+    direction: rtl;
+    font-family: sans-serif;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .levels-card {
+    position: relative;
+    width: 92vw;
+    max-width: 1100px;
+    max-height: 85vh;
+    background-color: #3b2579; /* סגול תואם לעיצוב ה-PDF */
+    border: 4px solid #ffffff;
+    border-radius: 35px;
+    padding: 50px 30px 30px 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    box-sizing: border-box;
+  }
+  
+  .levels-header {
+    position: absolute;
+    top: 15px;
+    left: 20px;
+    z-index: 10;
+  }
+  
+  /* ==========================================
+     כפתור הטרגר (LevelsBtn)
+     ========================================== */
+  .levels-toggle-btn {
+    position: fixed;
+    top: 3vh;
+    right: 8vw; /* ממוקם ליד כפתור ה-About שמיקמנו ב-3vw */
+    width: 50px;
+    height: 50px;
+    background-color: #40298a;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 9995;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+  }
+  
+  .levels-toggle-btn:hover {
+    transform: scale(1.08);
+  }
+  
+  /* איקון 3 פסים */
+  .hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    width: 24px;
+  }
+  
+  .hamburger-icon span {
+    display: block;
+    height: 4px;
+    background-color: #ffffff;
+    border-radius: 4px;
+    width: 100%;
+  }
+  
+  /* איקון תיבת יהלום */
+  .chest-icon {
+    position: relative;
+    width: 26px;
+    height: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .chest-base {
+    width: 24px;
+    height: 10px;
+    background-color: #ffffff;
+    border-radius: 2px;
+    margin-top: auto;
+  }
+  
+  .chest-lid {
+    width: 26px;
+    height: 5px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    transform: rotate(-25deg) translateY(-2px);
+    transform-origin: left bottom;
+  }
+  
+  .chest-diamond {
+    position: absolute;
+    top: -4px;
+    color: #00bfff;
+    font-size: 14px;
+    text-shadow: 0 0 4px #00bfff;
+  }
+  
+  /* ==========================================
+     גריד השלבים (Levels Grid)
+     ========================================== */
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px 20px;
+    padding: 10px 0;
+    direction: rtl;
+  }
+  
+  /* ==========================================
+     פריט שלב (Level Item State Styling)
+     ========================================== */
+  .level-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 50px;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+  }
+  
+  .level-item:hover {
+    transform: translateY(-2px);
+  }
+  
+  .level-pill {
+    flex: 1;
+    height: 42px;
+    background-color: #ffffff;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px 0 35px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid #3b82f6; /* ברירת מחדל - כחול */
+    transition: all 0.3s ease;
+  }
+  
+  .level-title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e3a8a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .level-diamond-wrapper {
+    position: absolute;
+    left: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+  
+  /* --- מצב 1: שלב פעיל (Active / Gold) --- */
+  .level-item.active .level-pill {
+    border-color: #eab308; /* צהוב/זהב */
+  }
+  
+  .level-item.active .level-title {
+    color: #d97706; /* זהב כהה */
+  }
+  
+  /* --- מצב 2: שלב פתוח (Unlocked / Blue) --- */
+  .level-item.unlocked .level-pill {
+    border-color: #3b82f6;
+  }
+  
+  .level-item.unlocked .level-title {
+    color: #1d4ed8;
+  }
+  
+  /* --- מצב 3: שלב נעול (Locked / Grey) --- */
+  .level-item.locked {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  
+  .level-item.locked .level-pill {
+    border-color: #9ca3af;
+    background-color: #f3f4f6;
+  }
+  
+  .level-item.locked .level-title {
+    color: #6b7280;
+  }
+  
+  /* ==========================================
+     אומנות היהלומים והמספרים בתוכם
+     ========================================== */
+  .diamond-container {
+    position: relative;
+    width: 55px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .diamond-svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.3));
+  }
+  
+  .diamond-number {
+    position: absolute;
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffffff;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    z-index: 3;
+  }
+  
+  .diamond-number.gold {
+    color: #ffffff;
+  }
+  
+  .diamond-number.grey {
+    color: #e5e7eb;
+  }
+  
+  /* ניצוצות זהב עבור שלב אקטיבי */
+  .active-sparkle .sparkle {
+    position: absolute;
+    color: #facc15;
+    font-size: 16px;
+    animation: pulseSparkle 1.5s infinite alternate;
+  }
+  
+  .sparkle-top {
+    top: -4px;
+    right: 2px;
+  }
+  
+  .sparkle-bottom {
+    bottom: -4px;
+    left: 2px;
+  }
+  
+  /* ==========================================
+     התאמה רספונסיבית מיוחדת למחשב (Desktop)
+     ========================================== */
+  @media (min-width: 1024px) {
+    .levels-card {
+      padding: 60px 50px 40px 50px;
+    }
+  
+    .levels-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px 25px;
+    }
+  
+    .level-item {
+      height: 60px;
+    }
+  
+    .level-pill {
+      height: 50px;
+      border-width: 3px;
+    }
+  
+    .level-title {
+      font-size: 21px;
+    }
+  
+    .diamond-container {
+      width: 65px;
+      height: 58px;
+    }
+  
+    .diamond-number {
+      font-size: 22px;
+    }
+  
+    .levels-toggle-btn {
+      width: 60px;
+      height: 60px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .levels-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes pulseSparkle {
+    from { transform: scale(0.8); opacity: 0.6; }
+    to { transform: scale(1.3); opacity: 1; }
+  }
