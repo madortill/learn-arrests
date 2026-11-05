@@ -51,53 +51,18 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "LocationMap",
+          "type": "LocationMap",
+          "speechBubbleText": "עברו על נקודות המיקום בשביל לראות איפה\nהמעצרים מתקיימים",
+          "generalImportantPoint": "Lorem ipsum dolor sit amet consectetur. Placerat facilisis dolor pharetra urna mauris ac eget suspendisse. Velit arcu id in nec molestie. Odio viverra euismod proin tempus libero.",
           "locations": [
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
-            },
-            {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0,
-              "importantPoint": "Lorem ipsum dolor sit amet consectetur. Placerat facilisis dolor pharetra urna mauris ac eget suspendisse...",
-              "popupPoint": "Lorem ipsum dolor sit amet consectetur. Viverra tellus volutpat..."
-            }
+            { "id": 1, "mainName": "מעצר דן", "subName": "שנמצא באזור תל השומר", "x": 58, "y": 26 },
+            { "id": 2, "mainName": "מעצר האשל", "subName": "שנמצא באזור באר שבע", "x": 48, "y": 78 },
+            { "id": 3, "mainName": "מעצר יואב", "subName": "שנמצא במחנה ג'וליס", "x": 44, "y": 48 },
+            { "id": 4, "mainName": "מעצר ענתות", "subName": "שנמצא בירושלים", "x": 51, "y": 44, "importantPoint": "Lorem ipsum dolor sit amet consectetur. Viverra tellus volutpat bibendum massa in in orci in donec." },
+            { "id": 5, "mainName": "מעצר ג'למה", "subName": "נמצא בצומת ג'למה שליד יגור", "x": 46, "y": 41 },
+            { "id": 6, "mainName": "מעצר פילון", "subName": "נמצא ליד ראש פינה", "x": 51, "y": 30 },
+            { "id": 7, "mainName": "מעצר הנגב", "subName": "נמצא בעיר בה״דִים", "x": 47, "y": 53 }
           ]
-        }
-      },
-      "secondaryComponent": {
-        "type": "SpeechBubble",
-        "props": {
-          "typeAnimation": false,
-          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים מתקיימים"
         }
       }
     },
@@ -107,18 +72,40 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
-              "answers": [
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
                 "מעצר ענתות",
-                "מעצר ענתות",
-                "מעצר ענתות",
-                "מעצר ענתות"
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
               ],
-              "correctAnswerIndex": 1,
-              "explanation": "אכככככ..."
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
+            },
+            {
+              "question": "עד איזו שעה מתקבלים דיווחים בפעימת הבוקר של 06:30?",
+              "options": [
+                "עד השעה 05:00",
+                "עד השעה 05:30",
+                "עד השעה 06:00",
+                "עד השעה 06:30"
+              ],
+              "correctAnswer": 2,
+              "explanation": "בפעימה של 06:30 מקבלים דיווחים עד השעה 06:00 בדיוק."
+            },
+            {
+              "question": "כמה פעימות עבודה קיימות בפלוגת הליוויים?",
+              "options": [
+                "שתי פעימות",
+                "שלוש פעימות",
+                "ארבע פעימות",
+                "חמש פעימות"
+              ],
+              "correctAnswer": 2,
+              "explanation": "פלוגת הליוויים עובדת לפי ארבע פעימות קבועות ביום."
             }
           ]
         }

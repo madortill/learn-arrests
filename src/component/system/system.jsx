@@ -1,83 +1,61 @@
 import React, { useState } from 'react';
-import Stages from '../stages.json';
-import About from '../About/About';
-import Levels, { LevelsBtn } from '../Levels/Levels';
-import ReturnBtn from '../ReturnBtn/ReturnBtn'; 
-
-import BookendScreen from '../BookendScreen/BookendScreen';
-import SpeechBubble from '../SpeechBubble/SpeechBubble';
+import stages from '../../data/stages.json'; // ודאי שהנתיב ל-JSON שלך נכון
 import Tablet from '../Tablet/Tablet';
-import WhatsAppChat from '../WhatsAppChat/WhatsAppChat';
+import BookendScreen from '../BookendScreen/BookendScreen';
+import EmptyState from '../EmptyState/EmptyState';
+import SpeechBubble from '../SpeechBubble/SpeechBubble';
+import ContinueBtn from '../ContinueBtn/ContinueBtn';
+// import './System.css';
 
-
-const components = {
-    BookendScreen: BookendScreen,
-    SpeechBubble: SpeechBubble,
-    Tablet: Tablet,
-    WhatsAppChat: WhatsAppChat,
+// מיפוי של כל הקומפוננטות הראשיות האפשריות בלומדה
+const componentMap = {
+  Tablet: Tablet,
+  BookendScreen: BookendScreen,
+  EmptyState: EmptyState
 };
 
 export default function System() {
-    const [currentNumStep, setCurrentNumStep] = useState(0);
-    const [isLevelsOpen, setIsLevelsOpen] = useState(false);
-    const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [isStepCompleted, setIsStepCompleted] = useState(false); // האם המשימה בשלב הסתיימה?
 
-    const currentStepData = Stages.pages[currentNumStep];
-    const Component = components[currentStepData.primaryComponent.type];
+  const stepData = stages[currentStep];
+  if (!stepData) return <div>סוף הלומדה!</div>;
 
-    if (!Component) {
-        return <div>Component not found: {currentStepData.primaryComponent.type}</div>;
-    }
+  const PrimaryComponent = componentMap[stepData.primaryComponent.type];
 
-    const handleNextStep = () => {
-        if (currentNumStep < Stages.pages.length - 1) {
-            const nextStep = currentNumStep + 1;
-            setCurrentNumStep(nextStep);
-            if (nextStep > maxUnlockedStep) {
-                setMaxUnlockedStep(nextStep);
-            }
-        }
-    };
+  // פונקציה שעוברת לשלב הבא (מופעלת ע"י ContinueBtn או ישירות ע"י QuizScreen)
+  const handleNextStep = () => {
+    setCurrentStep(prev => prev + 1);
+    setIsStepCompleted(false); // מאפסים את הסטטוס לשלב הבא
+  };
 
-    // 2. פונקציה לחזרה לשלב הקודם
-    const handlePrevStep = () => {
-        if (currentNumStep > 0) {
-            setCurrentNumStep(prev => prev - 1);
-        }
-    };
+  // הקומפוננטות הפנימיות קוראות לפונקציה הזו כשהן מסיימות את המשימה שלהן
+  const handleComplete = () => {
+    setIsStepCompleted(true);
+  };
 
-    const restart = () => {
-        setCurrentNumStep(1);
-    };
+  return (
+    <div className={`system-container ${stepData.background}`}>
+      
+      {/* 1. רינדור הקומפוננטה המרכזית (טאבלט, מסך פתיחה וכו') */}
+      {PrimaryComponent && (
+        <PrimaryComponent 
+          {...stepData.primaryComponent.props} 
+          onComplete={handleComplete} 
+          onNext={handleNextStep} // מועבר ל-QuizScreen שמעביר שלב בעצמו
+        />
+      )}
 
-    return (
-        <>
-            <About />
-            
-            <LevelsBtn 
-                isOpen={isLevelsOpen} 
-                onClick={() => setIsLevelsOpen(!isLevelsOpen)} 
-            />
+      {/* 2. רינדור בועת דיבור גלובלית (אם מוגדרת בשלב הנוכחי ב-JSON) */}
+      {stepData.speechBubble && (
+        <SpeechBubble {...stepData.speechBubble} />
+      )}
 
-            {/* 3. הכפתור יוצג אך ורק החל משלב 1 ואילך (לא במסך הפתיחה 0) */}
-            {currentNumStep > 0 && (
-                <ReturnBtn onClick={handlePrevStep} />
-            )}
+      {/* 3. רינדור כפתור ההמשך הגלובלי (רק אם השלב דורש אותו והמשימה הושלמה) */}
+      {stepData.requiresContinueBtn && isStepCompleted && (
+        <ContinueBtn onClick={handleNextStep} />
+      )}
 
-            <Levels 
-                steps={Stages.pages} 
-                currentStep={currentNumStep}
-                maxUnlockedStep={maxUnlockedStep}
-                isOpen={isLevelsOpen}
-                onClose={() => setIsLevelsOpen(false)}
-                onSelectStep={(stepIndex) => setCurrentNumStep(stepIndex)} 
-            />
-            
-            <Component 
-                {...currentStepData.primaryComponent.props} 
-                onNext={handleNextStep} 
-                onRestart={restart} 
-            />
-        </>
-    );
+    </div>
+  );
 }

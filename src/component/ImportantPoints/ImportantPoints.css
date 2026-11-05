@@ -1,0 +1,81 @@
+.important-points-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeInModal 0.25s ease;
+  }
+  
+  .important-points-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    width: 85%;
+    max-width: 340px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box;
+    animation: scaleUpModal 0.25s ease;
+  }
+  
+  .warning-icon-wrapper {
+    font-size: 32px;
+    margin-bottom: 8px;
+  }
+  
+  .modal-title {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
+  }
+  
+  .modal-text-content {
+    max-height: 140px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+    padding: 0 5px;
+  }
+  
+  .modal-text-content p {
+    margin: 0;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #475569;
+  }
+  
+  .modal-ok-btn {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 30px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .modal-ok-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  @keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes scaleUpModal {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
