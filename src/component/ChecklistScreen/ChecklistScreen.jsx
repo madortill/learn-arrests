@@ -7,7 +7,7 @@ import pekelim from '../../assets/pekelim.png';
 import clipboardMini from '../../assets/ClipboardMini.png';
 
 const imageMap = {
-  'Pekelim.png': pekelim,
+  'pekelim.png': pekelim,
 };
 
 export default function ChecklistScreen({
