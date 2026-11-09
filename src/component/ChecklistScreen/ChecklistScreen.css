@@ -18,7 +18,7 @@
     min-height: 500px;
     max-height: 85vh;
   
-    background-image: url('src/assets/Clipboard.png');
+    background-image: url('../../assets/Clipboard.png');
     background-size: 100% 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -78,7 +78,7 @@
   .checkbox-box {
     width: 32px;
     height: 32px;
-    background-image: url('src/assets/Checkbox.png');
+    background-image: url('../../assets/Checkbox.png');
     background-size: cover;
     position: relative;
     flex-shrink: 0;
