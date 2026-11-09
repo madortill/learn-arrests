@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './ChecklistScreen.css';
 
 import checkmark from '../../assets/checkmark.png';
-import pekelim from '../../assets/pekelim.png';
+import pekelim from '../../assets/Pekelim.png';
 import clipboardMini from '../../assets/ClipboardMini.png';
 
 const imageMap = {
