@@ -1,0 +1,212 @@
+
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background: #171b1c;
+    color: white;
+    direction: rtl;
+    overflow: hidden;
+  }
+  
+  .initial-loader,
+  .transition-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 35px;
+  }
+  
+  .loading-screen p {
+    font-family: inherit;
+    font-size: clamp(20px, 3vw, 30px);
+  }
+  
+  /* טעינה ראשונית */
+  
+  .loading-diamond {
+    font-size: 85px;
+    color: #d4b477;
+  
+    animation: diamond-spin 1.5s linear infinite;
+  }
+  
+  @keyframes diamond-spin {
+    from {
+      transform: rotateY(0deg) rotateZ(0deg);
+    }
+  
+    to {
+      transform: rotateY(360deg) rotateZ(360deg);
+    }
+  }
+  
+  /* טעינת מעבר */
+  
+  .road-scene {
+    position: relative;
+    width: min(80vw, 650px);
+    height: 260px;
+    perspective: 700px;
+  }
+  
+  .road {
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+  
+    width: 100%;
+    height: 100px;
+  
+    background: #383b3c;
+    transform: rotateX(35deg);
+    overflow: hidden;
+  }
+  
+  .road-lines {
+    position: absolute;
+    top: 48%;
+    left: 0;
+  
+    width: 200%;
+    height: 7px;
+  
+    background: repeating-linear-gradient(
+      to right,
+      #f4e6bd 0 45px,
+      transparent 45px 90px
+    );
+  
+    animation: road-move 0.7s linear infinite;
+  }
+  
+  @keyframes road-move {
+    from {
+      transform: translateX(0);
+    }
+  
+    to {
+      transform: translateX(90px);
+    }
+  }
+  
+  /* המכונית */
+  
+  .loading-car {
+    position: absolute;
+    bottom: 65px;
+    left: 50%;
+  
+    width: 230px;
+    height: 100px;
+  
+    transform: translateX(-50%);
+    animation: car-bounce 0.5s ease-in-out infinite alternate;
+  }
+  
+  .car-body {
+    position: absolute;
+    bottom: 15px;
+  
+    width: 100%;
+    height: 48px;
+  
+    background: #e8e8e8;
+    border: 3px solid #252525;
+    border-radius: 15px 25px 10px 10px;
+  }
+  
+  .car-roof {
+    position: absolute;
+    bottom: 60px;
+    left: 55px;
+  
+    width: 115px;
+    height: 40px;
+  
+    background: #d5d5d5;
+    border: 3px solid #252525;
+    border-radius: 25px 30px 0 0;
+  }
+  
+  .car-window {
+    position: absolute;
+    top: 4px;
+    left: 65px;
+  
+    width: 45px;
+    height: 30px;
+  
+    background: #253b47;
+    border-radius: 5px;
+  }
+  
+  .car-light {
+    position: absolute;
+    top: 8px;
+    left: 15px;
+  
+    width: 35px;
+    height: 10px;
+  
+    background: #3159e8;
+    border-radius: 5px;
+  
+    box-shadow: 25px 0 #e33d3d;
+    animation: siren-flash 0.4s infinite alternate;
+  }
+  
+  .car-wheel {
+    position: absolute;
+    bottom: 0;
+  
+    width: 38px;
+    height: 38px;
+  
+    background: #171717;
+    border: 5px solid #555;
+    border-radius: 50%;
+  }
+  
+  .wheel-front {
+    right: 25px;
+  }
+  
+  .wheel-back {
+    left: 25px;
+  }
+  
+  @keyframes car-bounce {
+    from {
+      transform: translate(-50%, 0);
+    }
+  
+    to {
+      transform: translate(-50%, -6px);
+    }
+  }
+  
+  @keyframes siren-flash {
+    from {
+      opacity: 0.5;
+    }
+  
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .loading-screen *,
+    .loading-screen *::before,
+    .loading-screen *::after {
+      animation-duration: 2s !important;
+    }
+  }
+  

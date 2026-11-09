@@ -390,27 +390,36 @@
       }
     },
     {
-      "step": 13,
+      "id": 13,
       "background": "bg-2",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
-          "cardType": "regular",
           "cards": [
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 1,
+              "frontImage": "question",
+              "backText": "יש לוודא את זהות העצור מול הפרטים שנמסרו."
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 2,
+              "frontImage": "question",
+              "backText": "יש להקפיד על שמירת ביטחונו וביטחון הסביבה."
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 3,
+              "frontImage": "question",
+              "backText": "יש לפעול בהתאם להנחיות המפקד ולנהלים."
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 4,
+              "frontImage": "question",
+              "backText": "יש לוודא שכל הציוד הנדרש נמצא וזמין."
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 5,
+              "frontImage": "exclamation",
+              "backText": "חשוב! אין להתחיל בפעולה לפני שכל הבדיקות הנדרשות הושלמו."
             }
           ]
         }
@@ -419,13 +428,19 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך"
+          "text": "הפכו את הכרטיסיות כדי להכיר את הדגשים החשובים בתהליך.",
+          "position": {
+            "bottom": "5%",
+            "right": "5%"
+          },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },
     {
-      "step": 14,
-      "background": "bg-2",
+      "id": 14,
+      "background": "bg-1",
       "primaryComponent": {
         "type": "DepositsBtn",
         "props": {}
@@ -433,8 +448,11 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "השלב השני הוא לקיחת האחריות על פיקדונות העצורים מסגל המעצר"
+          "text": "השלב השני הוא לקיחת האחריות על פיקדונות העצורים מסגל המעצר",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          }
         }
       }
     },

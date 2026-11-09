@@ -7,7 +7,7 @@ import pekelim from '../../assets/Pekelim.png';
 import clipboardMini from '../../assets/ClipboardMini.png';
 
 const imageMap = {
-  'pekelim.png': pekelim,
+  'Pekelim.png': pekelim,
 };
 
 export default function ChecklistScreen({
@@ -38,9 +38,7 @@ export default function ChecklistScreen({
   // בדיקה שכל הפריטים סומנו
   const allChecked =
     items.length > 0 &&
-    items.every(
-      item => isCompleted || checkedItems[item.id]
-    );
+    items.every((item) => Boolean(checkedItems[item.id]));
 
   // לחיצה על פריט
   const handleItemClick = (itemId) => {
@@ -57,20 +55,26 @@ export default function ChecklistScreen({
     });
   };
 
-  // השלמת השלב
+  // איפוס מנגנון ההשלמה אם השלב עדיין לא הושלם
   useEffect(() => {
-    if (!allChecked || isCompleted || completionCalled.current) {
+    if (!allChecked && !isCompleted) {
+      completionCalled.current = false;
+    }
+  }, [allChecked, isCompleted]);
+
+  // הודעה ל-System מיד כשכל הפריטים סומנו
+  useEffect(() => {
+    if (
+      !allChecked ||
+      isCompleted ||
+      completionCalled.current
+    ) {
       return;
     }
 
-    const timeout = setTimeout(() => {
-      if (completionCalled.current) return;
+    completionCalled.current = true;
+    onComplete?.();
 
-      completionCalled.current = true;
-      onComplete?.();
-    }, 1200);
-
-    return () => clearTimeout(timeout);
   }, [allChecked, isCompleted, onComplete]);
 
   if (!items.length) return null;
@@ -117,7 +121,6 @@ export default function ChecklistScreen({
                 </div>
 
                 <div className="item-text-container">
-
                   <span className="item-text">
                     {item.text}
                   </span>
@@ -129,7 +132,6 @@ export default function ChecklistScreen({
                       className="item-image"
                     />
                   )}
-
                 </div>
               </div>
             );

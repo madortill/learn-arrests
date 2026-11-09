@@ -1,0 +1,53 @@
+
+.deposits-btn-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 20;
+  }
+  
+  .deposit-hand-btn {
+    position: absolute;
+    bottom: 10%;
+    right: -50%;
+  
+    background: none;
+    border: none;
+    cursor: pointer;
+  
+    pointer-events: auto;
+  
+    animation:
+      slideInFromRight 1s forwards ease-out,
+      glowYellow 2s infinite alternate ease-in-out 1s;
+  }
+  
+  .deposit-bag-img {
+    width: clamp(200px, 30vw, 400px);
+    height: auto;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+  }
+  
+  @keyframes slideInFromRight {
+    to {
+      right: 5%;
+    }
+  }
+  
+  @keyframes glowYellow {
+    from {
+      filter:
+        drop-shadow(0 10px 10px rgba(0,0,0,0.5))
+        drop-shadow(0 0 5px rgba(255,215,0,0));
+    }
+  
+    to {
+      filter:
+        drop-shadow(0 10px 10px rgba(0,0,0,0.5))
+        drop-shadow(0 0 20px rgba(255,215,0,0.8));
+    }
+  }
+  

@@ -1,6 +1,7 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import stages from '../../data/stages.json';
 
 import Tablet from '../Tablet/Tablet';
@@ -9,6 +10,7 @@ import EmptyState from '../EmptyState/EmptyState';
 import SpeechBubble from '../SpeechBubble/SpeechBubble';
 import FlipCards from '../FlipCards/FlipCards';
 import ChecklistScreen from '../ChecklistScreen/ChecklistScreen';
+import DepositsBtn from '../DepositsBtn/DepositsBtn';
 
 import ContinueBtn from '../ContinueBtn/ContinueBtn';
 
@@ -23,6 +25,7 @@ const componentMap = {
   SpeechBubble,
   FlipCards,
   ChecklistScreen,
+  DepositsBtn,
 };
 
 export default function System() {
@@ -32,22 +35,25 @@ export default function System() {
 
   const [currentStep, setCurrentStep] = useState(0);
 
-  // שלבים שהמשתמש השלים
   const [completedSteps, setCompletedSteps] = useState([]);
 
-  // השלב הגבוה ביותר שאליו המשתמש הגיע
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
 
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
 
-  // אות להפעלת ההערה הכללית בשלב המפה
   const [continueSignal, setContinueSignal] = useState(0);
 
-  // שמירת הסימונים של הצ'קליסט לפי מספר שלב
+  // שמירת התקדמות הצ'קליסטים
   const [checklistProgress, setChecklistProgress] = useState({});
 
-  // שמירת העובדה שהמשתמש התחיל אינטראקציה עם הצ'קליסט
   const [checklistStartedSteps, setChecklistStartedSteps] = useState([]);
+
+  // מצב מסך הפיקדונות
+  const [isDepositsScreenOpen, setIsDepositsScreenOpen] = useState(false);
+
+  // מסכי טעינה
+  const [loadingType, setLoadingType] = useState('initial');
+  const [pendingStep, setPendingStep] = useState(null);
 
   const stepData = pages[currentStep];
 
@@ -58,15 +64,12 @@ export default function System() {
 
   const isBookend = primaryData?.type === 'BookendScreen';
 
-  // האם השלב הנוכחי כבר הושלם?
   const isCompleted = completedSteps.includes(currentStep);
 
-  // זיהוי קומפוננטת ChecklistScreen
+  // זיהוי ChecklistScreen
   const isChecklistStep =
     primaryData?.type === 'ChecklistScreen';
 
-  // נתוני הצ'קליסט
-  // תומך בפריטים שמוגדרים בתוך props או ישירות בתוך נתוני השלב
   const checklistItems =
     primaryData?.props?.items ||
     stepData?.items ||
@@ -78,7 +81,7 @@ export default function System() {
   const checklistHasInteracted =
     checklistStartedSteps.includes(currentStep);
 
-  // זיהוי שלבי WhatsApp
+  // זיהוי WhatsApp
   const isWhatsAppStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -86,12 +89,11 @@ export default function System() {
       primaryData?.props?.tabletType === 'WhatsAppChat'
     );
 
-  // זיהוי שלב 8 - דיווח עצור
   const isPrisonerWhatsAppStep =
     isWhatsAppStep &&
     Number(primaryData?.props?.part) === 2;
 
-  // זיהוי שלב המפה
+  // זיהוי מסך מפה
   const isLocationMapStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -99,7 +101,7 @@ export default function System() {
       primaryData?.props?.tabletType === 'LocationMap'
     );
 
-  // זיהוי שלב החידון
+  // זיהוי חידון
   const isQuizStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -107,7 +109,7 @@ export default function System() {
       primaryData?.props?.tabletType === 'QuizScreen'
     );
 
-  // שמירת השלמת שלב
+  // השלמת שלב
   const markStepCompleted = useCallback((stepIndex) => {
     setCompletedSteps((prev) =>
       prev.includes(stepIndex)
@@ -116,7 +118,6 @@ export default function System() {
     );
   }, []);
 
-  // קומפוננטה מודיעה שהשלב הושלם
   const handleComplete = useCallback(() => {
     markStepCompleted(currentStep);
   }, [currentStep, markStepCompleted]);
@@ -129,7 +130,7 @@ export default function System() {
     }));
   }, [currentStep]);
 
-  // זיהוי האינטראקציה הראשונה עם הצ'קליסט
+  // שמירת התחלת אינטראקציה
   const handleChecklistInteractionStart = useCallback(() => {
     setChecklistStartedSteps((prev) =>
       prev.includes(currentStep)
@@ -149,13 +150,64 @@ export default function System() {
       return;
     }
 
+    const stageNumber = Number(
+      stepData?.step ??
+      stepData?.id ??
+      currentStep + 1
+    );
+
+    // מסך טעינה אחרי שלבים 12 ו-21
+    if (stageNumber === 12 || stageNumber === 21) {
+      setPendingStep(nextStep);
+      setLoadingType('transition');
+      return;
+    }
+
     setMaxUnlockedStep((prev) =>
       Math.max(prev, nextStep)
     );
 
     setCurrentStep(nextStep);
     setContinueSignal(0);
-  }, [currentStep, pages.length, markStepCompleted]);
+
+  }, [
+    currentStep,
+    pages.length,
+    stepData,
+    markStepCompleted,
+  ]);
+
+  // טעינה ראשונית
+  useEffect(() => {
+    if (loadingType !== 'initial') return;
+
+    const timer = setTimeout(() => {
+      setLoadingType(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [loadingType]);
+
+  // טעינת מעבר
+  useEffect(() => {
+    if (loadingType !== 'transition' || pendingStep === null) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setMaxUnlockedStep((prev) =>
+        Math.max(prev, pendingStep)
+      );
+
+      setCurrentStep(pendingStep);
+      setContinueSignal(0);
+
+      setPendingStep(null);
+      setLoadingType(null);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [loadingType, pendingStep]);
 
   // חזרה לשלב הקודם
   const handlePreviousStep = useCallback(() => {
@@ -165,7 +217,7 @@ export default function System() {
     }
   }, [currentStep]);
 
-  // בחירת שלב ממפת השלבים
+  // בחירת שלב מהמפה
   const handleSelectStep = useCallback((stepIndex) => {
     if (stepIndex <= maxUnlockedStep) {
       setCurrentStep(stepIndex);
@@ -180,15 +232,20 @@ export default function System() {
     setCompletedSteps([]);
     setMaxUnlockedStep(0);
     setContinueSignal(0);
+
     setChecklistProgress({});
     setChecklistStartedSteps([]);
+
+    setIsDepositsScreenOpen(false);
+
     setIsLevelsOpen(false);
+
+    setPendingStep(null);
+    setLoadingType('initial');
   }, []);
 
-  // לחיצה על כפתור ההמשך הגלובלי
+  // כפתור המשך גלובלי
   const handleGlobalContinue = () => {
-
-    // שלב מיקום עם הערה כללית
     if (
       isLocationMapStep &&
       primaryData?.props?.generalImportantPoint
@@ -197,9 +254,13 @@ export default function System() {
       return;
     }
 
-    // בכל שאר השלבים עוברים לשלב הבא
     handleNextStep();
   };
+
+  // מסך טעינה
+  if (loadingType) {
+    return <LoadingScreen type={loadingType} />;
+  }
 
   // מסך סיום
   if (!stepData) {
@@ -213,7 +274,7 @@ export default function System() {
     );
   }
 
-  // הצגת כפתור המשך גלובלי רק בשלבים המתאימים
+  // הצגת כפתור המשך
   const showGlobalContinue =
     isCompleted &&
     (!isWhatsAppStep || isPrisonerWhatsAppStep) &&
@@ -255,6 +316,7 @@ export default function System() {
               ? currentStep
               : undefined
           }
+
           {...(primaryData.props || {})}
 
           currentStep={currentStep}
@@ -266,15 +328,17 @@ export default function System() {
 
           continueSignal={continueSignal}
 
-          
+          {...(primaryData?.type === 'DepositsBtn'
+            ? {
+                onScreenOpenChange: setIsDepositsScreenOpen,
+              }
+            : {})}
+
           {...(isChecklistStep
             ? {
                 items: checklistItems,
-                stepData: { items: checklistItems },
-
                 checkedItems: checklistCheckedItems,
                 onCheckedItemsChange: handleChecklistProgress,
-
                 hasInteracted: checklistHasInteracted,
                 onInteractionStart: handleChecklistInteractionStart,
               }
@@ -283,27 +347,19 @@ export default function System() {
       ) : (
         <div className="system-missing-component">
           <h2>הקומפוננטה עדיין לא מחוברת</h2>
-
-          <p>
-            {primaryData?.type || 'לא הוגדרה קומפוננטה'}
-          </p>
-
+          <p>{primaryData?.type || 'לא הוגדרה קומפוננטה'}</p>
           <p>שלב מספר: {currentStep}</p>
         </div>
       )}
 
-      {/* קומפוננטה משנית - בועת דיבור */}
-      {secondaryData?.type === 'SpeechBubble' && (
-        !(
-          isChecklistStep &&
-          checklistHasInteracted
-        ) && (
+      {/* בועת דיבור – מוסתרת בזמן שמסך הפיקדונות פתוח */}
+      {secondaryData?.type === 'SpeechBubble' &&
+        !isDepositsScreenOpen && (
           <SpeechBubble
             {...(secondaryData.props || {})}
             isCompleted={isCompleted}
           />
-        )
-      )}
+        )}
 
       {/* כפתור המשך גלובלי */}
       {showGlobalContinue && (

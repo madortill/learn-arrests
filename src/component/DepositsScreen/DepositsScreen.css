@@ -1,0 +1,385 @@
+
+.deposits-screen-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: #e0e0e0;
+    z-index: 1000;
+  
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+  }
+  
+  /* =================================
+     צד שמאל – סרט הצילום
+  ================================= */
+  
+  .film-area {
+    position: relative;
+    width: 40%;
+    max-width: 420px;
+    min-width: 260px;
+    height: 100%;
+    overflow: hidden;
+  
+    display: flex;
+    justify-content: center;
+  
+    background: #f5f5f5;
+    border-right: 2px solid #ccc;
+  
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .film-area.is-dragging {
+    cursor: grabbing;
+  }
+  
+  /* המיקום של כל סרט הצילום */
+  .film-track-position {
+    position: absolute;
+    top: 0;
+    left: 0;
+  
+    width: 100%;
+  
+    display: flex;
+    justify-content: center;
+  
+    will-change: transform;
+  }
+  
+  /* כל הסרט כולל ראש הגליל */
+  .film-assembly {
+    width: 78%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  
+    animation: filmIntro 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  
+  /* אנימציית כניסה – כל הסרט עולה יחד */
+  @keyframes filmIntro {
+    from {
+      transform: translateY(14vh);
+    }
+  
+    to {
+      transform: translateY(0);
+    }
+  }
+  
+  /* ראש הגליל */
+  .film-roll-top {
+    width: 125%;
+    position: relative;
+    z-index: 5;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  
+  .film-roll-top img {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+  }
+  
+  /* =================================
+     רצועת הפילם
+  ================================= */
+  
+  .film-frames {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  
+    gap: 2vh;
+    padding: 1vh 12px 3vh;
+  
+    background-color: #111;
+  
+    background-image:
+      radial-gradient(circle at 8px 15px, transparent 5px, #111 6px),
+      radial-gradient(
+        circle at calc(100% - 8px) 15px,
+        transparent 5px,
+        #111 6px
+      );
+  
+    background-size: 100% 30px;
+    background-position: left top;
+    background-repeat: repeat-y;
+  }
+  
+  .film-frame-wrapper {
+    position: relative;
+    width: 100%;
+    height: 20vh;
+    min-height: 100px;
+    flex-shrink: 0;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    padding: 5px 12px;
+    box-sizing: border-box;
+  }
+  
+  .film-frame-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  
+    object-fit: contain;
+  
+    transition:
+      filter 0.45s ease,
+      transform 0.45s ease,
+      opacity 0.45s ease;
+  
+    pointer-events: none;
+  }
+  
+  .film-frame-img.blurred {
+    filter: blur(5px) grayscale(100%);
+    opacity: 0.45;
+  }
+  
+  .film-frame-img.clear {
+    filter: blur(0) grayscale(0%);
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  
+  /* הדגשת הפריים הנוכחי */
+  .active-frame {
+    z-index: 2;
+  }
+  
+  /* =================================
+     הנחיית גרירה
+  ================================= */
+  
+  .pull-hint {
+    position: absolute;
+    bottom: 7%;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    z-index: 10;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  
+    width: 90%;
+    text-align: center;
+  
+    color: #d4a900;
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(16px, 1.8vw, 24px);
+  
+    pointer-events: none;
+  }
+  
+  .pull-arrow {
+    font-size: 32px;
+    animation: pullArrow 0.8s infinite alternate;
+  }
+  
+  @keyframes pullArrow {
+    from {
+      transform: translateY(5px);
+    }
+  
+    to {
+      transform: translateY(-8px);
+    }
+  }
+  
+  /* =================================
+     צד ימין – תיבת הטקסט
+  ================================= */
+  
+  .text-area {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    padding: 3%;
+    box-sizing: border-box;
+  
+    direction: rtl;
+  }
+  
+  .text-frame-container {
+    position: relative;
+  
+    width: min(85%, 650px);
+    aspect-ratio: 1 / 1;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .text-frame-bg {
+    position: absolute;
+    inset: 0;
+  
+    width: 100%;
+    height: 100%;
+  
+    object-fit: contain;
+    pointer-events: none;
+  }
+  
+  .text-content {
+    position: relative;
+    z-index: 2;
+  
+    width: 70%;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  
+    text-align: center;
+  }
+  
+  .deposits-text {
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(22px, 3vw, 40px);
+    color: #222;
+  
+    line-height: 1.4;
+    margin: 0;
+  
+    animation: textAppear 0.4s ease both;
+  }
+  
+  .step-indicator {
+    margin-top: 20px;
+  
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(14px, 1.5vw, 20px);
+  
+    color: #777;
+  }
+  
+  @keyframes textAppear {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* =================================
+     התאמה למסכים קטנים
+  ================================= */
+  
+  @media (max-width: 700px) {
+    .film-area {
+      width: 38%;
+      min-width: 0;
+    }
+  
+    .film-assembly {
+      width: 90%;
+    }
+  
+    .film-frame-wrapper {
+      height: 18vh;
+    }
+  
+    .text-frame-container {
+      width: 95%;
+    }
+  
+    .text-content {
+      width: 75%;
+    }
+  
+    .deposits-text {
+      font-size: clamp(17px, 3vw, 25px);
+    }
+  
+    .pull-hint {
+      font-size: 14px;
+    }
+  }
+  
+
+  .film-area {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  .film-track-position,
+  .film-assembly,
+  .film-roll-top,
+  .film-roll-top img,
+  .film-frames,
+  .film-frame-wrapper,
+  .film-frame-img {
+    pointer-events: none;
+  }
+
+  
+/* אזור הסרט כולו הוא אזור אינטראקטיבי */
+.film-area {
+    pointer-events: auto;
+    touch-action: none;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  
+  /* בזמן משיכה */
+  .film-area.is-dragging {
+    cursor: grabbing;
+  }
+  
+  /* מניעת גרירה רגילה של תמונות */
+  .film-area img {
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+  
+  /* הסרט עצמו */
+  .film-track-position {
+    pointer-events: none;
+    will-change: transform;
+  }
+  
+  /* אין חסימה של אירועי העכבר */
+  .film-assembly,
+  .film-frames,
+  .film-frame-wrapper {
+    pointer-events: none;
+  }
+  
