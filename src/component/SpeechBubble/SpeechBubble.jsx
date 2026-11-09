@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import './SpeechBubble.css';
 
@@ -9,24 +9,38 @@ export default function SpeechBubble({
   tailPosition = 'left-top',
   position = { top: '20%', right: '15%' },
   speed = 30,
+  isCompleted = false,
   onComplete,
 }) {
-  const [displayedText, setDisplayedText] = useState('');
+  const [displayedText, setDisplayedText] = useState(
+    isCompleted ? text : ''
+  );
+
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     let currentIndex = 0;
     let interval;
 
+    // אם השלב כבר הושלם – מציגים את כל הטקסט מיד
+    if (isCompleted) {
+      setDisplayedText(text);
+      return;
+    }
+
     setDisplayedText('');
 
     const finishTyping = () => {
-      if (onComplete) {
-        onComplete();
-      }
+      setDisplayedText(text);
+      onCompleteRef.current?.();
     };
 
+    // ללא אנימציה או ללא טקסט
     if (!typeAnimation || !text) {
-      setDisplayedText(text);
       finishTyping();
       return;
     }
@@ -47,7 +61,7 @@ export default function SpeechBubble({
         clearInterval(interval);
       }
     };
-  }, [text, typeAnimation, speed, onComplete]);
+  }, [text, typeAnimation, speed, isCompleted]);
 
   return (
     <div
@@ -76,7 +90,7 @@ export default function SpeechBubble({
         <div className="speech-content">
           <p>{displayedText}</p>
 
-          {typeAnimation && displayedText.length < text.length && (
+          {typeAnimation && !isCompleted && displayedText.length < text.length && (
             <span className="typing-cursor">|</span>
           )}
         </div>

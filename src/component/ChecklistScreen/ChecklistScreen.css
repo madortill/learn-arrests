@@ -1,0 +1,188 @@
+
+.checklist-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    max-width: 100%;
+  }
+  
+  .clipboard-wrapper {
+    position: relative;
+    width: 95%;
+    max-width: 450px;
+    aspect-ratio: 3 / 4;
+    min-height: 500px;
+    max-height: 85vh;
+  
+    background-image: url('src/assets/Clipboard.png');
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  
+    padding: 12% 8% 8% 10%;
+  
+    transform: translateY(20vh);
+    transition: transform 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
+  
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .clipboard-wrapper.moved-up {
+    transform: translateY(0);
+  }
+  
+  /* שלב 11 - לוח קטן וקבוע */
+  .clipboard-wrapper.clipboard-mini {
+    width: 75%;
+    max-width: 360px;
+    min-height: 0;
+    max-height: 65vh;
+    aspect-ratio: 3 / 4;
+  
+    padding: 13% 10% 10% 10%;
+  
+    transform: none;
+    transition: none;
+  
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* רשימת הפריטים */
+  .checklist-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5vh;
+    overflow-y: auto;
+    padding-left: 10px;
+    height: 100%;
+    scrollbar-width: thin;
+  }
+  
+  /* פריט */
+  .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  /* תיבת סימון */
+  .checkbox-box {
+    width: 32px;
+    height: 32px;
+    background-image: url('src/assets/Checkbox.png');
+    background-size: cover;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  
+  .checkmark-img {
+    position: absolute;
+    top: -8px;
+    right: -5px;
+    width: 40px;
+    height: auto;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .checklist-item.checked .checkmark-img {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  /* טקסט */
+  .item-text-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .item-text {
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(22px, 4.5vw, 35px);
+    color: #222;
+    position: relative;
+    display: inline-block;
+    line-height: 1.1;
+  
+    text-shadow:
+      -1px -1px 0 rgba(0,0,0,0.4),
+       1px -1px 0 rgba(0,0,0,0.4),
+      -1px  1px 0 rgba(0,0,0,0.4),
+       1px  1px 0 rgba(0,0,0,0.4);
+  }
+  
+  /* קו מחיקה */
+  .item-text::after {
+    content: '';
+    position: absolute;
+    top: 55%;
+    right: 0;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.8);
+    width: 0;
+    border-radius: 2px;
+  }
+  
+  .checklist-item.checked .item-text::after {
+    animation: strike-through 0.4s ease-out forwards;
+  }
+  
+  @keyframes strike-through {
+    0% {
+      width: 0;
+    }
+  
+    100% {
+      width: 100%;
+    }
+  }
+  
+  .item-image {
+    max-height: 45px;
+    object-fit: contain;
+    margin-right: auto;
+  }
+  
+  /* התאמה למצב Mini */
+  .mini-checklist .checklist-items {
+    gap: 3vh;
+  }
+  
+  .mini-checklist .item-text {
+    font-size: clamp(19px, 3vw, 27px);
+  }
+  
+  .mini-checklist .checkbox-box {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .mini-checklist .checkmark-img {
+    width: 35px;
+  }
+  
+  /* מסכים קטנים */
+  @media (max-height: 650px) {
+    .clipboard-wrapper {
+      min-height: 0;
+    }
+  
+    .clipboard-wrapper.clipboard-mini {
+      max-height: 65vh;
+    }
+  }
+  

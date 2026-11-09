@@ -41,7 +41,8 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "type": "WhatsAppChat"
+          "type": "WhatsAppChat",
+          "part": 1
         }
       }
     },
@@ -112,30 +113,25 @@
       }
     },
     {
-      "step": 5,
-      "background": "bg-1",
+      "id": 5,
+      "background": "bg-blur",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
-          "cardType": "regular",
           "cards": [
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur. Faucibus mi pharetra hac congue lectus vel."
-            }
+            { "id": 1, "frontImage": "question", "backText": "טקסט לקלף 1..." },
+            { "id": 2, "frontImage": "question", "backText": "טקסט לקלף 2..." },
+            { "id": 3, "frontImage": "question", "backText": "טקסט לקלף 3..." }
           ]
         }
       },
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח"
+          "text": "לפני שיוצאים, חשוב שנזכור את הדגשים המבצעיים. הפכו את הכרטיסיות.",
+          "position": { "bottom": "5%", "right": "5%" },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },
@@ -148,10 +144,9 @@
           "cardType": "compare",
           "cards": [
             {
-              "text": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean..."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur. Pellentesque felis amet."
+              "id": 1,
+              "frontText": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean...",
+              "backText": "Lorem ipsum dolor sit amet consectetur. Pellentesque felis amet."
             }
           ]
         }
@@ -160,7 +155,7 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "חשוב שגם נכיר מי הם צוותי צח”ם"
+          "text": "חשוב שגם נכיר מי הם צוותי צח״ם"
         }
       }
     },
@@ -170,37 +165,63 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "LocationMap",
+          "type": "LocationMap",
           "locations": [
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 1,
+              "mainName": "מיקום 1",
+              "subName": "תיאור מיקום 1",
+              "x": 58,
+              "y": 26
             },
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 2,
+              "mainName": "מיקום 2",
+              "subName": "תיאור מיקום 2",
+              "x": 48,
+              "y": 78
             },
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 3,
+              "mainName": "מיקום 3",
+              "subName": "תיאור מיקום 3",
+              "x": 44,
+              "y": 48
             },
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 4,
+              "mainName": "מיקום 4",
+              "subName": "תיאור מיקום 4",
+              "x": 51,
+              "y": 44
             },
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 5,
+              "mainName": "מיקום 5",
+              "subName": "תיאור מיקום 5",
+              "x": 46,
+              "y": 41
             },
             {
-              "name": "Lorem",
-              "x": 0,
-              "y": 0
+              "id": 6,
+              "mainName": "מיקום 6",
+              "subName": "תיאור מיקום 6",
+              "x": 51,
+              "y": 30
+            },
+            {
+              "id": 7,
+              "mainName": "מיקום 7",
+              "subName": "תיאור מיקום 7",
+              "x": 47,
+              "y": 53
+            },
+            {
+              "id": 8,
+              "mainName": "מיקום 8",
+              "subName": "תיאור מיקום 8",
+              "x": 60,
+              "y": 60
             }
           ]
         }
@@ -209,7 +230,7 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים של מצ”ח מתקיימים"
+          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים של מצ״ח מתקיימים"
         }
       }
     },
@@ -219,16 +240,8 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "WhatsAppChat",
-          "part": 2,
-          "message": "*דיווח עצורה:*\n*שם מלא:* שי כהן\n*מ.א:* 9476041\n*ת.ז:* 218641473\n*מגדר- זכר/נקבה:* זכר\n*סוג עצור:* על”מ\n*התייצבות/נעצר:* נעצרה במחסום מגב\n*תאריך תחילת עבירה:* 13.01.26\n*מקום המעצר/התייצבות:* ---\n*בסיס מ״צ המטפל על בעצור* : מצ”ח חוף\n*ייצוג סנגורי- צבאי/פרטי:* -\n*תאריך מעצר* 05.07.26\n*שעת מעצר:* 18:20\n*שעת קבלה למעצר:* ייעודכן\n*רמס:* 4\n*הערות*:"
-        }
-      },
-      "secondaryComponent": {
-        "type": "SpeechBubble",
-        "props": {
-          "typeAnimation": false,
-          "text": "זו העצור שאנחנו נלווה היום."
+          "type": "WhatsAppChat",
+          "part": 2
         }
       }
     },
@@ -238,47 +251,80 @@
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
+                "מעצר ענתות",
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
+              ],
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
+            },
+            {
+              "question": "עד איזו שעה מתקבלים דיווחים בפעימת הבוקר של 06:30?",
+              "options": [
+                "עד השעה 05:00",
+                "עד השעה 05:30",
+                "עד השעה 06:00",
+                "עד השעה 06:30"
+              ],
+              "correctAnswer": 2,
+              "explanation": "בפעימה של 06:30 מקבלים דיווחים עד השעה 06:00 בדיוק."
+            },
+            {
+              "question": "כמה פעימות עבודה קיימות בפלוגת הליוויים?",
+              "options": [
+                "שתי פעימות",
+                "שלוש פעימות",
+                "ארבע פעימות",
+                "חמש פעימות"
+              ],
+              "correctAnswer": 2,
+              "explanation": "פלוגת הליוויים עובדת לפי ארבע פעימות קבועות ביום."
             }
           ]
         }
       }
     },
     {
-      "step": 10,
-      "background": "bg-1",
+      "id": 10,
+      "background": "bg-10",
       "primaryComponent": {
-        "type": "Checklist",
+        "type": "ChecklistScreen",
         "props": {
           "items": [
             {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item1",
+              "text": "חוגר, פנקס שבי ודיסקית",
               "image": null
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": "path/to/image1.png"
+              "id": "item2",
+              "text": "פקל\"ים (אזיקים, גז פלפל)",
+              "image": "Pekelim.png"
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": "path/to/image2.png"
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item3",
+              "text": "נשק אישי ומחסניות בהכנס",
               "image": null
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item4",
+              "text": "קסדה ואפוד מגן תקניים",
+              "image": "Helmet.png"
+            },
+            {
+              "id": "item5",
+              "text": "תיק ליווי (מסמכים רלוונטיים)",
               "image": null
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item6",
+              "text": "מים (מינימום 3 ליטר) ומזון לדרך",
               "image": null
             }
           ]
@@ -287,28 +333,31 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי"
+          "text": "לפני שיוצאים לליווי מעצרים, סמנו שכל הציוד הנדרש עליכם. לא זזים בלי הכל!",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          }
         }
       }
     },
+    
     {
-      "step": 11,
-      "background": "bg-1",
+      "id": 11,
+      "background": "bg-11",
       "primaryComponent": {
-        "type": "Checklist",
+        "type": "ChecklistScreen",
         "props": {
+          "variant": "mini",
           "items": [
             {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item1",
+              "text": "בדקתי שכל הציוד האישי תקין, שלם ונגיש",
               "image": null
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": null
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item2",
+              "text": "וידאתי שקיבלתי את פרטי המשימה והנחיות המפקד",
               "image": null
             }
           ]
@@ -317,8 +366,11 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח"
+          "text": "לפני היציאה, ודאו שכל הבדיקות הושלמו ושאתם מוכנים למשימה!",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          }
         }
       }
     },

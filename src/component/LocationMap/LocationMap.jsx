@@ -10,13 +10,17 @@ export default function LocationMap({
   locations = [],
   generalImportantPoint,
   onComplete,
+  onNext,
+  isCompleted = false,
+  continueSignal = 0,
 }) {
   const [visitedIds, setVisitedIds] = useState([]);
   const [hasClickedAny, setHasClickedAny] = useState(false);
+
   const [activePopupText, setActivePopupText] = useState(null);
   const [popupTitle, setPopupTitle] = useState('דגשים חשובים');
+
   const [isGeneralPopupOpen, setIsGeneralPopupOpen] = useState(false);
-  const [hasShownGeneralPopup, setHasShownGeneralPopup] = useState(false);
 
   const initialArrowLoc =
     locations.find((loc) => !loc.importantPoint) || locations[0];
@@ -25,17 +29,47 @@ export default function LocationMap({
 
   const [pulsingId, setPulsingId] = useState(initialArrowId);
 
+  // בדיקה האם כל הנקודות הושלמו
   const isAllVisited =
     locations.length > 0 &&
-    visitedIds.length === locations.length;
+    locations.every((loc) => visitedIds.includes(loc.id));
 
-  const triggerGeneralPopup = () => {
-    setPopupTitle('דגשים חשובים');
-    setActivePopupText(generalImportantPoint);
-    setIsGeneralPopupOpen(true);
-    setHasShownGeneralPopup(true);
-  };
+  // שחזור הנקודות כאשר חוזרים לשלב שהושלם
+  useEffect(() => {
+    if (isCompleted && locations.length > 0) {
+      setVisitedIds(locations.map((loc) => loc.id));
+      setHasClickedAny(true);
+      setPulsingId(null);
+    }
+  }, [isCompleted, locations]);
 
+  // פתיחת ההערה הכללית רק בעקבות לחיצה על ההמשך הגלובלי
+  useEffect(() => {
+    if (
+      continueSignal > 0 &&
+      isAllVisited &&
+      generalImportantPoint &&
+      !isGeneralPopupOpen
+    ) {
+      setPopupTitle('דגשים חשובים');
+      setActivePopupText(generalImportantPoint);
+      setIsGeneralPopupOpen(true);
+    }
+  }, [
+    continueSignal,
+    isAllVisited,
+    generalImportantPoint,
+    isGeneralPopupOpen,
+  ]);
+
+  // עדכון System לאחר השלמת כל הנקודות
+  useEffect(() => {
+    if (isAllVisited && onComplete) {
+      onComplete();
+    }
+  }, [isAllVisited, onComplete]);
+
+  // פתיחת הערה אישית או סימון נקודה
   const handleLocationClick = (loc) => {
     const isNew = !visitedIds.includes(loc.id);
 
@@ -47,10 +81,9 @@ export default function LocationMap({
       setVisitedIds(newVisited);
     }
 
-    if (!hasClickedAny) {
-      setHasClickedAny(true);
-    }
+    setHasClickedAny(true);
 
+    // מציאת הנקודה הבאה שעדיין לא ביקרו בה
     const remaining = locations.filter(
       (location) => !newVisited.includes(location.id)
     );
@@ -61,51 +94,26 @@ export default function LocationMap({
       setPulsingId(null);
     }
 
+    // אם יש דגש אישי, פותחים אותו
     if (loc.importantPoint) {
       setPopupTitle('דגשים חשובים');
       setActivePopupText(loc.importantPoint);
       setIsGeneralPopupOpen(false);
-    } else if (
-      newVisited.length === locations.length &&
-      generalImportantPoint &&
-      !hasShownGeneralPopup
-    ) {
-      triggerGeneralPopup();
     }
   };
 
+  // סגירת פופאפ
   const handleClosePopup = () => {
-    setActivePopupText(null);
+    const wasGeneralPopup = isGeneralPopupOpen;
 
-    if (isGeneralPopupOpen) {
-      setIsGeneralPopupOpen(false);
-    } else if (
-      isAllVisited &&
-      generalImportantPoint &&
-      !hasShownGeneralPopup
-    ) {
-      setTimeout(() => {
-        triggerGeneralPopup();
-      }, 300);
+    setActivePopupText(null);
+    setIsGeneralPopupOpen(false);
+
+    // רק אישור ההערה הכללית מעביר לשלב הבא
+    if (wasGeneralPopup) {
+      onNext?.();
     }
   };
-
-  useEffect(() => {
-    const isFullyComplete =
-      isAllVisited &&
-      !activePopupText &&
-      (!generalImportantPoint || hasShownGeneralPopup);
-
-    if (isFullyComplete && onComplete) {
-      onComplete();
-    }
-  }, [
-    isAllVisited,
-    activePopupText,
-    generalImportantPoint,
-    hasShownGeneralPopup,
-    onComplete,
-  ]);
 
   return (
     <div className="location-map-container">
