@@ -4,6 +4,7 @@ import './FlipCards.css';
 
 import questionMarkIcon from '../../assets/question-mark.png';
 import exclamationMarkIcon from '../../assets/exclamation-mark.png';
+import level5CardImage from '../../assets/level5_card_image.png';
 
 // זיכרון של מצב הקלפים לפי שלב
 const flipCardsCache = {};
@@ -106,7 +107,8 @@ const FlipCards = ({
   const resolveImage = (imageString) => {
     if (imageString === 'question') return questionMarkIcon;
     if (imageString === 'exclamation') return exclamationMarkIcon;
-
+    if (imageString === 'level5_card_image.png') return level5CardImage;
+  
     return imageString;
   };
 

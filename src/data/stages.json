@@ -458,52 +458,48 @@
     },
     {
       "step": 15,
-      "background": "bg-2",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
+                "מעצר ענתות",
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
+              ],
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
             }
           ]
         }
       }
     },
     {
-      "step": 16,
-      "background": "bg-3",
+      "id": 16,
+      "background": "bg-10",
       "primaryComponent": {
-        "type": "Checklist",
+        "type": "ChecklistScreen",
         "props": {
           "items": [
             {
-              "text": "Lorem ipsum dolor sit amet",
+              "id": "item1",
+              "text": "חוגר, פנקס שבי ודיסקית",
               "image": null
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": "path/to/image3.png"
+              "id": "item2",
+              "text": "פקל\"ים (אזיקים, גז פלפל)",
+              "image": "pekelim.png"
             },
             {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": "path/to/image4.png"
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": null
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": null
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet",
-              "image": null
+              "id": "item3",
+              "text": "נשק אישי ומחסניות בהכנס",
+              "image": "pekelim.png"
             }
           ]
         }
@@ -511,24 +507,25 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "השלב הרביעי בתהליך הוא לבצע חיפושים יסודיים"
+          "text": "לפני שיוצאים לליווי מעצרים, סמנו שכל הציוד הנדרש עליכם. לא זזים בלי הכל!",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          }
         }
       }
     },
     {
       "step": 17,
-      "background": "bg-4",
+      "background": "bg-2",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
-          "cardType": "compare",
           "cards": [
             {
-              "text": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean..."
-            },
-            {
-              "image": "path/to/handcuffs.png"
+              "id": 1,
+              "frontImage": "level5_card_image.png",
+              "backText": "ההסבר של הקלף הראשון"
             }
           ]
         }
@@ -537,23 +534,45 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "השלב ההחמישי הוא האזיקה"
+          "text": "הפכו את הכרטיסיות כדי להכיר את הדגשים החשובים.",
+          "position": {
+            "bottom": "5%",
+            "right": "5%"
+          },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },
     {
-      "step": 18,
-      "background": "bg-2",
+      "step": 9,
+      "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
+                "מעצר ענתות",
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
+              ],
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
+            },
+            {
+              "question": "עד איזו שעה מתקבלים דיווחים בפעימת הבוקר של 06:30?",
+              "options": [
+                "עד השעה 05:00",
+                "עד השעה 05:30",
+                "עד השעה 06:00",
+                "עד השעה 06:30"
+              ],
+              "correctAnswer": 2,
+              "explanation": "בפעימה של 06:30 מקבלים דיווחים עד השעה 06:00 בדיוק."
             }
           ]
         }
