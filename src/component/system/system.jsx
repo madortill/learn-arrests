@@ -11,6 +11,7 @@ import SpeechBubble from '../SpeechBubble/SpeechBubble';
 import FlipCards from '../FlipCards/FlipCards';
 import ChecklistScreen from '../ChecklistScreen/ChecklistScreen';
 import DepositsBtn from '../DepositsBtn/DepositsBtn';
+import ParkingButton from '../ParkingButton/ParkingButton';
 
 import ContinueBtn from '../ContinueBtn/ContinueBtn';
 
@@ -26,6 +27,7 @@ const componentMap = {
   FlipCards,
   ChecklistScreen,
   DepositsBtn,
+  ParkingButton,
 };
 
 export default function System() {
@@ -47,6 +49,9 @@ export default function System() {
   const [checklistProgress, setChecklistProgress] = useState({});
 
   const [checklistStartedSteps, setChecklistStartedSteps] = useState([]);
+
+  // שמירת התקדמות הרכבים בכל שלב
+  const [parkingProgress, setParkingProgress] = useState({});
 
   // מצב מסך הפיקדונות
   const [isDepositsScreenOpen, setIsDepositsScreenOpen] = useState(false);
@@ -109,6 +114,14 @@ export default function System() {
       primaryData?.props?.tabletType === 'QuizScreen'
     );
 
+  // זיהוי שלב מגרש החניה
+  const isParkingStep =
+    primaryData?.type === 'ParkingButton';
+
+  // התקדמות הרכבים בשלב הנוכחי
+  const currentParkingProgress =
+    parkingProgress[currentStep] || {};
+
   // השלמת שלב
   const markStepCompleted = useCallback((stepIndex) => {
     setCompletedSteps((prev) =>
@@ -137,6 +150,14 @@ export default function System() {
         ? prev
         : [...prev, currentStep]
     );
+  }, [currentStep]);
+
+  // שמירת התקדמות הרכבים
+  const handleParkingProgress = useCallback((newState) => {
+    setParkingProgress((prev) => ({
+      ...prev,
+      [currentStep]: newState,
+    }));
   }, [currentStep]);
 
   // מעבר לשלב הבא
@@ -235,6 +256,8 @@ export default function System() {
 
     setChecklistProgress({});
     setChecklistStartedSteps([]);
+
+    setParkingProgress({});
 
     setIsDepositsScreenOpen(false);
 
@@ -341,6 +364,13 @@ export default function System() {
                 onCheckedItemsChange: handleChecklistProgress,
                 hasInteracted: checklistHasInteracted,
                 onInteractionStart: handleChecklistInteractionStart,
+              }
+            : {})}
+
+          {...(isParkingStep
+            ? {
+                completedVehicles: currentParkingProgress,
+                onCompletedVehiclesChange: handleParkingProgress,
               }
             : {})}
         />

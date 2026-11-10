@@ -545,7 +545,7 @@
       }
     },
     {
-      "step": 9,
+      "step": 18,
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -578,121 +578,68 @@
         }
       }
     },
+    
     {
       "step": 19,
-      "background": "bg-5",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "ParkingButton",
+        "props": {}
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
         "props": {
-          "parkingData": {
-            "intro": [
-              {
-                "title": "הרכב יציאה לליוי",
-                "type": "Checklist",
-                "content": [
-                  "Lorem ipsum...",
-                  "Lorem ipsum...",
-                  "Lorem ipsum..."
-                ]
-              },
-              {
-                "title": "זו היא טבלת תקן הליווי ברכב הליווי",
-                "type": "image",
-                "content": "path/to/table.png"
-              },
-              {
-                "title": "רכב ליווי לא מדוגם",
-                "type": "text",
-                "content": "Lorem ipsum dolor sit amet consectetur..."
-              }
-            ],
-            "vehicles": [
-              {
-                "title": "מיניבוס אזרחי",
-                "details": [
-                  "Lorem ipsum...",
-                  "Lorem ipsum...",
-                  "Lorem ipsum..."
-                ]
-              },
-              {
-                "title": "מיניבוס אזרחי",
-                "details": [
-                  "Lorem ipsum...",
-                  "Lorem ipsum...",
-                  "Lorem ipsum..."
-                ]
-              },
-              {
-                "title": "מיניבוס אזרחי",
-                "details": [
-                  "Lorem ipsum...",
-                  "Lorem ipsum...",
-                  "Lorem ipsum..."
-                ]
-              },
-              {
-                "title": "מיניבוס אזרחי",
-                "details": [
-                  "Lorem ipsum...",
-                  "Lorem ipsum...",
-                  "Lorem ipsum..."
-                ]
-              }
-            ]
-          }
+          "text": "הגעתם למגרש החניה. היכנסו למגרש ולמדו על ארבעת רכבי הליווי.",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          },
+          "tailPosition": "right-bottom"
         }
       }
     },
     {
       "step": 20,
-      "background": "bg-6",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
+                "מעצר ענתות",
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
+              ],
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
             }
           ]
         }
       }
     },
     {
-      "step": 21,
-      "background": "bg-6",
+      "id": 5,
+      "background": "bg-blur",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
-          "cardType": "regular",
           "cards": [
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
-            },
-            {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
-            }
+            { "id": 1, "frontImage": "question", "backText": "טקסט לקלף 1..." },
+            { "id": 2, "frontImage": "question", "backText": "טקסט לקלף 3..." }
           ]
         }
       },
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": false,
-          "text": "הגענו לשלב האחרון של תהליך איסוף במעצר"
+          "text": "לפני שיוצאים, חשוב שנזכור את הדגשים המבצעיים. הפכו את הכרטיסיות.",
+          "position": { "bottom": "5%", "right": "5%" },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },

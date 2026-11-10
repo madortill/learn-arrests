@@ -13,7 +13,7 @@ const imageMap = {
 export default function ChecklistScreen({
   items = [],
   variant = 'default',
-  checkedItems = {},
+  checkedItems: externalCheckedItems,
   onCheckedItemsChange,
   onComplete,
   onInteractionStart,
@@ -22,25 +22,26 @@ export default function ChecklistScreen({
 }) {
   const isMini = variant === 'mini';
 
+  const [internalCheckedItems, setInternalCheckedItems] = useState({});
   const [hasStarted, setHasStarted] = useState(
     hasInteracted || isCompleted
   );
 
   const completionCalled = useRef(false);
 
-  // שחזור מצב הלוח
+  // מאפשר שימוש גם עם State חיצוני וגם עצמאי
+  const checkedItems = externalCheckedItems ?? internalCheckedItems;
+
   useEffect(() => {
     if (hasInteracted || isCompleted) {
       setHasStarted(true);
     }
   }, [hasInteracted, isCompleted]);
 
-  // בדיקה שכל הפריטים סומנו
   const allChecked =
     items.length > 0 &&
-    items.every((item) => Boolean(checkedItems[item.id]));
+    items.every(item => Boolean(checkedItems[item.id]));
 
-  // לחיצה על פריט
   const handleItemClick = (itemId) => {
     if (isCompleted || checkedItems[itemId]) return;
 
@@ -49,20 +50,24 @@ export default function ChecklistScreen({
       onInteractionStart?.();
     }
 
-    onCheckedItemsChange?.({
+    const updatedItems = {
       ...checkedItems,
       [itemId]: true,
-    });
+    };
+
+    if (externalCheckedItems === undefined) {
+      setInternalCheckedItems(updatedItems);
+    }
+
+    onCheckedItemsChange?.(updatedItems);
   };
 
-  // איפוס מנגנון ההשלמה אם השלב עדיין לא הושלם
   useEffect(() => {
     if (!allChecked && !isCompleted) {
       completionCalled.current = false;
     }
   }, [allChecked, isCompleted]);
 
-  // הודעה ל-System מיד כשכל הפריטים סומנו
   useEffect(() => {
     if (
       !allChecked ||
@@ -74,7 +79,6 @@ export default function ChecklistScreen({
 
     completionCalled.current = true;
     onComplete?.();
-
   }, [allChecked, isCompleted, onComplete]);
 
   if (!items.length) return null;
@@ -99,8 +103,7 @@ export default function ChecklistScreen({
         }
       >
         <div className="checklist-items">
-
-          {items.map((item) => {
+          {items.map(item => {
             const isChecked =
               isCompleted || Boolean(checkedItems[item.id]);
 
@@ -111,6 +114,18 @@ export default function ChecklistScreen({
                   isChecked ? 'checked' : ''
                 }`}
                 onClick={() => handleItemClick(item.id)}
+                role="button"
+                tabIndex={isCompleted ? -1 : 0}
+                aria-pressed={isChecked}
+                onKeyDown={event => {
+                  if (
+                    event.key === 'Enter' ||
+                    event.key === ' '
+                  ) {
+                    event.preventDefault();
+                    handleItemClick(item.id);
+                  }
+                }}
               >
                 <div className="checkbox-box">
                   <img
@@ -136,7 +151,6 @@ export default function ChecklistScreen({
               </div>
             );
           })}
-
         </div>
       </div>
     </div>
