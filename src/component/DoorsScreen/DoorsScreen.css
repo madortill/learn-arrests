@@ -1,0 +1,250 @@
+
+.doors-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  
+  .doors-hall-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  .doors-row {
+    position: absolute;
+    z-index: 2;
+  
+    bottom: 5%;
+    left: 3%;
+    width: 94%;
+    height: 75%;
+  
+    display: flex;
+    flex-direction: row;
+    direction: rtl;
+    justify-content: space-evenly;
+    align-items: flex-end;
+    gap: 1%;
+  }
+  
+  .door-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+  
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+  
+  .door-frame {
+    position: relative;
+  
+    width: 100%;
+    height: 100%;
+  
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  
+    padding: 0;
+    border: none;
+    background: transparent;
+  
+    transition: transform 0.3s ease;
+  }
+  
+  .pointer-cursor {
+    cursor: pointer;
+  }
+  
+  .locked-cursor {
+    cursor: not-allowed;
+  }
+  
+  .pointer-cursor:hover {
+    transform: scale(1.035);
+  }
+  
+  .door-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+    user-select: none;
+  }
+  
+  .door-title {
+    position: absolute;
+    top: 23%;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    width: 80%;
+  
+    color: white;
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(17px, 2vw, 30px);
+  
+    line-height: 1.2;
+    text-align: center;
+    white-space: pre-line;
+  
+    text-shadow: 1px 2px 5px rgba(0, 0, 0, 0.65);
+    pointer-events: none;
+  }
+  
+  .door-status-label {
+    position: absolute;
+    z-index: 4;
+  
+    top: 42%;
+    right: 0;
+    transform: translate(25%, -50%);
+  
+    padding: 6px 12px;
+  
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(12px, 1.2vw, 17px);
+    font-weight: bold;
+  
+    white-space: nowrap;
+    border: 2px solid #333;
+    border-radius: 5px;
+  
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
+  }
+  
+  .status-not-done {
+    background: #E6C57A;
+    color: #333;
+  }
+  
+  .status-locked {
+    background: #D3A8A8;
+    color: #555;
+  }
+  
+  .status-done {
+    background: #A9BDB0;
+    color: #222;
+  }
+  
+  /* Tooltip */
+  .locked-tooltip {
+    position: absolute;
+    z-index: 10;
+  
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    width: max-content;
+    max-width: 230px;
+  
+    padding: 10px 14px;
+  
+    background: rgba(25, 25, 25, 0.92);
+    color: white;
+  
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    text-align: center;
+  
+    border-radius: 8px;
+  
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  
+    transition: opacity 0.2s ease;
+  }
+  
+  .locked-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    border: 7px solid transparent;
+    border-top-color: rgba(25, 25, 25, 0.92);
+  }
+  
+  .locked-cursor:hover .locked-tooltip,
+  .locked-cursor:focus-visible .locked-tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  /* כפתור המשך */
+  .doors-continue-btn {
+    position: absolute;
+    z-index: 10;
+  
+    bottom: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  
+    padding: 12px 32px;
+  
+    background: #D6B36A;
+    color: #29251D;
+  
+    border: 2px solid #55452D;
+    border-radius: 30px;
+  
+    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+    font-size: clamp(18px, 2vw, 25px);
+    font-weight: bold;
+  
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .doors-continue-btn:hover {
+    transform: translateX(-50%) scale(1.06);
+  }
+  
+  @media (max-width: 768px) {
+    .doors-row {
+      width: 98%;
+      left: 1%;
+      height: 65%;
+      gap: 0;
+    }
+  
+    .door-title {
+      font-size: clamp(12px, 2.2vw, 20px);
+    }
+  
+    .door-status-label {
+      font-size: 11px;
+      padding: 4px 6px;
+    }
+  
+    .locked-tooltip {
+      max-width: 160px;
+      font-size: 12px;
+      white-space: normal;
+    }
+  }
+  

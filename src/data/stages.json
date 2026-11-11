@@ -622,7 +622,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 21,
       "background": "bg-blur",
       "primaryComponent": {
         "type": "FlipCards",
@@ -643,27 +643,93 @@
         }
       }
     },
+    
     {
       "step": 22,
-      "background": "bg-7",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "DrivingScreen",
-        "props": {}
+        "props": {
+          "emphasisPoints": [
+            {
+              "id": 1,
+              "text": "דגש 1 – טקסט להחלפה"
+            },
+            {
+              "id": 2,
+              "text": "דגש 2 – טקסט להחלפה"
+            },
+            {
+              "id": 3,
+              "text": "דגש 3 – טקסט להחלפה"
+            },
+            {
+              "id": 4,
+              "text": "דגש 4 – טקסט להחלפה"
+            },
+            {
+              "id": 5,
+              "text": "דגש 5 – טקסט להחלפה"
+            }
+          ],
+          "weakPoints": [
+            {
+              "id": 1,
+              "text": "נקודת תורפה 1 – טקסט להחלפה"
+            },
+            {
+              "id": 2,
+              "text": "נקודת תורפה 2 – טקסט להחלפה"
+            },
+            {
+              "id": 3,
+              "text": "נקודת תורפה 3 – טקסט להחלפה"
+            }
+          ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "text": "משכו את ההגה ימינה בשביל להמשיך בנסיעה ושמאלה בשביל לחזור.",
+          "typeAnimation": false,
+          "position": {
+            "top": "5%",
+            "left": "5%"
+          },
+          "tailPosition": "left-top"
+        }
       }
     },
     {
       "step": 23,
-      "background": "bg-7",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "סמנו שני מעצרים אשר נמצאים תחת פלוגת הליוויים",
+              "options": [
+                "מעצר ענתות",
+                "מעצר דן",
+                "מעצר יואב",
+                "מעצר פילון"
+              ],
+              "correctAnswer": 0,
+              "explanation": "מעצר ענתות ומעצר דן הם המעצרים הנמצאים תחת אחריות פלוגת הליוויים."
+            },
+            {
+              "question": "עד איזו שעה מתקבלים דיווחים בפעימת הבוקר של 06:30?",
+              "options": [
+                "עד השעה 05:00",
+                "עד השעה 05:30",
+                "עד השעה 06:00",
+                "עד השעה 06:30"
+              ],
+              "correctAnswer": 2,
+              "explanation": "בפעימה של 06:30 מקבלים דיווחים עד השעה 06:00 בדיוק."
             }
           ]
         }
@@ -671,34 +737,56 @@
     },
     {
       "step": 24,
-      "background": "bg-8",
+      "id": 24,
+      "background": "",
       "primaryComponent": {
         "type": "DoorsScreen",
         "props": {}
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "text": "מעולה! הגעתם כמעט לסוף. נשארו לכם רק עוד 4 כיתות לעבור בהן.",
+          "position": "top-left"
+        }
       }
     },
     {
       "step": 25,
-      "background": "bg-9",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
-          "cardType": "regular",
           "cards": [
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 1,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 1"
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 2,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 2"
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 3,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 3"
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 4,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 4"
             },
             {
-              "text": "Lorem ipsum dolor sit amet consectetur..."
+              "id": 5,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 5"
+            },
+            {
+              "id": 6,
+              "frontImage": "question",
+              "backText": "טקסט להסבר כרטיסייה 6"
             }
           ]
         }
@@ -707,27 +795,68 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך"
+          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
+          "position": {
+            "bottom": "5%",
+            "right": "5%"
+          },
+          "tailPosition": "right-bottom",
+          "character": "commander"
+        }
+      }
+    },
+    
+    {
+      "step": 26,
+      "background": "",
+      "primaryComponent": {
+        "type": "WriteboardScreen",
+        "props": {
+          "whiteboardData": {
+            "title": "דגשים לקבלה",
+            "subtitle": "עברו על הקוביות והפס עם הטוש",
+            "bulletPoints": [
+              "Lorem ipsum dolor sit amet consectetur. Fringilla massa.",
+              "Lorem ipsum dolor sit amet consectetur. Praesent nulla.",
+              "Lorem ipsum dolor sit amet consectetur. Praesent nulla."
+            ],
+            "footerNote": "המתנה בקבלה לרוב ארוכה ותפקיד צוות הליווי לדאוג ולפקח על העצורים לאורך כל התהליך"
+          }
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "text": "עברו על הקוביות והפס עם הטוש",
+          "position": "top-right"
         }
       }
     },
     {
-      "step": 26,
-      "background": "bg-10",
-      "primaryComponent": {
-        "type": "Whiteboard",
-        "props": {}
-      }
-    },
-    {
       "step": 27,
-      "background": "bg-10",
+      "background": "bg-1",
       "primaryComponent": {
-        "type": "Checklist",
+        "type": "ChecklistScreen",
         "props": {
           "items": [
             {
-              "text": "Lorem ipsum...",
+              "id": "item1",
+              "text": "טקסט לנקודת בדיקה ראשונה",
+              "image": null
+            },
+            {
+              "id": "item2",
+              "text": "טקסט לנקודת בדיקה שנייה",
+              "image": null
+            },
+            {
+              "id": "item3",
+              "text": "טקסט לנקודת בדיקה שלישית – פק״לים",
+              "image": "pekelim.png"
+            },
+            {
+              "id": "item4",
+              "text": "טקסט לנקודת בדיקה רביעית",
               "image": null
             }
           ]
@@ -737,23 +866,55 @@
         "type": "SpeechBubble",
         "props": {
           "typeAnimation": false,
-          "text": "כעט נעבור על ההדגישים המיוחדים לקליטת עצור מצ”ח"
+          "text": "עברו על הדגשים וסמנו את הנקודות לאחר שעברתם עליהן.",
+          "position": {
+            "bottom": "15%",
+            "right": "10%"
+          },
+          "tailPosition": "right-bottom"
         }
       }
     },
     {
       "step": 28,
-      "background": "bg-10",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
-          "tabletType": "QuizScreen",
+          "type": "QuizScreen",
           "questions": [
             {
-              "question": "סמן שני מעצרים...",
-              "answers": [],
-              "correctAnswerIndex": 1,
-              "explanation": ""
+              "question": "שאלה ראשונה – להחלפה",
+              "options": [
+                "תשובה א'",
+                "תשובה ב'",
+                "תשובה ג'",
+                "תשובה ד'"
+              ],
+              "correctAnswer": 0,
+              "explanation": "הסבר לתשובה הנכונה בשאלה הראשונה."
+            },
+            {
+              "question": "שאלה שנייה – להחלפה",
+              "options": [
+                "תשובה א'",
+                "תשובה ב'",
+                "תשובה ג'",
+                "תשובה ד'"
+              ],
+              "correctAnswer": 1,
+              "explanation": "הסבר לתשובה הנכונה בשאלה השנייה."
+            },
+            {
+              "question": "שאלה שלישית – להחלפה",
+              "options": [
+                "תשובה א'",
+                "תשובה ב'",
+                "תשובה ג'",
+                "תשובה ד'"
+              ],
+              "correctAnswer": 2,
+              "explanation": "הסבר לתשובה הנכונה בשאלה השלישית."
             }
           ]
         }

@@ -12,6 +12,9 @@ import FlipCards from '../FlipCards/FlipCards';
 import ChecklistScreen from '../ChecklistScreen/ChecklistScreen';
 import DepositsBtn from '../DepositsBtn/DepositsBtn';
 import ParkingButton from '../ParkingButton/ParkingButton';
+import DrivingScreen from '../DrivingScreen/DrivingScreen';
+import DoorsScreen from '../DoorsScreen/DoorsScreen';
+import WriteboardScreen from '../WriteboardScreen/WriteboardScreen';
 
 import ContinueBtn from '../ContinueBtn/ContinueBtn';
 
@@ -28,7 +31,16 @@ const componentMap = {
   ChecklistScreen,
   DepositsBtn,
   ParkingButton,
+  DrivingScreen,
+  DoorsScreen,
+  WriteboardScreen,
 };
+
+const DOOR_STAGES = [25, 26, 27, 28];
+const DOORS_HUB_STAGE = 24;
+
+const getStageNumber = (page, index) =>
+  Number(page?.step ?? page?.id ?? index + 1);
 
 export default function System() {
   const pages = Array.isArray(stages.pages)
@@ -45,20 +57,93 @@ export default function System() {
 
   const [continueSignal, setContinueSignal] = useState(0);
 
-  // שמירת התקדמות הצ'קליסטים
+  // התקדמות צ'קליסטים
   const [checklistProgress, setChecklistProgress] = useState({});
-
   const [checklistStartedSteps, setChecklistStartedSteps] = useState([]);
 
-  // שמירת התקדמות הרכבים בכל שלב
+  // התקדמות רכבים
   const [parkingProgress, setParkingProgress] = useState({});
 
-  // מצב מסך הפיקדונות
+  // מסך פיקדונות
   const [isDepositsScreenOpen, setIsDepositsScreenOpen] = useState(false);
 
   // מסכי טעינה
   const [loadingType, setLoadingType] = useState('initial');
   const [pendingStep, setPendingStep] = useState(null);
+
+  // ==========================================
+  // ניווט מסדרון הדלתות
+  // ==========================================
+
+  // השלב שאליו צריך לחזור אחרי יציאה מחדר
+  const doorsHubIndex = pages.findIndex(
+    (page, index) =>
+      getStageNumber(page, index) === DOORS_HUB_STAGE
+  );
+
+  // האם אנחנו כרגע בתוך אחד מארבעת החדרים
+  const [activeDoorStage, setActiveDoorStage] = useState(null);
+
+  // זיהוי השלבים שבוצעו לפי האינדקסים האמיתיים במערך
+  const completedDoorStages = DOOR_STAGES.reduce(
+    (result, stageNumber) => {
+      const stageIndex = pages.findIndex(
+        (page, index) =>
+          getStageNumber(page, index) === stageNumber
+      );
+
+      result[stageNumber] =
+        stageIndex !== -1 && completedSteps.includes(stageIndex);
+
+      return result;
+    },
+    {}
+  );
+
+  const allDoorsCompleted = DOOR_STAGES.every(
+    (id) => completedDoorStages[id]
+  );
+
+  // כניסה לחדר מתוך המסדרון
+  const handleEnterDoorStage = useCallback((stageNumber) => {
+    const targetIndex = pages.findIndex(
+      (page, index) =>
+        getStageNumber(page, index) === stageNumber
+    );
+
+    if (targetIndex === -1) {
+      console.error(`Stage ${stageNumber} was not found in stages.json`);
+      return;
+    }
+
+    // הגנה נוספת על תנאי הנעילה
+    if (
+      stageNumber === 26 &&
+      !completedDoorStages[25]
+    ) {
+      return;
+    }
+
+    if (
+      stageNumber === 28 &&
+      !(
+        completedDoorStages[25] &&
+        completedDoorStages[26] &&
+        completedDoorStages[27]
+      )
+    ) {
+      return;
+    }
+
+    setActiveDoorStage(stageNumber);
+    setCurrentStep(targetIndex);
+    setContinueSignal(0);
+    setIsLevelsOpen(false);
+  }, [pages, completedDoorStages]);
+
+  // ==========================================
+  // נתוני השלב הנוכחי
+  // ==========================================
 
   const stepData = pages[currentStep];
 
@@ -69,9 +154,15 @@ export default function System() {
 
   const isBookend = primaryData?.type === 'BookendScreen';
 
+  const isDoorsHubStep =
+    primaryData?.type === 'DoorsScreen' &&
+    getStageNumber(stepData, currentStep) === DOORS_HUB_STAGE;
+
+  const isDoorRoomStep = activeDoorStage !== null;
+
   const isCompleted = completedSteps.includes(currentStep);
 
-  // זיהוי ChecklistScreen
+  // Checklist
   const isChecklistStep =
     primaryData?.type === 'ChecklistScreen';
 
@@ -86,7 +177,7 @@ export default function System() {
   const checklistHasInteracted =
     checklistStartedSteps.includes(currentStep);
 
-  // זיהוי WhatsApp
+  // WhatsApp
   const isWhatsAppStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -98,7 +189,7 @@ export default function System() {
     isWhatsAppStep &&
     Number(primaryData?.props?.part) === 2;
 
-  // זיהוי מסך מפה
+  // מפה
   const isLocationMapStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -106,7 +197,7 @@ export default function System() {
       primaryData?.props?.tabletType === 'LocationMap'
     );
 
-  // זיהוי חידון
+  // חידון
   const isQuizStep =
     primaryData?.type === 'Tablet' &&
     (
@@ -114,15 +205,17 @@ export default function System() {
       primaryData?.props?.tabletType === 'QuizScreen'
     );
 
-  // זיהוי שלב מגרש החניה
+  // מגרש חניה
   const isParkingStep =
     primaryData?.type === 'ParkingButton';
 
-  // התקדמות הרכבים בשלב הנוכחי
   const currentParkingProgress =
     parkingProgress[currentStep] || {};
 
-  // השלמת שלב
+  // ==========================================
+  // השלמת שלבים
+  // ==========================================
+
   const markStepCompleted = useCallback((stepIndex) => {
     setCompletedSteps((prev) =>
       prev.includes(stepIndex)
@@ -135,7 +228,7 @@ export default function System() {
     markStepCompleted(currentStep);
   }, [currentStep, markStepCompleted]);
 
-  // שמירת התקדמות הצ'קליסט
+  // Checklist
   const handleChecklistProgress = useCallback((newState) => {
     setChecklistProgress((prev) => ({
       ...prev,
@@ -143,7 +236,6 @@ export default function System() {
     }));
   }, [currentStep]);
 
-  // שמירת התחלת אינטראקציה
   const handleChecklistInteractionStart = useCallback(() => {
     setChecklistStartedSteps((prev) =>
       prev.includes(currentStep)
@@ -152,7 +244,7 @@ export default function System() {
     );
   }, [currentStep]);
 
-  // שמירת התקדמות הרכבים
+  // Parking
   const handleParkingProgress = useCallback((newState) => {
     setParkingProgress((prev) => ({
       ...prev,
@@ -160,24 +252,56 @@ export default function System() {
     }));
   }, [currentStep]);
 
+  // ==========================================
   // מעבר לשלב הבא
+  // ==========================================
+
   const handleNextStep = useCallback(() => {
     markStepCompleted(currentStep);
 
-    const nextStep = currentStep + 1;
+    // יציאה מחדר 25, 26, 27 או 28:
+    // חוזרים למסדרון במקום לעבור לשלב הבא במערך.
+    if (activeDoorStage !== null) {
+      setActiveDoorStage(null);
+      setCurrentStep(doorsHubIndex);
+      setContinueSignal(0);
+      setIsLevelsOpen(false);
+      return;
+    }
+
+    // יציאה ממסדרון הדלתות:
+    // מדלגים על ארבעת החדרים ועוברים לשלב שאחריהם.
+    let nextStep;
+
+    if (isDoorsHubStep) {
+      const doorIndexes = DOOR_STAGES.map((stageNumber) =>
+        pages.findIndex(
+          (page, index) =>
+            getStageNumber(page, index) === stageNumber
+        )
+      );
+
+      const validIndexes = doorIndexes.filter(
+        (index) => index !== -1
+      );
+
+      nextStep = Math.max(...validIndexes) + 1;
+
+    } else {
+      nextStep = currentStep + 1;
+    }
 
     if (nextStep >= pages.length) {
       setCurrentStep(nextStep);
       return;
     }
 
-    const stageNumber = Number(
-      stepData?.step ??
-      stepData?.id ??
-      currentStep + 1
+    const stageNumber = getStageNumber(
+      stepData,
+      currentStep
     );
 
-    // מסך טעינה אחרי שלבים 12 ו-21
+    // מסכי טעינה אחרי שלבים 12 ו-21
     if (stageNumber === 12 || stageNumber === 21) {
       setPendingStep(nextStep);
       setLoadingType('transition');
@@ -193,12 +317,18 @@ export default function System() {
 
   }, [
     currentStep,
-    pages.length,
+    activeDoorStage,
+    doorsHubIndex,
+    isDoorsHubStep,
+    pages,
     stepData,
     markStepCompleted,
   ]);
 
+  // ==========================================
   // טעינה ראשונית
+  // ==========================================
+
   useEffect(() => {
     if (loadingType !== 'initial') return;
 
@@ -209,9 +339,15 @@ export default function System() {
     return () => clearTimeout(timer);
   }, [loadingType]);
 
+  // ==========================================
   // טעינת מעבר
+  // ==========================================
+
   useEffect(() => {
-    if (loadingType !== 'transition' || pendingStep === null) {
+    if (
+      loadingType !== 'transition' ||
+      pendingStep === null
+    ) {
       return;
     }
 
@@ -230,24 +366,45 @@ export default function System() {
     return () => clearTimeout(timer);
   }, [loadingType, pendingStep]);
 
+  // ==========================================
   // חזרה לשלב הקודם
+  // ==========================================
+
   const handlePreviousStep = useCallback(() => {
+
+    // מתוך חדר חוזרים תמיד למסדרון
+    if (activeDoorStage !== null) {
+      setActiveDoorStage(null);
+      setCurrentStep(doorsHubIndex);
+      setContinueSignal(0);
+      return;
+    }
+
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
       setContinueSignal(0);
     }
-  }, [currentStep]);
 
+  }, [currentStep, activeDoorStage, doorsHubIndex]);
+
+  // ==========================================
   // בחירת שלב מהמפה
+  // ==========================================
+
   const handleSelectStep = useCallback((stepIndex) => {
+    if (activeDoorStage !== null) return;
+
     if (stepIndex <= maxUnlockedStep) {
       setCurrentStep(stepIndex);
       setContinueSignal(0);
       setIsLevelsOpen(false);
     }
-  }, [maxUnlockedStep]);
+  }, [maxUnlockedStep, activeDoorStage]);
 
+  // ==========================================
   // איפוס הלומדה
+  // ==========================================
+
   const handleRestart = useCallback(() => {
     setCurrentStep(0);
     setCompletedSteps([]);
@@ -260,14 +417,18 @@ export default function System() {
     setParkingProgress({});
 
     setIsDepositsScreenOpen(false);
-
     setIsLevelsOpen(false);
+
+    setActiveDoorStage(null);
 
     setPendingStep(null);
     setLoadingType('initial');
   }, []);
 
+  // ==========================================
   // כפתור המשך גלובלי
+  // ==========================================
+
   const handleGlobalContinue = () => {
     if (
       isLocationMapStep &&
@@ -280,12 +441,18 @@ export default function System() {
     handleNextStep();
   };
 
+  // ==========================================
   // מסך טעינה
+  // ==========================================
+
   if (loadingType) {
     return <LoadingScreen type={loadingType} />;
   }
 
+  // ==========================================
   // מסך סיום
+  // ==========================================
+
   if (!stepData) {
     return (
       <div className="system-container">
@@ -297,9 +464,13 @@ export default function System() {
     );
   }
 
-  // הצגת כפתור המשך
+  // ==========================================
+  // כפתור המשך גלובלי
+  // ==========================================
+
   const showGlobalContinue =
     isCompleted &&
+    !isDoorsHubStep &&
     (!isWhatsAppStep || isPrisonerWhatsAppStep) &&
     !isQuizStep &&
     !isBookend;
@@ -309,33 +480,35 @@ export default function System() {
 
       <About />
 
-      {!isBookend && (
-        <>
-          <LevelsBtn
-            isOpen={isLevelsOpen}
-            onClick={() => setIsLevelsOpen((prev) => !prev)}
-          />
-
-          {currentStep > 0 && (
-            <ReturnBtn onClick={handlePreviousStep} />
-          )}
-        </>
+      {!isBookend && !isDoorRoomStep && (
+        <LevelsBtn
+          isOpen={isLevelsOpen}
+          onClick={() => setIsLevelsOpen((prev) => !prev)}
+        />
       )}
 
-      <Levels
-        steps={pages}
-        currentStep={currentStep}
-        maxUnlockedStep={maxUnlockedStep}
-        onSelectStep={handleSelectStep}
-        isOpen={isLevelsOpen}
-        onClose={() => setIsLevelsOpen(false)}
-      />
+      {!isBookend && currentStep > 0 && (
+        <ReturnBtn onClick={handlePreviousStep} />
+      )}
+
+      {!isDoorRoomStep && (
+        <Levels
+          steps={pages}
+          currentStep={currentStep}
+          maxUnlockedStep={maxUnlockedStep}
+          onSelectStep={handleSelectStep}
+          isOpen={isLevelsOpen}
+          onClose={() => setIsLevelsOpen(false)}
+        />
+      )}
 
       {/* קומפוננטה ראשית */}
       {PrimaryComponent ? (
         <PrimaryComponent
           key={
-            primaryData?.type === 'FlipCards'
+            primaryData?.type === 'FlipCards' ||
+            primaryData?.type === 'WriteboardScreen' ||
+            isDoorRoomStep
               ? currentStep
               : undefined
           }
@@ -345,11 +518,25 @@ export default function System() {
           currentStep={currentStep}
           isCompleted={isCompleted}
 
-          onComplete={handleComplete}
+          // במסדרון המעבר מתבצע רק אחרי שכל הדלתות הושלמו
+          onComplete={
+            isDoorsHubStep
+              ? handleNextStep
+              : handleComplete
+          }
+
           onNext={handleNextStep}
           onRestart={handleRestart}
 
           continueSignal={continueSignal}
+
+          // חיבור ארבע הדלתות
+          {...(isDoorsHubStep
+            ? {
+                completedStages: completedDoorStages,
+                onEnterStage: handleEnterDoorStage,
+              }
+            : {})}
 
           {...(primaryData?.type === 'DepositsBtn'
             ? {
@@ -382,7 +569,7 @@ export default function System() {
         </div>
       )}
 
-      {/* בועת דיבור – מוסתרת בזמן שמסך הפיקדונות פתוח */}
+      {/* בועת דיבור */}
       {secondaryData?.type === 'SpeechBubble' &&
         !isDepositsScreenOpen && (
           <SpeechBubble
