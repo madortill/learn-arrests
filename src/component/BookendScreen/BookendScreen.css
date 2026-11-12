@@ -58,18 +58,26 @@
 .bookend-main-title {
   width: 100%;
   max-width: 763px;
-  background: hsla(356, 92%, 42%, 1);
-  border: 5px solid hsla(0, 0%, 100%, 1);
-  color: #ffffff;
+
+  background: transparent;
+
+  color: hsla(356, 92%, 42%, 1);
+
   font-family: 'Rubik', sans-serif;
   font-weight: 800;
-  font-size: 54px; /* מותאם רספונסיבית לטאבלט/מסך */
+  font-size: clamp(2.5rem, 5.5vw, 84px);
+
   line-height: 1.1;
   letter-spacing: -0.05em;
   text-align: center;
+
+  /* מסגרת לבנה מסביב לאותיות */
+  -webkit-text-stroke: clamp(1px, 0.33vw, 5px) #ffffff;
+  paint-order: stroke fill;
+
   padding: 15px 20px;
   margin: 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+
   box-sizing: border-box;
 }
 
@@ -114,23 +122,34 @@
 /* תיבת הטקסט הלבנה: רוחב 605px, פונט Rubik SemiBold 36px והצללה */
 .bookend-text-box {
   width: 100%;
-  max-width: 605.03px;
-  background: hsla(0, 0%, 100%, 1);
-  box-shadow: 0px 4px 4px 0px hsla(0, 0%, 0%, 0.25);
-  padding: 24px 28px;
+  max-width: 605px;
   box-sizing: border-box;
-  border-radius: 4px;
+  margin: 0 auto;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
 }
 
 .bookend-text-box p {
   margin: 0;
   font-family: 'Rubik', sans-serif;
   font-weight: 600;
-  font-size: 24px;
-  line-height: 1.35;
-  letter-spacing: 0%;
+  font-size: clamp(22px, 2.35vw, 36px);
+  line-height: 1;
+  letter-spacing: 0;
   text-align: center;
-  color: #1e293b;
+  color: hsla(0, 0%, 100%, 1);
+
+  /* הצל חל על הטקסט בלבד */
+  text-shadow: 0px 4px 4px hsla(0, 0%, 0%, 0.25);
+}
+
+/* התאמה למסכים קטנים יותר */
+@media (max-width: 768px) {
+  .bookend-text-box p {
+    font-size: clamp(20px, 3.2vw, 28px);
+  }
 }
 
 @media (min-width: 1200px) {
@@ -140,24 +159,112 @@
 }
 
         
+
+
 .bookend-btn {
+  position: relative;
+  isolation: isolate;
+
   width: 100%;
   max-width: 361px;
-  height: 75px;
-  background: hsla(356, 92%, 42%, 1);
-  border: 5px solid transparent;
-  border-image: linear-gradient(90deg, #D8B589 0%, #FFFBE0 100%) 1;
-  color: #ffffff;
-  font-family: 'Rubik', sans-serif;
-  font-weight: 700;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  transition: all 0.25s ease;
+  height: clamp(76px, 6.5vw, 100px);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+
+  color: #ffffff;
+  font-family: 'Rubik', sans-serif;
+  font-weight: 800;
+  font-size: clamp(25px, 2.5vw, 36px);
+  line-height: 1;
+  text-align: center;
+
+  cursor: pointer;
+
+  /* צורת שמונה הצלעות */
+  clip-path: polygon(
+    5% 0,
+    95% 0,
+    100% 13%,
+    100% 87%,
+    95% 100%,
+    5% 100%,
+    0 87%,
+    0 13%
+  );
+
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
 }
+
+/* המסגרת החיצונית */
+.bookend-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background: linear-gradient(
+    135deg,
+    #d8b589 0%,
+    #fffbe0 45%,
+    #d8b589 100%
+  );
+
+  clip-path: inherit;
+}
+
+/* המילוי האדום הפנימי */
+.bookend-btn::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+
+  background: hsla(356, 92%, 42%, 1);
+
+  clip-path: inherit;
+
+  transition: background 0.25s ease;
+}
+
+/* Hover */
+.bookend-btn:hover {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.22));
+}
+
+.bookend-btn:hover::after {
+  background: hsla(356, 92%, 36%, 1);
+}
+
+/* Active */
+.bookend-btn:active {
+  transform: translateY(1px) scale(0.985);
+  filter: brightness(0.92);
+}
+
+/* נגישות מקלדת */
+.bookend-btn:focus-visible {
+  outline: 3px solid #fffbe0;
+  outline-offset: 5px;
+}
+
+/* Disabled */
+.bookend-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+
 
 .bookend-btn:hover {
   transform: translateY(-2px) scale(1.02);
