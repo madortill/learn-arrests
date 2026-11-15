@@ -1,54 +1,106 @@
+
 import React from 'react';
 import bgImage from '../../assets/bg-bookend.png';
 import logosImage from '../../assets/idf-logos.png';
+import dividerImage from '../../assets/bookend-divider.svg';
 import './BookendScreen.css';
 
 export default function BookendScreen({ isStart, onNext, onRestart }) {
     return (
-        <div className="bookend-container" style={{ backgroundImage: `url(${bgImage})` }}>
+        <div
+            className="bookend-container"
+            style={{ backgroundImage: `url(${bgImage})` }}
+        >
             {/* שכבת כהות עדינה ברקע */}
             <div className="bookend-overlay"></div>
 
             {/* לוגואים בצד שמאל למעלה */}
             <div className="bookend-top-left">
-                <img src={logosImage} alt="לוגואים" className="idf-logos-img" />
+                <img
+                    src={logosImage}
+                    alt="לוגואים"
+                    className="idf-logos-img"
+                />
             </div>
 
-            {/* תוכן המסך המרכזי המדויק לפי המפרט שלך */}
+            {/* תוכן המסך המרכזי */}
             <div className="bookend-content-wrapper">
-                
-                {/* כותרת ראשית בעיצוב מסגרת אדומה ושוליים לבנים */}
+
+                {/* כותרת ראשית */}
                 <h1 className="bookend-main-title">
-                    {isStart ? "לומדת איסוף ממעצרים" : "כל הכבוד! סיימת את הלומדה"}
+                    {isStart
+                        ? "לומדת איסוף ממעצרים"
+                        : "כל הכבוד! סיימת את הלומדה"}
                 </h1>
 
-                {/* קו הפרדה מעוצב עם יהלום באמצע (Frame 3) */}
+                
+                {/* Animated Diamond Divider */}
                 <div className="bookend-divider">
-                    <div className="line-side"></div>
-                    <div className="divider-diamond">
-                        <svg viewBox="0 0 100 85" className="diamond-svg">
-                            <polygon points="50,5 85,25 98,38 50,80 2,38 15,25" fill="#a3b8cd" stroke="#5d7893" strokeWidth="2" />
-                            <polygon points="50,5 85,25 50,38 15,25" fill="#e2edf7" />
-                            <polygon points="15,25 50,38 2,38" fill="#88a4be" />
-                            <polygon points="85,25 50,38 98,38" fill="#5d7893" />
-                            <polygon points="50,38 98,38 50,80" fill="#3b5268" />
-                            <polygon points="50,38 2,38 50,80" fill="#6d87a3" />
-                        </svg>
-                    </div>
-                    <div className="line-side"></div>
+
+                <div className="divider-line divider-line-left" />
+
+                <div className="divider-diamond">
+                <svg
+                    className="diamond-svg"
+                    viewBox="0 0 160 120"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <g className="diamond-facets">
+
+                    {/* המסגרת החיצונית */}
+                    <path
+                        className="diamond-outline"
+                        d="M80 5 L145 42 L80 115 L15 42 Z"
+                    />
+
+                    {/* החלק העליון */}
+                    <path
+                        className="diamond-facet facet-top"
+                        d="M15 42 L55 42 L80 5 L105 42 L145 42"
+                    />
+
+                    {/* חלוקה פנימית */}
+                    <path
+                        className="diamond-facet facet-middle"
+                        d="M15 42 L80 65 L145 42"
+                    />
+
+                    <path
+                        className="diamond-facet facet-left"
+                        d="M55 42 L80 115 L80 65"
+                    />
+
+                    <path
+                        className="diamond-facet facet-right"
+                        d="M105 42 L80 115"
+                    />
+
+                    {/* קו מרכזי */}
+                    <path
+                        className="diamond-center"
+                        d="M80 5 L80 115"
+                    />
+
+                    </g>
+                </svg>
                 </div>
 
-                {/* תיבת הטקסט הלבנה עם הצללה */}
+                <div className="divider-line divider-line-right" />
+
+                </div>
+
+
+                {/* תיבת הטקסט */}
                 <div className="bookend-text-box">
                     <p>
-                        {isStart 
-                            ? "בלומדה זאת תעבורו על סדר היום של חייל בתפקיד ליווי ותלמדו חוקים ונהלים חשובים." 
+                        {isStart
+                            ? "בלומדה זאת תעבורו על סדר היום של חייל בתפקיד ליווי ותלמדו חוקים ונהלים חשובים."
                             : "לחצו כאן כדי לחזור להתחלה ולתרגל שוב את הלומדה."}
                     </p>
                 </div>
 
-                {/* כפתור מעבר עם מסגרת מדורגת יוקרתית */}
-                <button 
+                {/* כפתור מעבר */}
+                <button
                     className="bookend-btn"
                     onClick={isStart ? onNext : onRestart}
                 >

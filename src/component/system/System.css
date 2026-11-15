@@ -1,0 +1,26 @@
+
+/* =========================================
+   SYSTEM CONTAINER
+========================================= */
+
+.system-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  
+    overflow: hidden;
+  
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  /* =========================================
+     BACKGROUNDS
+  ========================================= */
+  
+  .system-container.bg-1 {
+    background-image: url('../../assets/backgrounds/bg-1.png');
+  }
+  

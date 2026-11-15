@@ -1,79 +1,227 @@
-/* מיקום הכפתור - בצד שמאל למעלה, מותאם רספונסיבית */
+
+/* =========================================
+   RETURN BUTTON
+========================================= */
+
 .return-btn {
-    position: fixed;
-    top: 3vh;
-    left: 3vw;
-    z-index: 9995;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    
-    /* צבעי רקע וטקסט בדיוק לפי התמונה */
-    background-color: #d8c5ed; /* סגול בהיר/לבלנדר */
-    color: #4a2175;           /* סגול כהה לטקסט ולחץ */
-    border: none;
-    border-radius: 30px;
-    
-    padding: 10px 16px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    
-    font-family: sans-serif;
-    font-size: 18px;
-    font-weight: bold;
-    font-style: italic;
-    
-    /* מעברים חלקים לאנימציות */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    direction: rtl;
-    user-select: none;
-  }
+  /* Position */
+  position: fixed;
+  bottom: clamp(16px, 2.54vh, 36px);
+  left: clamp(20px, 2.15vw, 55px);
+
+  z-index: 9995;
+
+  /* Responsive dimensions */
+  --btn-height: clamp(41px, 3.47vw, 56px);
+
+  --btn-compact-width: clamp(64px, 5.42vw, 78px);
+
+  --btn-expanded-width: clamp(190px, 13.9vw, 260px);
+
+  --icon-size: clamp(32px, 2.75vw, 40px);
+
+  --icon-left: calc(
+    (var(--btn-compact-width) - var(--icon-size)) / 2
+  );
+
+  --content-gap: clamp(14px, 1.25vw, 20px);
+
+  --content-color: hsla(274, 39%, 43%, 1);
+
+  /* Layout */
+  width: var(--btn-compact-width);
+  height: var(--btn-height);
+
+  display: flex;
+  align-items: center;
+
+  padding: 0;
+  box-sizing: border-box;
+
+  direction: ltr;
+
+  position: fixed;
+  overflow: hidden;
+
+  /* Appearance */
+  background: hsla(279, 35%, 84%, 1);
+  border: none;
+  border-radius: 999px;
+
+  box-shadow: 0 4px 4px hsla(0, 0%, 0%, 0.25);
+
+  cursor: pointer;
+  user-select: none;
+
+  /* Smooth animation */
+  transition:
+    width 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.3s ease;
+
+  animation: returnBtnPopIn 0.4s
+    cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
+/* =========================================
+   ICON
+========================================= */
+
+.return-icon {
+  position: absolute;
+
+  left: var(--icon-left);
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: var(--icon-size);
+  height: var(--icon-size);
+
+  flex-shrink: 0;
+
+  /* SVG recoloring */
+  background-color: var(--content-color);
+
+  -webkit-mask-image: var(--return-icon);
+  mask-image: var(--return-icon);
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+
+  -webkit-mask-position: center;
+  mask-position: center;
+
+  -webkit-mask-size: contain;
+  mask-size: contain;
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   TEXT
+========================================= */
+
+.return-text {
+  position: absolute;
+
+  /* הקטנת המרווח בין האייקון לטקסט */
+  left: calc(
+    var(--icon-left) + var(--icon-size) + 10px
+  );
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+
+  font-size: clamp(18px, 1.67vw, 24px);
+  line-height: 1.67;
+
+  color: var(--content-color);
+  white-space: nowrap;
+
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+
+  transition:
+    max-width 0.3s ease,
+    opacity 0.2s ease 0.05s;
+
+  pointer-events: none;
   
-  /* גודל האיקון */
-  .return-icon {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-  }
-  
-  /* טקסט הכפתור */
+}
+
+/* =========================================
+   HOVER
+========================================= */
+
+.return-btn:hover {
+  width: auto;
+
+  /* רוחב לפי התוכן בפועל */
+  width: max-content;
+
+  padding-left: 12px;
+  padding-right: 14px;
+}
+
+.return-btn:hover .return-text {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+
+  max-width: 200px;
+  opacity: 1;
+
+  margin-left: 60px;
+  margin-right: 0;
+}
+
+
+/* =========================================
+   ACTIVE
+========================================= */
+
+.return-btn:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+.return-btn:focus-visible {
+  outline: 2px solid var(--content-color);
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .return-btn,
   .return-text {
-    white-space: nowrap;
+    transition: none;
+    animation: none;
   }
-  
-  /* אפקטים בלחיצה ובמעבר עכבר (Hover & Active) */
-  .return-btn:hover {
-    background-color: #cbaff0;
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
+}
+
+
+/* =========================================
+   ANIMATION
+========================================= */
+
+@keyframes returnBtnPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
   }
-  
-  .return-btn:hover .return-icon {
-    transform: translateX(3px); /* החץ זז קצת ימינה ב-hover */
+
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  /* מראה בלחיצה (מצב שקוע בדיוק כמו האיקון השלישי בתמונה) */
-  .return-btn:active {
-    transform: translateY(0) scale(0.96);
-    box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.25);
-    background-color: #c0a1e8;
-    color: #381659;
+}
+
+
+/* =========================================
+   RESPONSIVE TEXT SIZE
+========================================= */
+
+/* Large laptops and screens */
+@media (min-width: 1600px) and (max-width: 2199px) {
+  .return-text {
+    font-size: clamp(26px, 1.4vw, 30px);
   }
-  
-  /* ========================================================= */
-  /* התאמה רספונסיבית מיוחדת למסכי מחשב (Desktop)          */
-  /* ========================================================= */
-  @media (min-width: 1024px) {
-    .return-btn {
-      top: 3.5vh;
-      left: 3.5vw;
-      padding: 12px 22px;
-      font-size: 21px;
-      border-radius: 35px;
-    }
-  
-    .return-icon {
-      width: 28px;
-      height: 28px;
-    }
+}
+
+/* Very large screens */
+@media (min-width: 2200px) {
+  .return-text {
+    font-size: clamp(32px, 1.4vw, 36px);
   }
+}

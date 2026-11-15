@@ -1,63 +1,111 @@
-/* ייבוא פונט Rubik */
+
+/* =========================================
+   FONT
+========================================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400..900;1,400..900&display=swap');
+
+
+/* =========================================
+   GLOBAL / MAIN CONTAINER
+========================================= */
 
 .bookend-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   direction: rtl;
   overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
   font-family: 'Rubik', sans-serif;
 }
 
+
+/* =========================================
+   OVERLAY
+========================================= */
+
 .bookend-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(10, 25, 45, 0.2);
+  inset: 0;
   z-index: 1;
+  background: rgba(10, 25, 45, 0.2);
 }
+
+
+/* =========================================
+   IDF LOGOS
+========================================= */
 
 .bookend-top-left {
   position: absolute;
-  top: 25px;
-  left: 30px;
+  top: clamp(12px, 2.3vh, 25px);
+  left: clamp(12px, 2vw, 30px);
   z-index: 3;
 }
 
 .idf-logos-img {
-  height: 52px;
+  display: block;
   width: auto;
+  height: clamp(45px, 7.5vh, 85px);
+  max-width: 25vw;
   object-fit: contain;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
-/* מיכל התוכן המרכזי לפי רוחב 605px שציינת */
+
+/* =========================================
+   CONTENT WRAPPER
+========================================= */
+
 .bookend-content-wrapper {
   position: relative;
   z-index: 3;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 90%;
-  max-width: 650px;
-  gap: 27px; /* הרווח המדויק שהגדרת */
+
+  width: min(90%, 763px);
+  max-height: 94%;
+  box-sizing: border-box;
+
+  gap: clamp(12px, 2.5vh, 27px);
+
+  /* מיקום קבוצת התוכן */
+  transform: translate(
+    clamp(100px, 20vw, 350px),
+    clamp(-250px, -15vh, -100px)
+  );
 }
 
-/* כותרת ראשית: רוחב 763 מקסימלי, פונט Rubik ExtraBold 84px, מסגרת אדומה ושוליים לבנים */
+
+/* =========================================
+   MAIN TITLE
+========================================= */
+
 .bookend-main-title {
   width: 100%;
-  max-width: 763px;
+  max-width: 100%;
+
+  margin: 0;
+  padding: clamp(5px, 1.2vw, 15px)
+           clamp(4px, 1vw, 12px);
+
+  box-sizing: border-box;
 
   background: transparent;
 
@@ -65,128 +113,205 @@
 
   font-family: 'Rubik', sans-serif;
   font-weight: 800;
-  font-size: clamp(2.5rem, 5.5vw, 84px);
-
-  line-height: 1.1;
+  font-size: clamp(24px, min(5vw, 8vh), 84px);
+  line-height: 1.12;
   letter-spacing: -0.05em;
   text-align: center;
 
+  /* שמירה על שורה אחת */
+  white-space: nowrap;
+
   /* מסגרת לבנה מסביב לאותיות */
-  -webkit-text-stroke: clamp(1px, 0.33vw, 5px) #ffffff;
+  -webkit-text-stroke: clamp(1px, 0.28vw, 5px) #ffffff;
   paint-order: stroke fill;
-
-  padding: 15px 20px;
-  margin: 0;
-
-  box-sizing: border-box;
 }
 
-@media (min-width: 1200px) {
-  .bookend-main-title {
-    font-size: 84px; /* הגודל המקורי המבוקש למסכי מחשב גדולים */
-    line-height: 100px;
-  }
-}
 
-/* קו הפרדה עם יהלום באמצע (Frame 3) */
+/* =========================================
+   ANIMATED DIAMOND DIVIDER
+========================================= */
+
 .bookend-divider {
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 100%;
-  gap: 15px;
-  margin: 5px 0;
+  gap: clamp(8px, 2vw, 24px);
+
+  margin: 0;
+  flex-shrink: 0;
 }
 
-.line-side {
+/* קווים משני צדי היהלום */
+
+.divider-line {
   flex: 1;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, #88a4be, transparent);
-  border-radius: 2px;
+  min-width: 0;
+  height: clamp(1px, 0.18vw, 2px);
+
+  border-radius: 50%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #88a4be 35%,
+    #dce8f3 50%,
+    #88a4be 65%,
+    transparent
+  );
+
+  opacity: 0.9;
 }
+
+/* יהלום */
 
 .divider-diamond {
-  width: 35px;
-  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+
+  width: clamp(35px, 5vw, 75px);
+  aspect-ratio: 4 / 3;
+
+  flex-shrink: 0;
 }
 
 .diamond-svg {
+  display: block;
   width: 100%;
   height: 100%;
+  overflow: visible;
 }
 
-/* תיבת הטקסט הלבנה: רוחב 605px, פונט Rubik SemiBold 36px והצללה */
+/* מבנה היהלום */
+
+.diamond-facets {
+  fill: none;
+  stroke: #b9cde0;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+/* מסגרת חיצונית */
+
+.diamond-outline {
+  stroke: #dce8f3;
+  stroke-width: 2.5;
+  opacity: 0.95;
+
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+
+  animation: diamondDraw 3s ease-in-out infinite alternate;
+}
+
+/* חלוקה פנימית */
+
+.diamond-facet {
+  stroke: #88a4be;
+  stroke-width: 1.5;
+  opacity: 0.75;
+
+  stroke-dasharray: 180;
+  stroke-dashoffset: 180;
+
+  animation: diamondDraw 2.5s ease-in-out infinite alternate;
+}
+
+/* קו מרכזי */
+
+.diamond-center {
+  stroke: #88a4be;
+  stroke-width: 1.5;
+
+  animation: diamondGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes diamondDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes diamondGlow {
+  from {
+    opacity: 0.35;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* =========================================
+   TEXT BOX
+========================================= */
+
 .bookend-text-box {
   width: 100%;
   max-width: 605px;
+
+  margin: 0;
+  padding: 0;
+
   box-sizing: border-box;
-  margin: 0 auto;
+
   background: transparent;
   border: none;
   box-shadow: none;
-  padding: 0;
 }
 
 .bookend-text-box p {
   margin: 0;
+
   font-family: 'Rubik', sans-serif;
   font-weight: 600;
-  font-size: clamp(22px, 2.35vw, 36px);
-  line-height: 1;
+
+  font-size: clamp(18px, min(2.35vw, 4.2vh), 36px);
+  line-height: 1.15;
   letter-spacing: 0;
+
   text-align: center;
-  color: hsla(0, 0%, 100%, 1);
+  color: #ffffff;
 
-  /* הצל חל על הטקסט בלבד */
-  text-shadow: 0px 4px 4px hsla(0, 0%, 0%, 0.25);
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-/* התאמה למסכים קטנים יותר */
-@media (max-width: 768px) {
-  .bookend-text-box p {
-    font-size: clamp(20px, 3.2vw, 28px);
-  }
-}
 
-@media (min-width: 1200px) {
-  .bookend-text-box p {
-    font-size: 36px; /* גודל מקורי במחשב */
-  }
-}
-
-        
-
+/* =========================================
+   BUTTON
+========================================= */
 
 .bookend-btn {
   position: relative;
   isolation: isolate;
 
-  width: 100%;
-  max-width: 361px;
-  height: clamp(76px, 6.5vw, 100px);
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  background: transparent;
-  border: none;
-  padding: 0;
+  width: min(100%, 361px);
+  height: clamp(58px, 9vh, 100px);
 
+  flex-shrink: 0;
+
+  padding: 0;
+  border: none;
+
+  background: transparent;
   color: #ffffff;
+
   font-family: 'Rubik', sans-serif;
   font-weight: 800;
-  font-size: clamp(25px, 2.5vw, 36px);
+  font-size: clamp(22px, min(2.5vw, 4vh), 36px);
   line-height: 1;
   text-align: center;
 
   cursor: pointer;
 
-  /* צורת שמונה הצלעות */
   clip-path: polygon(
     5% 0,
     95% 0,
@@ -203,7 +328,8 @@
     filter 0.25s ease;
 }
 
-/* המסגרת החיצונית */
+/* מסגרת זהובה */
+
 .bookend-btn::before {
   content: '';
   position: absolute;
@@ -220,43 +346,47 @@
   clip-path: inherit;
 }
 
-/* המילוי האדום הפנימי */
+/* מילוי אדום */
+
 .bookend-btn::after {
   content: '';
   position: absolute;
-  inset: 5px;
+  inset: clamp(3px, 0.35vw, 5px);
   z-index: -1;
 
   background: hsla(356, 92%, 42%, 1);
 
   clip-path: inherit;
-
   transition: background 0.25s ease;
 }
 
-/* Hover */
-.bookend-btn:hover {
-  transform: translateY(-2px);
-  filter: drop-shadow(0 5px 7px rgba(0, 0, 0, 0.22));
+/* HOVER */
+
+.bookend-btn:hover:not(:disabled) {
+  transform: translateY(-2px) scale(1.02);
+  filter: drop-shadow(0 5px 8px rgba(0, 0, 0, 0.25));
 }
 
-.bookend-btn:hover::after {
+.bookend-btn:hover:not(:disabled)::after {
   background: hsla(356, 92%, 36%, 1);
 }
 
-/* Active */
-.bookend-btn:active {
-  transform: translateY(1px) scale(0.985);
+/* ACTIVE */
+
+.bookend-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
   filter: brightness(0.92);
 }
 
-/* נגישות מקלדת */
+/* FOCUS */
+
 .bookend-btn:focus-visible {
   outline: 3px solid #fffbe0;
   outline-offset: 5px;
 }
 
-/* Disabled */
+/* DISABLED */
+
 .bookend-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -265,12 +395,156 @@
 }
 
 
+/* =========================================
+   ULTRAWIDE SCREENS
+========================================= */
 
-.bookend-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 20px rgba(225, 29, 72, 0.4);
+@media (min-width: 2000px) {
+  .bookend-content-wrapper {
+    width: min(85%, 900px);
+  }
+
+  .bookend-main-title {
+    font-size: clamp(60px, 4.2vw, 84px);
+  }
+
+  .bookend-text-box {
+    max-width: 680px;
+  }
+
+  .bookend-divider {
+    max-width: 850px;
+  }
+
+  .divider-diamond {
+    width: clamp(65px, 3.5vw, 90px);
+  }
 }
 
-.bookend-btn:active {
-  transform: translateY(0) scale(0.98);
+
+/* =========================================
+   SHORT DESKTOP SCREENS
+========================================= */
+
+@media (max-height: 800px) and (min-width: 769px) {
+  .bookend-content-wrapper {
+    gap: clamp(8px, 1.8vh, 18px);
+    max-height: 96%;
+
+    /* שומר על ההזזה האופקית גם במסכים נמוכים */
+    transform: translate(
+      clamp(100px, 20vw, 350px),
+      -1vh
+    );
+  }
+
+  .bookend-main-title {
+    font-size: clamp(28px, min(4.5vw, 7vh), 68px);
+    padding: 5px 12px;
+  }
+
+  .bookend-text-box p {
+    font-size: clamp(18px, min(2.1vw, 3.8vh), 30px);
+  }
+
+  .bookend-btn {
+    height: clamp(55px, 8vh, 78px);
+  }
+
+  .bookend-divider {
+    max-width: 700px;
+  }
+
+  .divider-diamond {
+    width: clamp(30px, 3vw, 48px);
+  }
+}
+
+
+/* =========================================
+   TABLET / SMALL SCREENS
+========================================= */
+
+@media (max-width: 768px) {
+  .bookend-content-wrapper {
+    width: 90%;
+    max-height: 94%;
+    gap: clamp(12px, 2.5vh, 22px);
+    transform: none;
+  }
+
+  .bookend-main-title {
+    font-size: clamp(22px, 6vw, 48px);
+    letter-spacing: -0.055em;
+    padding: 5px 2px;
+    -webkit-text-stroke: 2px #ffffff;
+  }
+
+  .bookend-text-box p {
+    font-size: clamp(17px, 3.5vw, 27px);
+  }
+
+  .bookend-btn {
+    width: min(100%, 320px);
+    height: clamp(58px, 9vh, 82px);
+    font-size: clamp(21px, 4vw, 30px);
+  }
+
+  .bookend-divider {
+    width: 100%;
+  }
+
+  .divider-diamond {
+    width: clamp(32px, 6vw, 55px);
+  }
+}
+
+
+/* =========================================
+   VERY SMALL SCREENS
+========================================= */
+
+@media (max-width: 380px) {
+  .bookend-content-wrapper {
+    width: 94%;
+    gap: 12px;
+  }
+
+  .bookend-main-title {
+    font-size: clamp(19px, 5.8vw, 24px);
+    letter-spacing: -0.06em;
+    -webkit-text-stroke: 1.5px #ffffff;
+  }
+
+  .bookend-divider {
+    gap: 8px;
+  }
+
+  .bookend-text-box p {
+    font-size: 17px;
+  }
+
+  .bookend-btn {
+    height: 58px;
+    font-size: 21px;
+  }
+}
+
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .diamond-facet,
+  .diamond-outline,
+  .diamond-center {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+
+  .bookend-btn {
+    transition: none;
+  }
 }

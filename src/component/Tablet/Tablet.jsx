@@ -26,7 +26,6 @@ export default function Tablet({
   ...rest
 }) {
   const currentType = type || tabletType;
-
   const InnerComponent = tabletComponents[currentType];
 
   const currentSoldierImg = soldierImage || defaultSoldierImg;
@@ -34,44 +33,60 @@ export default function Tablet({
   return (
     <div className="tablet-stage-wrapper">
 
-      <div className="tablet-blur-backdrop"></div>
+      {/* רקע מטושטש */}
+      <div
+        className="tablet-blur-backdrop"
+        aria-hidden="true"
+      />
 
+      {/* תמונת החייל - שכבת בסיס */}
       <div className="tablet-character-container">
 
         <img
           src={currentSoldierImg}
           alt="חייל מחזיק טאבלט"
           className="soldier-base-img"
+          draggable="false"
         />
 
+        {/* מסכת הטאבלט */}
         <div
-          className="tablet-screen-viewport"
+          className="tablet-mask-layer"
           style={{
             WebkitMaskImage: `url(${maskImg})`,
             maskImage: `url(${maskImg})`,
           }}
         >
 
-          <div className="tablet-inner-rotator">
+          {/* המסך הפנימי */}
+          <div className="tablet-inner-screen">
 
-            {InnerComponent ? (
-              <InnerComponent
-                {...rest}
-                onComplete={onComplete}
-                onNext={onNext}
-              />
-            ) : children ? (
-              children
-            ) : (
-              <div className="placeholder-screen">
-                <p>תוכן השלב: {currentType || 'לא הוגדר'}</p>
-              </div>
-            )}
+            <div className="tablet-screen-content">
+
+              {InnerComponent ? (
+                <InnerComponent
+                  {...rest}
+                  onComplete={onComplete}
+                  onNext={onNext}
+                />
+              ) : children != null ? (
+                children
+              ) : (
+                <div className="tablet-placeholder-screen">
+                  <p>
+                    תוכן השלב: {currentType || 'לא הוגדר'}
+                  </p>
+                </div>
+              )}
+
+            </div>
 
           </div>
 
         </div>
+
       </div>
+
     </div>
   );
 }

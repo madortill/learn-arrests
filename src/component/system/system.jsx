@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import stages from '../../data/stages.json';
+import './System.css';
 
 import Tablet from '../Tablet/Tablet';
 import BookendScreen from '../BookendScreen/BookendScreen';
@@ -22,6 +23,8 @@ import About from '../About/About';
 import Levels, { LevelsBtn } from '../Levels/Levels';
 import ReturnBtn from '../ReturnBtn/ReturnBtn';
 
+import bg1 from '../../assets/backgrounds/bg-1.png';
+
 const componentMap = {
   Tablet,
   BookendScreen,
@@ -34,6 +37,10 @@ const componentMap = {
   DrivingScreen,
   DoorsScreen,
   WriteboardScreen,
+};
+
+const backgroundMap = {
+  'bg-1': bg1,
 };
 
 const DOOR_STAGES = [25, 26, 27, 28];
@@ -161,6 +168,13 @@ export default function System() {
   const isDoorRoomStep = activeDoorStage !== null;
 
   const isCompleted = completedSteps.includes(currentStep);
+
+  // זיהוי בועת דיבור ראשית
+  const isPrimarySpeechBubble =
+    primaryData?.type === 'SpeechBubble';
+
+  const primarySpeechHasTyping =
+    primaryData?.props?.typeAnimation !== false;
 
   // Checklist
   const isChecklistStep =
@@ -469,14 +483,24 @@ export default function System() {
   // ==========================================
 
   const showGlobalContinue =
-    isCompleted &&
+    (
+      isCompleted ||
+      (isPrimarySpeechBubble && !primarySpeechHasTyping)
+    ) &&
     !isDoorsHubStep &&
     (!isWhatsAppStep || isPrisonerWhatsAppStep) &&
     !isQuizStep &&
     !isBookend;
 
   return (
-    <div className={`system-container ${stepData.background || ''}`}>
+    <div
+      className="system-container"
+      style={{
+        backgroundImage: backgroundMap[stepData.background]
+          ? `url(${backgroundMap[stepData.background]})`
+          : 'none',
+      }}
+    >
 
       <About />
 
@@ -569,11 +593,12 @@ export default function System() {
         </div>
       )}
 
-      {/* בועת דיבור */}
+      {/* בועת דיבור משנית */}
       {secondaryData?.type === 'SpeechBubble' &&
         !isDepositsScreenOpen && (
           <SpeechBubble
             {...(secondaryData.props || {})}
+            typeAnimation={false}
             isCompleted={isCompleted}
           />
         )}

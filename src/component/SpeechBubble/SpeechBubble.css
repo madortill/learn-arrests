@@ -1,163 +1,241 @@
-/* מעטפת מיקום כללית */
-.speech-bubble-wrapper {
-    position: absolute;
-    z-index: 100;
-    direction: rtl;
-    font-family: sans-serif;
-    pointer-events: auto;
-  }
-  
-  /* בועת הדיבור הראשית */
-  .speech-bubble {
-    position: relative;
-    background-color: #3e2888; /* צבע סגול תואם לעיצוב */
-    color: #ffffff;
-    border: 2px solid #ffffff; /* מסגרת לבנה */
-    border-radius: 20px;
-    padding: 24px 30px;
-    width: 90vw;
-    max-width: 520px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    box-sizing: border-box;
-  }
-  
-  /* תוכן הטקסט */
+
+/* =========================================
+   SPEECH BUBBLE LAYER
+========================================= */
+
+.speech-bubble-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+
+  z-index: 100;
+
+  direction: rtl;
+  font-family: 'Rubik', sans-serif;
+
+  pointer-events: none;
+  overflow: visible;
+
+  box-sizing: border-box;
+}
+
+/* =========================================
+   SVG SHAPE
+========================================= */
+
+.speech-bubble-shape {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* =========================================
+   BUBBLE
+========================================= */
+
+.speech-bubble {
+  position: absolute;
+
+  --speech-bubble-max-width: 1350px;
+
+  width: min(
+    52.64vw,
+    var(--speech-bubble-max-width),
+    calc(100vw - 32px)
+  );
+
+  box-sizing: border-box;
+
+  padding:
+    clamp(22px, 5vh, 64px)
+    clamp(20px, 5.49vw, 79px);
+
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+
+  color: #FFFFFF;
+}
+
+/* =========================================
+   TEXT CONTENT
+========================================= */
+
+.speech-content {
+  position: relative;
+  width: 100%;
+
+  direction: rtl;
+  text-align: right;
+}
+
+.speech-content p {
+  width: 100%;
+  margin: 0;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 600;
+
+  font-size: clamp(
+    18px,
+    min(2.7vw, 5vh),
+    40px
+  );
+
+  line-height: 1.875;
+
+  color: #FFFFFF;
+
+  text-align: right;
+  direction: rtl;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+/* Hidden measurement text */
+
+.speech-measure-text {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Visible typewriter text */
+
+.speech-visible-text {
+  position: absolute;
+  inset: 0;
+
+  visibility: visible;
+  pointer-events: none;
+}
+
+/* =========================================
+   1280x720 - KEEP ALMOST THE SAME
+========================================= */
+
+@media (min-width: 1200px) and (max-width: 1300px) {
   .speech-content p {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 700;
-    line-height: 1.6;
-    white-space: pre-line;
-    word-wrap: break-word;
-  }
-  
-  /* סמן הקלדה */
-  .typing-cursor {
-    display: inline-block;
-    font-weight: bold;
-    font-size: 22px;
-    color: #ffffff;
-    margin-right: 2px;
-    animation: blink 0.7s infinite;
-  }
-  
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
-  
-  /* ==========================================
-     ניהול מיקום קודקוד הדיבור (Tail / Pointer)
-     ========================================== */
-  .speech-tail {
-    position: absolute;
-    width: 25px;
-    height: 25px;
-    z-index: 2;
-  }
-  
-  .tail-svg {
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  
-  /* שמאל - למעלה (כמו בתמונה) */
-  .tail-left-top .speech-tail {
-    left: -24px;
-    top: 30px;
-    transform: rotate(0deg);
-  }
-  
-  /* שמאל - מרכז */
-  .tail-left-center .speech-tail {
-    left: -24px;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
-  }
-  
-  /* שמאל - למטה */
-  .tail-left-bottom .speech-tail {
-    left: -24px;
-    bottom: 30px;
-    transform: rotate(0deg);
-  }
-  
-  /* ימין - למעלה */
-  .tail-right-top .speech-tail {
-    right: -24px;
-    top: 30px;
-    transform: rotate(180deg);
-  }
-  
-  /* ימין - מרכז */
-  .tail-right-center .speech-tail {
-    right: -24px;
-    top: 50%;
-    transform: translateY(-50%) rotate(180deg);
-  }
-  
-  /* למעלה - ימין */
-  .tail-top-right .speech-tail {
-    top: -24px;
-    right: 40px;
-    transform: rotate(90deg);
-  }
-  
-  /* למעלה - שמאל */
-  .tail-top-left .speech-tail {
-    top: -24px;
-    left: 40px;
-    transform: rotate(90deg);
-  }
-  
-  /* ==========================================
-     התאמות רספונסיביות למסכי מחשב (Desktop)
-     ========================================== */
-  @media (min-width: 1024px) {
-    .speech-bubble {
-      max-width: 650px;
-      padding: 30px 40px;
-      border-radius: 24px;
-      border-width: 3px;
-    }
-  
-    .speech-content p {
-      font-size: 24px;
-      line-height: 1.7;
-    }
-  
-    .speech-tail {
-      width: 30px;
-      height: 30px;
-    }
-  
-    .tail-left-top .speech-tail {
-      left: -29px;
-      top: 40px;
-    }
-  
-    .tail-right-top .speech-tail {
-      right: -29px;
-      top: 40px;
-    }
+    font-size: 31px;
+    line-height: 1.75;
   }
 
-  /* מיקום כפתור ההמשך מתחת לבועת הדיבור */
-.speech-continue-container {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-start; /* או center לפי העדפה */
-    animation: fadeInContinue 0.4s ease forward;
+  .speech-bubble {
+    padding-top: 28px;
+    padding-bottom: 28px;
   }
-  
-  @keyframes fadeInContinue {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+}
+
+/* =========================================
+   1366x768 - WIDER + MORE LINE SPACING
+========================================= */
+
+@media (min-width: 1301px) and (max-width: 1399px) {
+  .speech-bubble {
+    width: 51vw;
+
+    padding:
+      28px
+      55px;
   }
+
+  .speech-content p {
+    font-size: 29px;
+    line-height: 1.75;
+  }
+}
+
+/* =========================================
+   1440x900 - WIDER + MORE LINE SPACING
+========================================= */
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .speech-bubble {
+    width: 50vw;
+
+    padding:
+      30px
+      58px;
+  }
+
+  .speech-content p {
+    font-size: 30px;
+    line-height: 1.75;
+  }
+}
+
+/* =========================================
+   1920x1080 - REFERENCE DESIGN
+   DO NOT CHANGE
+========================================= */
+
+@media (min-width: 1600px) and (max-width: 2199px) {
+  .speech-bubble {
+    width: 52.64vw;
+
+    padding:
+      clamp(22px, 5vh, 64px)
+      clamp(20px, 5.49vw, 79px);
+  }
+
+  .speech-content p {
+    font-size: 40px;
+    line-height: 1.875;
+  }
+}
+
+/* =========================================
+   2560x1440 - SLIGHTLY WIDER
+========================================= */
+
+@media (min-width: 2200px) {
+  .speech-bubble {
+    width: min(56vw, var(--speech-bubble-max-width));
+
+    padding:
+      64px
+      clamp(79px, 4vw, 105px);
+  }
+
+  .speech-content p {
+    font-size: 44px;
+    line-height: 1.9;
+  }
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 768px) {
+  .speech-bubble {
+    width: min(758px, calc(100vw - 24px));
+
+    padding:
+      clamp(20px, 5vw, 38px)
+      clamp(18px, 5vw, 38px);
+  }
+
+  .speech-content p {
+    font-size: clamp(18px, 3.5vw, 27px);
+    line-height: 1.65;
+  }
+}
+
+/* =========================================
+   ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .speech-bubble-layer {
+    scroll-behavior: auto;
+  }
+}

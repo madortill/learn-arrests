@@ -11,7 +11,7 @@
   "pages": [
     {
       "step": 0,
-      "background": "bg-1",
+      "background": "bg-0",
       "primaryComponent": {
         "type": "BookendScreen",
         "props": {
@@ -25,19 +25,22 @@
       "primaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לורם איפסום דולור סיט אמט קונסקטטור.\nאיפסום מגנה פאסלוס אגת ארקו אגסטס פורוס אליקוואם. אוגה אלייפנד אדיפיסינג אולטריסייס נון נונק האביטנט ויוורה. נולה אין ניסי טלוס ריסוס אגסטס סיט ביבנדום נון.\nיוצאים צוותי ליווי לאיסוף מן המעצרים.",
+          "text": "מידי יום מתייצבים ונעצרים עריקים ומשתמטים במעצרים הפיקודיים בבסיסי השיטור בחיל. כל יום פלוגת הליווים מקבלת דיווחים מן הבסיסים לגבי העצורים המיועדים לעבור לבסיסי הכליאה. בהתאם לכמות, ופעימות קבועות יוצאים צוותי ליווי לאיסוף מן המעצרים.",
           "typeAnimation": true,
-          "tailPosition": "left-top",
           "position": {
             "top": "15%",
-            "right": "10%"
+            "right": "4%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
           }
         }
       }
     },
     {
       "step": 2,
-      "background": "bg-1",
+      "background": "bg-2",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
@@ -114,24 +117,30 @@
     },
     {
       "id": 5,
-      "background": "bg-blur",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
           "cards": [
-            { "id": 1, "frontImage": "question", "backText": "טקסט לקלף 1..." },
-            { "id": 2, "frontImage": "question", "backText": "טקסט לקלף 2..." },
-            { "id": 3, "frontImage": "question", "backText": "טקסט לקלף 3..." }
+            { "id": 1, "frontImage": "question", "backText": "עצור מצ”ח הינו חייל אשר נמצא חשוד בעבירה פלילית ונתון תחת חקירה של המשטרה הצבאית החוקרת." },
+            { "id": 2, "frontImage": "question", "backText": "עצור מצ”ח ייחשב כעל”מ (עצור לפני משפט) כיוון שהוא בחקירה מתמשכת ואינו קיבל את גזר הדין שלו ועדיין." },
+            { "id": 3, "frontImage": "question", "backText": "פקודת המעצר של עצורי מצ”ח תקפה ל-24 שעות אלא אם יש החרגת סא”ל ל48 שעות." }
           ]
         }
       },
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שיוצאים, חשוב שנזכור את הדגשים המבצעיים. הפכו את הכרטיסיות.",
-          "position": { "bottom": "5%", "right": "5%" },
-          "tailPosition": "right-bottom",
-          "character": "commander"
+          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח ",
+          "typeAnimation": false,
+          "position": {
+            "top": "15%",
+            "right": "10%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },
@@ -145,8 +154,8 @@
           "cards": [
             {
               "id": 1,
-              "frontText": "Lorem ipsum dolor sit amet consectetur. Sit facilisi est sociis aenean...",
-              "backText": "Lorem ipsum dolor sit amet consectetur. Pellentesque felis amet."
+              "frontText": "כאשר יש ידיעה מודיעינית על פרשייה מתגלגלת ונמסר מידע כי יש מספר גדול של מעורבים, עולה על 4, על מפקד הבסיס בו ייערך הצח”ם לתאם שבועיים מראש מול ליוויים ומפקדת הימל”ת להעמיד צוותי עתודה שם כמות מספקת של כוח אדם.",
+              "backText": "לעומת זאת  ליווי מצ”ח שגרתי יכול לקפוץ כל יום, עצורי מצ”ח יכולים להגיע באופן רנדומלי."
             }
           ]
         }
@@ -154,8 +163,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח ",
           "typeAnimation": false,
-          "text": "חשוב שגם נכיר מי הם צוותי צח״ם"
+          "position": {
+            "top": "15%",
+            "right": "10%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },

@@ -1,43 +1,77 @@
+/* במידה והפונט לא נטען גלובלית בפרויקט, יש לוודא טעינה של משקל 700 נטוי */
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@1,700&display=swap');
+
 .global-continue-wrapper {
-    /* מנתק את הכפתור לחלוטין מכל מה שעוטף אותו (כמו הטאבלט) */
-    position: fixed;
-    
-    /* מיקום רספונסיבי - כאן מוגדר בפינה השמאלית התחתונה. 
-       אם תרצי למקם באמצע, שחקי עם left: 50% ו-transform */
-    bottom: clamp(20px, 4vh, 40px);
-    left: clamp(30px, 4vw, 50px);
-    
-    /* מוודא שהכפתור תמיד יופיע מעל כל אלמנט אחר במסך */
-    z-index: 9999;
-    
-    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: fixed;
+  /* בפיגמה: top: 897px מתוך 1024px (גובה כפתור 60px) => מרווח תחתון של 67px (6.54vh) */
+  bottom: clamp(32px, 6.54vh, 85px);
+  /* בפיגמה: left: 650px מתוך 1440px (רוחב כפתור 141px) => ממורכז אופקית לחלוטין */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+}
+
+.global-continue-btn {
+  /* שמירה על יחס המידות המדויק מהפיגמה (141x60) והתאמה לכל רוחב מסך מחשב */
+  width: clamp(122px, 9.8vw, 185px);
+  aspect-ratio: 141 / 60;
+  border: none;
+  border-radius: 999px; /* שקול ל-37.5px ושומר על צורת קפסולה בכל קנה מידה */
+  background: hsla(201, 28%, 88%, 1);
+  box-shadow: 0px 0px clamp(65px, 6.95vw, 120px) 0px hsla(219, 19%, 64%, 1);
+
+  /* סידור פנימי: היהלום משמאל והטקסט מימין גם אם האתר מוגדר RTL */
+  direction: ltr;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12% 0 10%;
+  box-sizing: border-box;
+
+  cursor: pointer;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.global-continue-btn:hover {
+  background: hsla(201, 28%, 84%, 1);
+  transform: scale(1.05);
+}
+
+.global-continue-btn:active {
+  transform: scale(0.95);
+}
+
+.continue-btn-diamond {
+  height: 60%;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+  /* שימוש ב-drop-shadow במקום box-shadow כדי שהצל יקיף את צורת היהלום עצמה */
+  filter: drop-shadow(0px 1px 4px hsla(0, 0%, 0%, 0.25));
+}
+
+.continue-btn-text {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  /* 24px במסך 1440px => 1.67vw */
+  font-size: clamp(20px, 1.67vw, 32px);
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: right;
+  /* בפיגמה צבע הטקסט מיוצא תחת background, ב-CSS יש להשתמש ב-color */
+  color: hsla(201, 15%, 39%, 1);
+  user-select: none;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
   }
-  
-  .global-continue-btn {
-    background-color: #ffffff;
-    border: 2px solid #000000;
-    border-radius: 40px;
-    padding: clamp(8px, 1.5vh, 12px) clamp(25px, 4vw, 45px);
-    font-family: 'DanaYadAlefAlefAlef', sans-serif;
-    font-size: clamp(24px, 3.5vh, 36px);
-    color: #000000;
-    -webkit-text-stroke: 1px #000000;
-    cursor: pointer;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .global-continue-btn:hover {
-    background-color: #f1f5f9;
-    transform: scale(1.05);
-  }
-  
-  .global-continue-btn:active {
-    transform: scale(0.95);
-  }
-  
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-  }
+}
