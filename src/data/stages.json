@@ -26,7 +26,7 @@
         "type": "SpeechBubble",
         "props": {
           "text": "מידי יום מתייצבים ונעצרים עריקים ומשתמטים במעצרים הפיקודיים בבסיסי השיטור בחיל. כל יום פלוגת הליווים מקבלת דיווחים מן הבסיסים לגבי העצורים המיועדים לעבור לבסיסי הכליאה. בהתאם לכמות, ופעימות קבועות יוצאים צוותי ליווי לאיסוף מן המעצרים.",
-          "typeAnimation": true,
+          "typeAnimation": false,
           "position": {
             "top": "15%",
             "right": "4%"
@@ -163,11 +163,11 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח ",
+          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח, לחצו בשביל להבין את ההבדל. ",
           "typeAnimation": false,
           "position": {
-            "top": "15%",
-            "right": "10%"
+            "top": "12%",
+            "right": "5%"
           },
           "tailTarget": {
             "x": "25%",
@@ -309,39 +309,39 @@
     },
     {
       "id": 10,
-      "background": "bg-10",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "ChecklistScreen",
         "props": {
           "items": [
             {
               "id": "item1",
-              "text": "חוגר, פנקס שבי ודיסקית",
+              "text": "מגיעים לתדרוך של קצין תורן בפלוגה",
               "image": null
             },
             {
               "id": "item2",
-              "text": "פקל\"ים (אזיקים, גז פלפל)",
+              "text": "כל המפקדים עם  פקלים מלאים",
               "image": "pekelim.png"
             },
             {
               "id": "item3",
-              "text": "נשק אישי ומחסניות בהכנס",
-              "image": null
+              "text": "כולם נערכו לאם צריכים אקסטרה איזיקים לפי רמ”סים",
+              "image": "handcuffs.png"
             },
             {
               "id": "item4",
-              "text": "קסדה ואפוד מגן תקניים",
-              "image": "Helmet.png"
+              "text": "לא יוצאים ללא תדרוך מקצין תורן בליוויים",
+              "image": null
             },
             {
               "id": "item5",
-              "text": "תיק ליווי (מסמכים רלוונטיים)",
+              "text": "לא יוצאים ללא תדרוך קדקוד",
               "image": null
             },
             {
               "id": "item6",
-              "text": "מים (מינימום 3 ליטר) ומזון לדרך",
+              "text": "לא יוצאים ללא תדרוך רמ”ן",
               "image": null
             }
           ]
@@ -350,18 +350,22 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שיוצאים לליווי מעצרים, סמנו שכל הציוד הנדרש עליכם. לא זזים בלי הכל!",
+          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי",
+          "typeAnimation": false,
           "position": {
-            "bottom": "15%",
-            "right": "10%"
+            "top": "12%",
+            "right": "5%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
           }
         }
       }
     },
-    
     {
       "id": 11,
-      "background": "bg-11",
+      "background": "bg-1",
       "primaryComponent": {
         "type": "ChecklistScreen",
         "props": {
@@ -369,12 +373,12 @@
           "items": [
             {
               "id": "item1",
-              "text": "בדקתי שכל הציוד האישי תקין, שלם ונגיש",
+              "text": "הצוות עבור תדרוך על ידי קצין תורן בכל נושא נהלי האבטחה והאזיקה בנוסף למתן איש קשר ממצ”ח.",
               "image": null
             },
             {
               "id": "item2",
-              "text": "וידאתי שקיבלתי את פרטי המשימה והנחיות המפקד",
+              "text": "לפני היציאה ברכב ליעד יתדרך קצין תורן את הנהג ואת מפקד הנסיעה.",
               "image": null
             }
           ]
@@ -383,10 +387,15 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני היציאה, ודאו שכל הבדיקות הושלמו ושאתם מוכנים למשימה!",
+          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח",
+          "typeAnimation": false,
           "position": {
-            "bottom": "15%",
-            "right": "10%"
+            "top": "12%",
+            "right": "5%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
           }
         }
       }
@@ -397,8 +406,16 @@
       "primaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "typeAnimation": true,
-          "text": "כל הכבוד עכשיו אלינו לצאת על השטח וללות את העצור."
+          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח",
+          "typeAnimation": false,
+          "position": {
+            "top": "12%",
+            "right": "5%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       },
       "secondaryComponent": {
@@ -444,14 +461,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך",
           "typeAnimation": false,
-          "text": "הפכו את הכרטיסיות כדי להכיר את הדגשים החשובים בתהליך.",
           "position": {
-            "bottom": "5%",
+            "top": "10%",
             "right": "5%"
           },
-          "tailPosition": "right-bottom",
-          "character": "commander"
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },
@@ -466,9 +485,14 @@
         "type": "SpeechBubble",
         "props": {
           "text": "השלב השני הוא לקיחת האחריות על פיקדונות העצורים מסגל המעצר",
+          "typeAnimation": false,
           "position": {
-            "bottom": "15%",
+            "top": "15%",
             "right": "10%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
           }
         }
       }
@@ -505,18 +529,18 @@
           "items": [
             {
               "id": "item1",
-              "text": "חוגר, פנקס שבי ודיסקית",
+              "text": "חיפוש יסודי מכף רגל ועד ראש לכלואים",
               "image": null
             },
             {
               "id": "item2",
-              "text": "פקל\"ים (אזיקים, גז פלפל)",
-              "image": "pekelim.png"
+              "text": "מעבר עם מגנומטר כדי לוודא שאין על הכלוא חפצים חדים שיכולים לסייע להם בבריחה, פגיעה עצמית ופגיעה במפקד.",
+              "image": "magnetometer.png"
             },
             {
               "id": "item3",
-              "text": "נשק אישי ומחסניות בהכנס",
-              "image": "pekelim.png"
+              "text": "לוודא שהכלוא לא לובש מתחת ללמדי הכליה אזרחי.",
+              "image": "noShirt.png"
             }
           ]
         }
@@ -524,10 +548,15 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שיוצאים לליווי מעצרים, סמנו שכל הציוד הנדרש עליכם. לא זזים בלי הכל!",
+          "text": "השלב הרביעי בתהליך הוא לבצע חיפושים יסודיים",
+          "typeAnimation": false,
           "position": {
-            "bottom": "15%",
+            "top": "15%",
             "right": "10%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
           }
         }
       }
@@ -542,7 +571,7 @@
             {
               "id": 1,
               "frontImage": "level5_card_image.png",
-              "backText": "ההסבר של הקלף הראשון"
+              "backText": "עצורים הנאספים ממעצרים לא התקבלו לכלא ולכן אין עליהם מידע מודעיני. בעקבות כך צוות הליווי יתיחס לעצורים בתור רמ”ס 4 ויבצע אזיקה בהתאם לפני העלאתם לרכב."
             }
           ]
         }
@@ -550,14 +579,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "השלב ההחמישי הוא האזיקה",
           "typeAnimation": false,
-          "text": "הפכו את הכרטיסיות כדי להכיר את הדגשים החשובים.",
           "position": {
-            "bottom": "5%",
-            "right": "5%"
+            "top": "15%",
+            "right": "10%"
           },
-          "tailPosition": "right-bottom",
-          "character": "commander"
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },
@@ -645,18 +676,24 @@
         "type": "FlipCards",
         "props": {
           "cards": [
-            { "id": 1, "frontImage": "question", "backText": "טקסט לקלף 1..." },
-            { "id": 2, "frontImage": "question", "backText": "טקסט לקלף 3..." }
+            { "id": 1, "frontImage": "question", "backText": "יש לבצע סריקה ברכב על מנת לוודא שאין חפצים מסוכנים לפני העלאת הכלואים לרכב הליווי." },
+            { "id": 2, "frontImage": "question", "backText": "יש לבצע ספירה של הכלואים." }
           ]
         }
       },
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שיוצאים, חשוב שנזכור את הדגשים המבצעיים. הפכו את הכרטיסיות.",
-          "position": { "bottom": "5%", "right": "5%" },
-          "tailPosition": "right-bottom",
-          "character": "commander"
+          "text": "הגענו לשלב האחרון של תהליך איסוף במעצר",
+          "typeAnimation": false,
+          "position": {
+            "top": "15%",
+            "right": "10%"
+          },
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },
@@ -763,8 +800,14 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "מעולה! הגעתם כמעט לסוף. נשארו לכם רק עוד 4 כיתות לעבור בהן.",
-          "position": "top-left"
+          "typeAnimation": false,
+          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
+          "position": {
+            "bottom": "5%",
+            "right": "5%"
+          },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },
@@ -778,32 +821,32 @@
             {
               "id": 1,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 1"
+              "backText": "להוריד את העצורים לפי נהלי האזיקה אל תא המעצר של הקבלה."
             },
             {
               "id": 2,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 2"
+              "backText": "להחתים את טפסי העצורים אצל ניהול הלכואים ומפקד התורן בבס”כ."
             },
             {
               "id": 3,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 3"
+              "backText": "להכניס את הפיקדונות לשם העברת אחריות והחתמת מש”ק הפיקדונות על טפסי הפיקדון"
             },
             {
               "id": 4,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 4"
+              "backText": "בזמן ההמתנה להכנסת הכלואים לקבלה על המלווים לפקח עליהם ולדאוג לצרכיהם."
             },
             {
               "id": 5,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 5"
+              "backText": "יש לדאוג לאוכל בהתאם לשעות ההמתינים."
             },
             {
               "id": 6,
               "frontImage": "question",
-              "backText": "טקסט להסבר כרטיסייה 6"
+              "backText": "בתום הקבלה יש לוודא החתמה של אישור מעבר ע”י הסמל התורן בקבלה."
             }
           ]
         }
@@ -811,14 +854,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך ",
           "typeAnimation": false,
-          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
           "position": {
-            "bottom": "5%",
-            "right": "5%"
+            "top": "12%",
+            "right": "8%"
           },
-          "tailPosition": "right-bottom",
-          "character": "commander"
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },
@@ -844,8 +889,14 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "עברו על הקוביות והפס עם הטוש",
-          "position": "top-right"
+          "typeAnimation": false,
+          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
+          "position": {
+            "bottom": "5%",
+            "right": "5%"
+          },
+          "tailPosition": "right-bottom",
+          "character": "commander"
         }
       }
     },
@@ -858,22 +909,22 @@
           "items": [
             {
               "id": "item1",
-              "text": "טקסט לנקודת בדיקה ראשונה",
+              "text": "לאחר הגעת צוות הליווי לבסיס המצ”ח יבדקו טפסי המעצר על ידי מפקד המשימה.",
               "image": null
             },
             {
               "id": "item2",
-              "text": "טקסט לנקודת בדיקה שנייה",
+              "text": "הצוות יעבור על פיקדונות הכלוא ויוודא את תקינותם.",
               "image": null
             },
             {
               "id": "item3",
-              "text": "טקסט לנקודת בדיקה שלישית – פק״לים",
-              "image": "pekelim.png"
+              "text": "כמו כן, הצוות יעשה חיפוש על גופו של החייל ויוודא שאינו לובש אזרחי",
+              "image": "noShirt.png"
             },
             {
               "id": "item4",
-              "text": "טקסט לנקודת בדיקה רביעית",
+              "text": "יש להתייחס אל עצור מצ” כאל עצור רמ”ס 4 אלא אם הוגדר אחרת בעת התדרוך.",
               "image": null
             }
           ]
@@ -882,13 +933,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "כעט נעבור על ההדגישים המיוחדים לקליטת עצור מצ”ח ",
           "typeAnimation": false,
-          "text": "עברו על הדגשים וסמנו את הנקודות לאחר שעברתם עליהן.",
           "position": {
-            "bottom": "15%",
-            "right": "10%"
+            "top": "12%",
+            "right": "8%"
           },
-          "tailPosition": "right-bottom"
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },

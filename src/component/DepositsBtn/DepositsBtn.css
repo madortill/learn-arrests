@@ -26,14 +26,14 @@
   }
   
   .deposit-bag-img {
-    width: clamp(200px, 30vw, 400px);
+    width: clamp(200px, 50vw, 500px);
     height: auto;
     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
   }
   
   @keyframes slideInFromRight {
     to {
-      right: 5%;
+      right: -1%;
     }
   }
   

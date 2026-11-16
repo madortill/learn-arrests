@@ -6,7 +6,7 @@ import questionMarkIcon from '../../assets/question-mark.png';
 import exclamationMarkIcon from '../../assets/exclamation-mark.png';
 import level5CardImage from '../../assets/level5_card_image.png';
 
-// זיכרון של מצב הקלפים לפי שלב
+// שמירת מצב הקלפים לפי שלב
 const flipCardsCache = {};
 
 const FlipCards = ({
@@ -16,13 +16,10 @@ const FlipCards = ({
   currentStep,
   isCompleted = false,
 }) => {
-
-  // זיהוי ייחודי של השלב
   const stepKey = currentStep ?? JSON.stringify(cards);
 
   const savedState = flipCardsCache[stepKey];
 
-  // שחזור מצב הקלפים
   const [flippedCards, setFlippedCards] = useState(
     () => savedState?.flipped || {}
   );
@@ -30,10 +27,9 @@ const FlipCards = ({
   const [viewedCards, setViewedCards] = useState(() => {
     if (savedState?.viewed) return savedState.viewed;
 
-    // אם השלב כבר הושלם, כל הקלפים נחשבים כנצפו
     if (isCompleted && cards) {
       return Object.fromEntries(
-        cards.map(card => [card.id, true])
+        cards.map((card) => [card.id, true])
       );
     }
 
@@ -44,35 +40,30 @@ const FlipCards = ({
     () => isCompleted || savedState?.completed || false
   );
 
-  // שמירת המצב בזיכרון בכל שינוי
+  // שמירת המצב בזיכרון
   useEffect(() => {
     flipCardsCache[stepKey] = {
       flipped: flippedCards,
       viewed: viewedCards,
       completed,
     };
-  }, [
-    flippedCards,
-    viewedCards,
-    completed,
-    stepKey,
-  ]);
+  }, [flippedCards, viewedCards, completed, stepKey]);
 
-  // אם System מודיע שהשלב כבר הושלם
+  // סנכרון עם מצב השלמת השלב
   useEffect(() => {
-    if (isCompleted && cards) {
-      setViewedCards(prev => {
-        const updated = { ...prev };
+    if (!isCompleted || !cards) return;
 
-        cards.forEach(card => {
-          updated[card.id] = true;
-        });
+    setViewedCards((prev) => {
+      const updated = { ...prev };
 
-        return updated;
+      cards.forEach((card) => {
+        updated[card.id] = true;
       });
 
-      setCompleted(true);
-    }
+      return updated;
+    });
+
+    setCompleted(true);
   }, [isCompleted, cards]);
 
   // הפיכת קלף
@@ -90,36 +81,44 @@ const FlipCards = ({
     setFlippedCards(updatedFlipped);
     setViewedCards(updatedViewed);
 
-    // בדיקה האם כל הקלפים נצפו
     const allViewed = cards.every(
-      card => updatedViewed[card.id]
+      (card) => updatedViewed[card.id]
     );
 
     if (allViewed && !completed) {
       setCompleted(true);
-
-      // הודעה ל-System שהשלב הושלם
       onComplete?.();
     }
   };
 
-  // זיהוי תמונות
+  // זיהוי מקור התמונה
   const resolveImage = (imageString) => {
     if (imageString === 'question') return questionMarkIcon;
     if (imageString === 'exclamation') return exclamationMarkIcon;
-    if (imageString === 'level5_card_image.png') return level5CardImage;
-  
+    if (imageString === 'level5_card_image.png') {
+      return level5CardImage;
+    }
+
     return imageString;
+  };
+
+  // זיהוי אייקון
+  const isIcon = (imageString) => {
+    return (
+      imageString === 'question' ||
+      imageString === 'exclamation'
+    );
   };
 
   if (!cards || cards.length === 0) return null;
 
-  // התאמת פריסת הקלפים לפי הכמות
+  // התאמת פריסה לכמות הקלפים
   const layoutClass =
     cards.length === 1 ? 'layout-single' :
     cards.length === 2 ? 'layout-double' :
     cards.length === 3 ? 'layout-triple' :
     cards.length === 5 ? 'layout-quintuple' :
+    cards.length === 6 ? 'layout-six' :
     'layout-grid';
 
   return (
@@ -141,7 +140,6 @@ const FlipCards = ({
             }`}
             onClick={() => handleFlip(card.id)}
           >
-
             <div className="flip-card-inner">
 
               {/* חזית הקלף */}
@@ -150,8 +148,12 @@ const FlipCards = ({
                 {card.frontImage && (
                   <img
                     src={resolveImage(card.frontImage)}
-                    alt="front icon"
-                    className="flip-card-icon"
+                    alt="front image"
+                    className={
+                      isIcon(card.frontImage)
+                        ? 'flip-card-icon'
+                        : 'flip-card-image'
+                    }
                   />
                 )}
 
@@ -167,8 +169,12 @@ const FlipCards = ({
                 {card.backImage && (
                   <img
                     src={resolveImage(card.backImage)}
-                    alt="back icon"
-                    className="flip-card-icon"
+                    alt="back image"
+                    className={
+                      isIcon(card.backImage)
+                        ? 'flip-card-icon'
+                        : 'flip-card-image'
+                    }
                   />
                 )}
 
@@ -179,7 +185,6 @@ const FlipCards = ({
               </div>
 
             </div>
-
           </div>
         ))}
 

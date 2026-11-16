@@ -24,11 +24,6 @@ const TAIL_TIP_RADIUS = 4;
 // RESPONSIVE TAIL CALIBRATION
 // ==========================================
 
-// Calibration points:
-// 1440x1020 -> 29%
-// 1920x1080 -> 24%
-// 1366x768  -> 24%
-
 function getResponsiveTailY(width, height) {
   const value =
     24.030896 -
@@ -78,6 +73,7 @@ function createBubblePath(rect, target = null) {
     height / 2
   );
 
+  // בועה ללא זנב
   if (!target) {
     return `
       M ${left + radius} ${top}
@@ -148,15 +144,9 @@ const DEFAULT_POSITION = {
 export default function SpeechBubble({
   text = '',
   typeAnimation = true,
-
   position = DEFAULT_POSITION,
-
   tailTarget = null,
-
-  // When true, Y is calculated from the viewport dimensions.
-  // Set to false to use the exact tailTarget coordinates.
   responsiveTailTarget = true,
-
   isCompleted = false,
   onComplete,
 }) {
@@ -176,6 +166,15 @@ export default function SpeechBubble({
   const onCompleteRef = useRef(onComplete);
   const completedTextRef = useRef(null);
 
+  // עדכון callback
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  // ==========================================
+  // COMPLETE ONCE
+  // ==========================================
+
   const completeOnce = useCallback(() => {
     if (completedTextRef.current === text) return;
 
@@ -183,48 +182,64 @@ export default function SpeechBubble({
     onCompleteRef.current?.();
   }, [text]);
 
+  // ==========================================
+  // TYPEWRITER ANIMATION
+  // ==========================================
+
   useEffect(() => {
     let currentIndex = 0;
     let timer;
-  
+
     if (isCompleted || !typeAnimation) {
       setDisplayedText(text);
       completeOnce();
+
       return;
     }
-  
+
     completedTextRef.current = null;
-  
+
     const characters = Array.from(text);
-  
+
     setDisplayedText('');
-  
+
     if (!characters.length) {
       completeOnce();
       return;
     }
-  
+
     const typeNextCharacter = () => {
       currentIndex++;
-  
+
       setDisplayedText(
         characters.slice(0, currentIndex).join('')
       );
-  
+
       if (currentIndex < characters.length) {
-        timer = setTimeout(typeNextCharacter, TYPING_SPEED);
+        timer = setTimeout(
+          typeNextCharacter,
+          TYPING_SPEED
+        );
       } else {
         completeOnce();
       }
     };
-  
-    timer = setTimeout(typeNextCharacter, TYPING_SPEED);
-  
+
+    timer = setTimeout(
+      typeNextCharacter,
+      TYPING_SPEED
+    );
+
     return () => clearTimeout(timer);
-  }, [text, typeAnimation, isCompleted, completeOnce]);
+  }, [
+    text,
+    typeAnimation,
+    isCompleted,
+    completeOnce,
+  ]);
 
   // ==========================================
-  // GEOMETRY
+  // UPDATE SVG GEOMETRY
   // ==========================================
 
   const updateGeometry = useCallback(() => {
@@ -263,7 +278,7 @@ export default function SpeechBubble({
       width: layer.width,
       height: layer.height,
     };
-    
+
     setGeometry((previous) => {
       if (
         previous.path === nextGeometry.path &&
@@ -272,10 +287,14 @@ export default function SpeechBubble({
       ) {
         return previous;
       }
-    
+
       return nextGeometry;
     });
   }, [tailTarget, responsiveTailTarget]);
+
+  // ==========================================
+  // OBSERVE SIZE CHANGES
+  // ==========================================
 
   useLayoutEffect(() => {
     updateGeometry();
@@ -296,58 +315,14 @@ export default function SpeechBubble({
   }, [updateGeometry, position, text]);
 
   // ==========================================
-  // TYPEWRITER
-  // ==========================================
-
-  useEffect(() => {
-    let currentIndex = 0;
-    let timer;
-
-    if (isCompleted) {
-      setDisplayedText(text);
-      return;
-    }
-
-    if (!typeAnimation) {
-      setDisplayedText(text);
-      onCompleteRef.current?.();
-      return;
-    }
-
-    const characters = Array.from(text);
-
-    setDisplayedText('');
-
-    if (!characters.length) {
-      onCompleteRef.current?.();
-      return;
-    }
-
-    const typeNextCharacter = () => {
-      currentIndex++;
-
-      setDisplayedText(
-        characters.slice(0, currentIndex).join('')
-      );
-
-      if (currentIndex < characters.length) {
-        timer = setTimeout(typeNextCharacter, TYPING_SPEED);
-      } else {
-        onCompleteRef.current?.();
-      }
-    };
-
-    timer = setTimeout(typeNextCharacter, TYPING_SPEED);
-
-    return () => clearTimeout(timer);
-  }, [text, typeAnimation, isCompleted]);
-
-  // ==========================================
   // RENDER
   // ==========================================
 
   return (
-    <div className="speech-bubble-layer" ref={layerRef}>
+    <div
+      className="speech-bubble-layer"
+      ref={layerRef}
+    >
       <svg
         className="speech-bubble-shape"
         width={geometry.width}
@@ -373,13 +348,17 @@ export default function SpeechBubble({
         style={position}
       >
         <div className="speech-content">
+
+          {/* טקסט למדידת גובה ורוחב הבועה */}
           <p className="speech-measure-text">
             {text || ' '}
           </p>
 
+          {/* טקסט מוצג */}
           <p className="speech-visible-text">
             {displayedText}
           </p>
+
         </div>
       </div>
     </div>

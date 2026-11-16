@@ -6,6 +6,7 @@
 .speech-bubble-layer {
   position: absolute;
   inset: 0;
+
   width: 100%;
   height: 100%;
 
@@ -42,19 +43,16 @@
 .speech-bubble {
   position: absolute;
 
-  --speech-bubble-max-width: 1350px;
+  width: fit-content;
 
-  width: min(
-    52.64vw,
-    var(--speech-bubble-max-width),
-    calc(100vw - 32px)
-  );
+  max-width: min(48vw, 1050px);
+  min-width: 0;
 
   box-sizing: border-box;
 
   padding:
-    clamp(22px, 5vh, 64px)
-    clamp(20px, 5.49vw, 79px);
+    clamp(12px, 1.1vw, 24px)
+    clamp(24px, 2.1vw, 48px);
 
   background: transparent;
   border: none;
@@ -70,11 +68,17 @@
 
 .speech-content {
   position: relative;
+
   width: 100%;
+  min-width: 0;
 
   direction: rtl;
   text-align: right;
 }
+
+/* =========================================
+   TEXT
+========================================= */
 
 .speech-content p {
   width: 100%;
@@ -83,13 +87,8 @@
   font-family: 'Rubik', sans-serif;
   font-weight: 600;
 
-  font-size: clamp(
-    18px,
-    min(2.7vw, 5vh),
-    40px
-  );
-
-  line-height: 1.875;
+  font-size: clamp(22px, 1.7vw, 40px);
+  line-height: 1.45;
 
   color: #FFFFFF;
 
@@ -97,18 +96,22 @@
   direction: rtl;
 
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
   word-break: normal;
 }
 
-/* Hidden measurement text */
+/* =========================================
+   HIDDEN MEASUREMENT TEXT
+========================================= */
 
 .speech-measure-text {
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Visible typewriter text */
+/* =========================================
+   VISIBLE TYPEWRITER TEXT
+========================================= */
 
 .speech-visible-text {
   position: absolute;
@@ -119,95 +122,83 @@
 }
 
 /* =========================================
-   1280x720 - KEEP ALMOST THE SAME
+   1280x720
 ========================================= */
 
 @media (min-width: 1200px) and (max-width: 1300px) {
-  .speech-content p {
-    font-size: 31px;
-    line-height: 1.75;
-  }
-
   .speech-bubble {
-    padding-top: 28px;
-    padding-bottom: 28px;
-  }
-}
-
-/* =========================================
-   1366x768 - WIDER + MORE LINE SPACING
-========================================= */
-
-@media (min-width: 1301px) and (max-width: 1399px) {
-  .speech-bubble {
-    width: 51vw;
-
-    padding:
-      28px
-      55px;
-  }
-
-  .speech-content p {
-    font-size: 29px;
-    line-height: 1.75;
-  }
-}
-
-/* =========================================
-   1440x900 - WIDER + MORE LINE SPACING
-========================================= */
-
-@media (min-width: 1400px) and (max-width: 1599px) {
-  .speech-bubble {
-    width: 50vw;
-
-    padding:
-      30px
-      58px;
+    max-width: 55vw;
+    padding: 24px 39px;
   }
 
   .speech-content p {
     font-size: 30px;
-    line-height: 1.75;
+    line-height: 1.4;
   }
 }
 
 /* =========================================
-   1920x1080 - REFERENCE DESIGN
-   DO NOT CHANGE
+   1366x768
 ========================================= */
 
-@media (min-width: 1600px) and (max-width: 2199px) {
+@media (min-width: 1301px) and (max-width: 1399px) {
   .speech-bubble {
-    width: 52.64vw;
+    max-width: 57vw;
+    padding: 28px 45px;
+  }
 
-    padding:
-      clamp(22px, 5vh, 64px)
-      clamp(20px, 5.49vw, 79px);
+  .speech-content p {
+    font-size: 34px;
+    line-height: 1.4;
+  }
+}
+
+/* =========================================
+   1440x900 - 1440x1025
+   REFERENCE SIZE
+========================================= */
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .speech-bubble {
+    max-width: 60vw;
+    padding: 32px 52px;
   }
 
   .speech-content p {
     font-size: 40px;
-    line-height: 1.875;
+    line-height: 1.45;
   }
 }
 
 /* =========================================
-   2560x1440 - SLIGHTLY WIDER
+   1920x1080
+========================================= */
+
+@media (min-width: 1600px) and (max-width: 2199px) {
+  .speech-bubble {
+    max-width: 58vw;
+    padding: 40px 65px;
+  }
+
+  .speech-content p {
+    font-size: 48px;
+    line-height: 1.4;
+  }
+}
+
+/* =========================================
+   2560x1440
 ========================================= */
 
 @media (min-width: 2200px) {
   .speech-bubble {
-    width: min(56vw, var(--speech-bubble-max-width));
-
-    padding:
-      64px
-      clamp(79px, 4vw, 105px);
+    max-width: 58vw;
+    padding: 52px 84px;
   }
 
   .speech-content p {
-    font-size: 44px;
-    line-height: 1.9;
+    font-size: 64px;
+    line-height: 1.4;
   }
 }
 
@@ -217,25 +208,12 @@
 
 @media (max-width: 768px) {
   .speech-bubble {
-    width: min(758px, calc(100vw - 24px));
-
-    padding:
-      clamp(20px, 5vw, 38px)
-      clamp(18px, 5vw, 38px);
+    max-width: 80vw;
+    padding: 14px 20px;
   }
 
   .speech-content p {
     font-size: clamp(18px, 3.5vw, 27px);
-    line-height: 1.65;
-  }
-}
-
-/* =========================================
-   ACCESSIBILITY
-========================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  .speech-bubble-layer {
-    scroll-behavior: auto;
+    line-height: 1.45;
   }
 }

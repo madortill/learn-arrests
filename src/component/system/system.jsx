@@ -73,6 +73,10 @@ export default function System() {
 
   // מסך פיקדונות
   const [isDepositsScreenOpen, setIsDepositsScreenOpen] = useState(false);
+  // איפוס מצב מסך הפיקדונות במעבר בין שלבים
+  useEffect(() => {
+    setIsDepositsScreenOpen(false);
+  }, [currentStep]);
 
   // מסכי טעינה
   const [loadingType, setLoadingType] = useState('initial');
@@ -152,10 +156,14 @@ export default function System() {
   // נתוני השלב הנוכחי
   // ==========================================
 
-  const stepData = pages[currentStep];
+  
+const stepData = pages[currentStep];
 
-  const primaryData = stepData?.primaryComponent;
-  const secondaryData = stepData?.secondaryComponent;
+const primaryData = stepData?.primaryComponent;
+const secondaryData = stepData?.secondaryComponent;
+
+
+
 
   const PrimaryComponent = componentMap[primaryData?.type];
 
@@ -594,8 +602,11 @@ export default function System() {
       )}
 
       {/* בועת דיבור משנית */}
-      {secondaryData?.type === 'SpeechBubble' &&
-        !isDepositsScreenOpen && (
+      {secondaryData?.type === 'SpeechBubble' && !(isChecklistStep && checklistHasInteracted) &&
+        (
+          !isDepositsScreenOpen ||
+          primaryData?.type !== 'DepositsBtn'
+        ) && (
           <SpeechBubble
             {...(secondaryData.props || {})}
             typeAnimation={false}
