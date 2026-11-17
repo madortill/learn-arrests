@@ -1,50 +1,96 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import './ParkingButton.css';
 
 import Lock from '../Lock/Lock';
+import ParkingScreen from '../ParkingScreen/ParkingScreen';
 
-import parkingBg from '../../assets/parking_bg.png';
-import padlock from '../../assets/padlock.png';
+import padlock from '../../assets/parking/padlock.png';
 
 export default function ParkingButton({
   onComplete,
   isCompleted = false,
-  completedVehicles = {},
-  onCompletedVehiclesChange
+  lockSlides = [],
+  vehicles = [],
+  parkingSpeechBubble,
+  parkingState = {},
+  onParkingStateChange,
 }) {
-  const [isLockOpen, setIsLockOpen] = useState(false);
+  const isGateOpened = Boolean(
+    parkingState.isGateOpened || isCompleted
+  );
+
+  const isLockModalOpen = Boolean(
+    parkingState.isLockModalOpen
+  );
+
+  const handleOpenInitialLock = () => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      isLockModalOpen: true,
+    }));
+  };
+
+  const handleOpenGate = () => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      isGateOpened: true,
+      hasUnlockedOnce: true,
+      isLockModalOpen: false,
+    }));
+  };
+
+  const handleCloseLockModal = () => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      isLockModalOpen: false,
+    }));
+  };
+
+  const handleReopenLockModal = () => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      isLockModalOpen: true,
+    }));
+  };
 
   return (
     <div className="parking-container" dir="rtl">
-
-      <img
-        src={parkingBg}
-        alt="מגרש החניה"
-        className="parking-bg"
-      />
-
-      {!isLockOpen && (
+      {!isGateOpened && !isLockModalOpen && (
         <button
+          type="button"
           className="parking-padlock-btn"
-          onClick={() => setIsLockOpen(true)}
+          onClick={handleOpenInitialLock}
           aria-label="כניסה למגרש החניה"
         >
-          <img src={padlock} alt="" />
-          <span>לחצו לפתיחת השער</span>
+          <img src={padlock} alt="מנעול" />
         </button>
       )}
 
-      {isLockOpen && (
-        <Lock
+      {isGateOpened && (
+        <ParkingScreen
           onComplete={onComplete}
-          onClose={() => setIsLockOpen(false)}
-          isCompleted={isCompleted}
-          completedVehicles={completedVehicles}
-          onCompletedVehiclesChange={onCompletedVehiclesChange}
+          onBackToLock={handleReopenLockModal}
+          vehicles={vehicles}
+          parkingSpeechBubble={parkingSpeechBubble}
+          parkingState={parkingState}
+          onParkingStateChange={onParkingStateChange}
         />
       )}
 
+      {isLockModalOpen && (
+        <Lock
+          slides={lockSlides}
+          isCompleted={isCompleted}
+          canClose={Boolean(
+            parkingState.hasUnlockedOnce || isCompleted
+          )}
+          parkingState={parkingState}
+          onParkingStateChange={onParkingStateChange}
+          onOpenGate={handleOpenGate}
+          onClose={handleCloseLockModal}
+        />
+      )}
     </div>
   );
 }

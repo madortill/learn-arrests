@@ -1,4 +1,3 @@
-
 /* =========================================
    SPEECH BUBBLE LAYER
 ========================================= */
@@ -10,7 +9,8 @@
   width: 100%;
   height: 100%;
 
-  z-index: 100;
+  /* מתחת לבלר ולחלוניות של Lock ו-VehicleInfo, מעל החניה והרכבים */
+  z-index: 40;
 
   direction: rtl;
   font-family: 'Rubik', sans-serif;
@@ -74,6 +74,11 @@
 
   direction: rtl;
   text-align: right;
+}
+
+.speech-bubble-layer.is-centered .speech-content,
+.speech-bubble-layer.is-centered .speech-content p {
+  text-align: center;
 }
 
 /* =========================================

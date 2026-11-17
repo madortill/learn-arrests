@@ -1,183 +1,192 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import './Lock.css';
 
 import ChecklistScreen from '../ChecklistScreen/ChecklistScreen';
-import ParkingScreen from '../ParkingScreen/ParkingScreen';
 
-import padlock from '../../assets/padlock.png';
-import tableBg from '../../assets/table_bg.png';
+import lockPadlockBehind from '../../assets/parking/lock_padlock_behind.png';
+import openGateIcon from '../../assets/parking/open_gate_icon.png';
+import carouselArrow from '../../assets/parking/carousel_arrow.png';
 
-const miniChecklistItems = [
-  { id: 'lock1', text: 'בדיקת תקינות הרכב' },
-  { id: 'lock2', text: 'בדיקת ציוד הליווי' },
-  { id: 'lock3', text: 'בדיקת מסמכים נדרשים' },
-  { id: 'lock4', text: 'וידוא מוכנות ליציאה' }
-];
+const parkingAssets = import.meta.glob('../../assets/parking/*', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+
+const parkingImageMap = Object.fromEntries(
+  Object.entries(parkingAssets).map(([path, url]) => [
+    path.split('/').pop().toLowerCase(),
+    url,
+  ])
+);
+
+const getParkingImage = (name) => {
+  if (!name) return null;
+  return parkingImageMap[name.split('/').pop().toLowerCase()] || null;
+};
 
 export default function Lock({
-  onComplete,
-  onClose,
+  slides = [],
   isCompleted = false,
-  completedVehicles = {},
-  onCompletedVehiclesChange
+  canClose = false,
+  parkingState = {},
+  onParkingStateChange,
+  onOpenGate,
+  onClose,
 }) {
-  const [currentSlide, setCurrentSlide] = useState(
-    isCompleted ? 2 : 0
+  const totalSlides = slides.length;
+  const currentSlide = Math.min(
+    parkingState.lockSlide ?? 0,
+    Math.max(0, totalSlides - 1)
   );
 
-  const [showParkingScreen, setShowParkingScreen] = useState(
-    isCompleted
-  );
+  const activeSlide = slides[currentSlide] || {};
+  const checklistSlide = slides.find((s) => s.type === 'checklist');
+  const miniItems = checklistSlide?.items || [];
 
-  const [checkedItems, setCheckedItems] = useState(
-    isCompleted
-      ? Object.fromEntries(
-          miniChecklistItems.map(item => [item.id, true])
-        )
-      : {}
-  );
+  const checkedItems = isCompleted
+    ? Object.fromEntries(miniItems.map((item) => [item.id, true]))
+    : parkingState.lockCheckedItems || {};
 
-  const checklistCompleted = miniChecklistItems.every(
-    item => Boolean(checkedItems[item.id])
-  );
+  const checklistCompleted =
+    miniItems.length === 0 ||
+    miniItems.every((item) => Boolean(checkedItems[item.id]));
 
-  const nextSlide = () => {
-    if (currentSlide === 0 && !checklistCompleted) return;
+  const canGoNext =
+    currentSlide < totalSlides - 1 &&
+    (activeSlide.type !== 'checklist' || checklistCompleted);
 
-    setCurrentSlide(prev => Math.min(prev + 1, 2));
+  const canGoPrev = currentSlide > 0;
+
+  const setSlide = (nextIndex) => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      lockSlide: nextIndex,
+    }));
   };
 
-  const prevSlide = () => {
-    setCurrentSlide(prev => Math.max(prev - 1, 0));
+  const handleCheckedItemsChange = (updatedChecked) => {
+    onParkingStateChange?.((prev) => ({
+      ...prev,
+      lockCheckedItems: updatedChecked,
+    }));
   };
+
+  const slideImageUrl = getParkingImage(activeSlide.image);
 
   return (
-    <>
-      {!showParkingScreen && (
-        <div className="lock-carousel-overlay">
-          <div className="lock-carousel-container">
+    <div className="lock-carousel-overlay" dir="rtl">
+      {/* חץ חזור (ימין) - מופיע רק כשניתן לחזור */}
+      {canGoPrev && (
+        <button
+          type="button"
+          className="carousel-nav-arrow right-arrow"
+          onClick={() => setSlide(currentSlide - 1)}
+          aria-label="שקופית קודמת"
+        >
+          <img src={carouselArrow} alt="" />
+        </button>
+      )}
 
-            <div className="lock-top-img">
-              <img src={padlock} alt="מנעול" />
-            </div>
+      {/* חץ קדימה (שמאל) - מופיע רק כשניתן להתקדם */}
+      {canGoNext && (
+        <button
+          type="button"
+          className="carousel-nav-arrow left-arrow"
+          onClick={() => setSlide(currentSlide + 1)}
+          aria-label="שקופית הבאה"
+        >
+          <img src={carouselArrow} alt="" />
+        </button>
+      )}
 
-            <div className="lock-content-box">
+      <div className="lock-carousel-container">
+        {/* תמונת המנעול מאחורי הדיב הצהוב */}
+        <div className="lock-behind-img">
+          <img src={lockPadlockBehind} alt="מנעול" />
+        </div>
 
-              {currentSlide > 0 && (
-                <button
-                  className="lock-arrow right-arrow"
-                  onClick={prevSlide}
-                  aria-label="שקופית קודמת"
-                >
-                  &#10095;
-                </button>
-              )}
+        <div className="lock-content-box">
+          {canClose && (
+            <button
+              type="button"
+              className="lock-close-btn"
+              onClick={onClose}
+              aria-label="סגירה"
+            >
+              &#10005;
+            </button>
+          )}
 
-              <div className="lock-slide-content">
+          <div className="lock-slide-content">
+            {activeSlide.type === 'checklist' && (
+              <div className="lock-slide lock-slide-checklist">
+                <h2 className="lock-title">{activeSlide.title}</h2>
 
-                {currentSlide === 0 && (
-                  <div className="lock-slide lock-slide-checklist">
-                    <h2>הרכב יציאה לליווי</h2>
-
-                    <p>
-                      לפני הכניסה למגרש, עברו על הציוד הנדרש.
-                    </p>
-
-                    <div className="lock-checklist-wrapper">
-                      <ChecklistScreen
-                        items={miniChecklistItems}
-                        variant="mini"
-                        checkedItems={checkedItems}
-                        onCheckedItemsChange={setCheckedItems}
-                      />
-                    </div>
-
-                    {!checklistCompleted && (
-                      <p className="checklist-hint">
-                        יש לסמן את כל הפריטים כדי להמשיך
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {currentSlide === 1 && (
-                  <div className="lock-slide lock-slide-table">
-                    <h2>טבלת תקן הליווי ברכב</h2>
-
-                    <div className="lock-table-container">
-                      <img
-                        src={tableBg}
-                        alt="טבלת תקן הליווי"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {currentSlide === 2 && (
-                  <div className="lock-slide lock-slide-opening">
-                    <h2>רכב ליווי לא מדוגם</h2>
-
-                    <p>
-                      לפני תחילת הליווי חשוב להכיר את סוגי
-                      הרכבים, הציוד הנדרש ואת חלוקת מקומות
-                      הישיבה בכל אחד מהם.
-                    </p>
-
-                    <button
-                      className="open-gate-btn"
-                      onClick={() => setShowParkingScreen(true)}
-                    >
-                      <img src={padlock} alt="" />
-                      פתחו את השער
-                    </button>
-                  </div>
-                )}
-
+                <div className="lock-checklist-wrapper">
+                  <ChecklistScreen
+                    items={miniItems}
+                    variant="mini"
+                    side="center"
+                    checkedItems={checkedItems}
+                    onCheckedItemsChange={handleCheckedItemsChange}
+                    isCompleted={isCompleted}
+                  />
+                </div>
               </div>
+            )}
 
-              {currentSlide < 2 && (
+            {activeSlide.type === 'table' && (
+              <div className="lock-slide lock-slide-table">
+                <h2 className="lock-title">{activeSlide.title}</h2>
+
+                {slideImageUrl && (
+                  <div className="lock-table-container">
+                    <img
+                      src={slideImageUrl}
+                      alt={activeSlide.title || 'טבלת תקן הליווי'}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeSlide.type === 'text' && (
+              <div className="lock-slide lock-slide-opening">
+                <h2 className="lock-title">{activeSlide.title}</h2>
+
+                {activeSlide.text && (
+                  <p className="lock-body-text">{activeSlide.text}</p>
+                )}
+
                 <button
-                  className={`lock-arrow left-arrow ${
-                    currentSlide === 0 && !checklistCompleted
-                      ? 'disabled'
-                      : ''
-                  }`}
-                  onClick={nextSlide}
-                  disabled={
-                    currentSlide === 0 && !checklistCompleted
-                  }
-                  aria-label="שקופית הבאה"
+                  type="button"
+                  className="open-gate-btn"
+                  onClick={onOpenGate}
                 >
-                  &#10094;
+                  <span className="open-gate-btn-text">
+                    {activeSlide.buttonText || 'פתח את השער'}
+                  </span>
+                  <img
+                    src={openGateIcon}
+                    alt=""
+                    className="open-gate-btn-img"
+                  />
                 </button>
-              )}
-
-            </div>
-
-            <div className="lock-dots">
-              {[0, 1, 2].map(dot => (
-                <span
-                  key={dot}
-                  className={currentSlide === dot ? 'active' : ''}
-                />
-              ))}
-            </div>
-
+              </div>
+            )}
           </div>
         </div>
-      )}
 
-      {showParkingScreen && (
-        <div className="lock-parking-screen">
-          <ParkingScreen
-            onComplete={onComplete}
-            onBackToLock={() => setShowParkingScreen(false)}
-            completedVehicles={completedVehicles}
-            onCompletedVehiclesChange={onCompletedVehiclesChange}
-          />
+        <div className="lock-dots">
+          {slides.map((_, dotIndex) => (
+            <span
+              key={dotIndex}
+              className={currentSlide === dotIndex ? 'active' : ''}
+            />
+          ))}
         </div>
-      )}
-    </>
+      </div>
+    </div>
   );
 }

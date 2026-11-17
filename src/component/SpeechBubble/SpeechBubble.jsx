@@ -1,4 +1,3 @@
-
 import React, {
   useState,
   useEffect,
@@ -39,7 +38,6 @@ function getResponsiveTailY(width, height) {
 
 function parseCoordinate(value, total) {
   if (typeof value === 'number') return value;
-
   if (typeof value !== 'string') return 0;
 
   if (value.endsWith('%')) {
@@ -73,7 +71,7 @@ function createBubblePath(rect, target = null) {
     height / 2
   );
 
-  // בועה ללא זנב
+  // בועה ללא זנב (כאשר הדובר מחוץ למסך)
   if (!target) {
     return `
       M ${left + radius} ${top}
@@ -147,6 +145,8 @@ export default function SpeechBubble({
   position = DEFAULT_POSITION,
   tailTarget = null,
   responsiveTailTarget = true,
+  centered = false,
+  zIndex,
   isCompleted = false,
   onComplete,
 }) {
@@ -166,7 +166,6 @@ export default function SpeechBubble({
   const onCompleteRef = useRef(onComplete);
   const completedTextRef = useRef(null);
 
-  // עדכון callback
   useEffect(() => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
@@ -193,14 +192,11 @@ export default function SpeechBubble({
     if (isCompleted || !typeAnimation) {
       setDisplayedText(text);
       completeOnce();
-
       return;
     }
 
     completedTextRef.current = null;
-
     const characters = Array.from(text);
-
     setDisplayedText('');
 
     if (!characters.length) {
@@ -216,27 +212,16 @@ export default function SpeechBubble({
       );
 
       if (currentIndex < characters.length) {
-        timer = setTimeout(
-          typeNextCharacter,
-          TYPING_SPEED
-        );
+        timer = setTimeout(typeNextCharacter, TYPING_SPEED);
       } else {
         completeOnce();
       }
     };
 
-    timer = setTimeout(
-      typeNextCharacter,
-      TYPING_SPEED
-    );
+    timer = setTimeout(typeNextCharacter, TYPING_SPEED);
 
     return () => clearTimeout(timer);
-  }, [
-    text,
-    typeAnimation,
-    isCompleted,
-    completeOnce,
-  ]);
+  }, [text, typeAnimation, isCompleted, completeOnce]);
 
   // ==========================================
   // UPDATE SVG GEOMETRY
@@ -302,7 +287,6 @@ export default function SpeechBubble({
     if (!bubbleRef.current || !layerRef.current) return;
 
     const observer = new ResizeObserver(updateGeometry);
-
     observer.observe(bubbleRef.current);
     observer.observe(layerRef.current);
 
@@ -312,15 +296,21 @@ export default function SpeechBubble({
       observer.disconnect();
       window.removeEventListener('resize', updateGeometry);
     };
-  }, [updateGeometry, position, text]);
+  }, [updateGeometry, position, text, centered]);
 
-  // ==========================================
-  // RENDER
-  // ==========================================
+  const resolvedBubbleStyle = centered
+    ? {
+        left: '50%',
+        transform: 'translateX(-50%)',
+        top: position?.top ?? 'auto',
+        bottom: position?.bottom ?? '8%',
+      }
+    : position;
 
   return (
     <div
-      className="speech-bubble-layer"
+      className={`speech-bubble-layer ${centered ? 'is-centered' : ''}`}
+      style={zIndex !== undefined ? { zIndex } : undefined}
       ref={layerRef}
     >
       <svg
@@ -345,10 +335,9 @@ export default function SpeechBubble({
       <div
         ref={bubbleRef}
         className="speech-bubble"
-        style={position}
+        style={resolvedBubbleStyle}
       >
         <div className="speech-content">
-
           {/* טקסט למדידת גובה ורוחב הבועה */}
           <p className="speech-measure-text">
             {text || ' '}
@@ -358,7 +347,6 @@ export default function SpeechBubble({
           <p className="speech-visible-text">
             {displayedText}
           </p>
-
         </div>
       </div>
     </div>

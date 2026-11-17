@@ -1,446 +1,584 @@
-
 .vehicle-info-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    direction: rtl;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+
+  z-index: 110;
+  isolation: isolate;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: clamp(72px, 11vh, 130px);
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-sizing: border-box;
+  direction: rtl;
+}
+
+/* ==========================================
+   תמונת הרכב הנבחר (z-index: 15)
+   תואמת בגודל ובמיקום ל-ParkingScreen (ורכב 3 משוקף)
+========================================== */
+
+.vehicle-active-car-img {
+  position: fixed;
+  z-index: 15;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.vehicle-active-car-img.car-pos-v1 {
+  bottom: var(--v1-bottom);
+  left: var(--v1-left);
+  width: var(--v1-width);
+}
+
+.vehicle-active-car-img.car-pos-v2 {
+  bottom: var(--v2-bottom);
+  left: var(--v2-left);
+  width: var(--v2-width);
+}
+
+.vehicle-active-car-img.car-pos-v3 {
+  bottom: var(--v3-bottom);
+  right: var(--v3-right);
+  width: var(--v3-width);
+  transform: scaleX(-1);
+}
+
+.vehicle-active-car-img.car-pos-v4 {
+  bottom: var(--v4-bottom);
+  right: var(--v4-right);
+  width: var(--v4-width);
+}
+
+/* ==========================================
+   מעטפת חיצונית של הקומפוננטה
+========================================== */
+
+.vehicle-info-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* הדיב הצהוב - 1270px במסך 1440x1024 */
+.vehicle-info-modal {
+  position: relative;
+
+  width: min(1270px, 88.19vw);
+  height: auto;
+  min-height: clamp(210px, 26vh, 300px);
+
+  padding: clamp(22px, 2.8vh, 36px) clamp(36px, 4vw, 64px) clamp(24px, 3vh, 38px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+/* רקע הדיב הצהוב (z-index: 1) */
+.vehicle-yellow-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  background: #d4a34b;
+  border-radius: 24px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+/* כפתור סגירה X בצד ימין */
+.vehicle-close-btn {
+  position: absolute;
+  top: clamp(14px, 1.8vh, 22px);
+  right: clamp(16px, 1.6vw, 24px);
+  z-index: 30;
+
+  width: clamp(34px, 2.8vw, 44px);
+  height: clamp(34px, 2.8vw, 44px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+  border-radius: 50%;
+  background: rgba(68, 42, 21, 0.16);
+  color: rgba(68, 42, 21, 1);
+
+  font-family: 'Rubik', sans-serif;
+  font-size: clamp(18px, 1.5vw, 24px);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.vehicle-close-btn:hover {
+  background: rgba(68, 42, 21, 0.3);
+  transform: scale(1.06);
+}
+
+/* זרימת הטקסט שקובעת את גובה הדיב הצהוב */
+.vehicle-text-flow {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.2vh, 14px);
+}
+
+.vehicle-height-anchor {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* זרימה אנכית לשקופיות שאינן טקסט: כותרת -> כותרת משנה -> טקסט -> מרווח -> סדר ישיבה */
+.vehicle-slide-overlay-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  padding: clamp(22px, 2.8vh, 36px) clamp(36px, 4vw, 64px) 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.vehicle-header-block {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(6px, 0.9vh, 12px);
+}
+
+/* כותרת בתוך הדיב הצהוב */
+.vehicle-title {
+  margin: 0;
+  width: 100%;
+  max-width: 86%;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 3.9vw, 56px);
+  line-height: 1.17;
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+}
+
+/* כותרת משנה בתוך הדיב הצהוב */
+.vehicle-subtitle {
+  margin: 0;
+  width: 100%;
+  max-width: 94%;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 600;
+  font-size: clamp(18px, 2.1vw, 32px);
+  line-height: 1.28;
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+}
+
+/* טקסט רגיל בתוך הדיב הצהוב */
+.vehicle-body-text {
+  margin: clamp(6px, 1vh, 14px) 0 0;
+  width: 100%;
+  max-width: 92%;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  font-size: clamp(20px, 2.4vw, 36px);
+  line-height: clamp(32px, 4.4vw, 62px);
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+  overflow-wrap: break-word;
+}
+
+.vehicle-seats-text {
+  margin: clamp(4px, 0.6vh, 8px) 0 0;
+  width: 100%;
+  max-width: 94%;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  font-size: clamp(16px, 1.9vw, 28px);
+  line-height: 1.3;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+}
+
+/* ==========================================
+   שכבת סדר הישיבה (z-index: 25 - מעל תמונת הרכב, עם מרווח ברור מהטקסט)
+========================================== */
+
+.vehicle-seats-layer {
+  position: relative;
+  z-index: 25;
+
+  margin-top: clamp(24px, 3.4vh, 42px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ==========================================
+   שכבת צ'קליסט רגיל במרכז (z-index: 25)
+   שומרת על הפרופורציות הרגילות ומנגנון הגלילה הקיים
+========================================== */
+
+.vehicle-checklist-fullscreen-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.vehicle-checklist-fullscreen-layer .checklist-scroll-area {
+  padding-top: clamp(210px, 28vh, 300px);
+  padding-bottom: 14vh;
+}
+
+/* ==========================================
+   תרשימי הישיבה (z-index: 25)
+========================================== */
+
+.vehicle-diagram-shell {
+  position: relative;
+  z-index: 25;
+
+  background: #FAF5F0;
+  border-radius: clamp(28px, 3vw, 44px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  direction: ltr;
+}
+
+.seat-card {
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  perspective: 1000px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.seat-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.seat-card.is-flipped .seat-inner {
+  transform: rotateY(180deg);
+}
+
+.seat-front,
+.seat-back {
+  position: absolute;
+  inset: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4px 8px;
+
+  border-radius: 9999px;
+  box-sizing: border-box;
+
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.seat-front {
+  background: #1e2635;
+}
+
+.seat-back {
+  background: #CF9339;
+  transform: rotateY(180deg);
+}
+
+.seat-outlined .seat-front,
+.seat-outlined .seat-back {
+  border: 1px solid #7A4B18;
+}
+
+.seat-label-text {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 500;
+  font-size: clamp(13px, 1.67vw, 24px);
+  line-height: 1.08;
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 1);
+  white-space: pre-line;
+}
+
+/* סימוני דלתות */
+.car-door {
+  position: absolute;
+  width: clamp(46px, 6.2vw, 88px);
+  height: clamp(8px, 0.9vh, 13px);
+  background: #3B230E;
+  pointer-events: none;
+}
+
+.door-top {
+  top: 0;
+  border-radius: 0 0 4px 4px;
+}
+
+.door-bottom {
+  bottom: 0;
+  border-radius: 4px 4px 0 0;
+}
+
+/* 1. תרשים מיניבוס */
+.diagram-minibus {
+  width: min(880px, 84vw);
+  aspect-ratio: 2.2 / 1;
+  max-height: 44vh;
+  padding: clamp(12px, 1.8vw, 22px) clamp(14px, 2vw, 26px);
+}
+
+.minibus-grid {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+  column-gap: clamp(6px, 1vw, 14px);
+  row-gap: clamp(4px, 0.7vh, 10px);
+}
+
+.diagram-minibus .seat-card {
+  min-height: 0;
+}
+
+.diagram-minibus .seat-label-text {
+  font-size: clamp(11px, 1.35vw, 20px);
+}
+
+/* 2. תרשים רכב 9 מקומות */
+.diagram-nine-seater {
+  width: min(620px, 76vw);
+  aspect-ratio: 1.45 / 1;
+  max-height: 44vh;
+  padding: clamp(16px, 2.2vw, 28px) clamp(18px, 2.6vw, 34px);
+}
+
+.nine-seater-grid {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(10px, 1.6vw, 22px);
+}
+
+.door-nine-top {
+  left: 81%;
+  transform: translateX(-50%);
+}
+
+.door-nine-bottom-front {
+  left: 81%;
+  transform: translateX(-50%);
+}
+
+.door-nine-bottom-mid {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* 3. תרשים קיה סורנטו */
+.diagram-sorento {
+  width: min(620px, 76vw);
+  aspect-ratio: 1.8 / 1;
+  max-height: 42vh;
+  padding: clamp(16px, 2.2vw, 26px) clamp(20px, 2.8vw, 36px);
+}
+
+.sorento-grid {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.8vw, 36px);
+  align-items: stretch;
+}
+
+.sorento-cage-box {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.5vh, 20px);
+
+  border: 3px dashed #22170D;
+  border-radius: 16px;
+  padding: clamp(8px, 1.2vw, 16px);
+  box-sizing: border-box;
+}
+
+.sorento-front-col {
+  display: grid;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.5vh, 20px);
+  padding: clamp(8px, 1.2vw, 16px) 0;
+  box-sizing: border-box;
+}
+
+.door-sorento-top {
+  left: 73%;
+  transform: translateX(-50%);
+}
+
+.door-sorento-bottom-front {
+  left: 73%;
+  transform: translateX(-50%);
+}
+
+.door-sorento-bottom-cage {
+  left: 38%;
+  transform: translateX(-50%);
+}
+
+/* ==========================================
+   נקודות ניווט וכפתור חזרה למגרש מחוץ לדיב הצהוב
+========================================== */
+
+.vehicle-carousel-dots {
+  position: fixed;
+  bottom: clamp(84px, 10.5vh, 118px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+
+  display: flex;
+  gap: 10px;
+}
+
+.vehicle-carousel-dots span {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #a88133;
+  transition: background 0.2s ease;
+}
+
+.vehicle-carousel-dots span.active {
+  background: #fff0c2;
+}
+
+.vehicle-continue-btn {
+  position: fixed;
+  bottom: clamp(18px, 2.8vh, 36px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1vw, 16px);
+
+  width: auto;
+  min-width: clamp(175px, 14.5vw, 225px);
+  height: clamp(46px, 5.86vh, 62px);
+  padding: 0 clamp(8px, 0.7vw, 12px) 0 clamp(16px, 1.5vw, 24px);
+
+  border: none;
+  border-radius: 37.5px;
+  background: rgba(211, 150, 59, 1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  box-sizing: border-box;
+}
+
+.vehicle-continue-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  filter: brightness(1.06);
+}
+
+.vehicle-continue-btn-text {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: clamp(18px, 1.67vw, 24px);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-align: right;
+  color: rgba(68, 42, 21, 1);
+  white-space: nowrap;
+}
+
+.vehicle-continue-btn-icon {
+  width: clamp(30px, 2.57vw, 37px);
+  height: clamp(30px, 2.57vw, 37px);
+  border-radius: 627px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+@media (max-height: 740px) {
+  .vehicle-info-overlay {
+    padding-top: 56px;
   }
-  
-  .vehicle-info-modal {
-    position: relative;
-  
-    width: 85%;
-    max-width: 900px;
-    height: 75vh;
-    min-height: 450px;
-  
-    padding: 30px 45px;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  
-    background: #d4a34b;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  
+
   .vehicle-title {
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(26px, 3.5vw, 40px);
-    color: #222;
-    text-align: center;
-    margin: 0 0 12px;
+    font-size: clamp(22px, 3.6vh, 40px);
   }
-  
-  .vehicle-slide-body {
-    width: 90%;
-    flex: 1;
-    min-height: 0;
-  
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+
+  .vehicle-subtitle {
+    font-size: clamp(15px, 2.2vh, 24px);
   }
-  
-  .vehicle-slide {
-    width: 100%;
-    height: 100%;
-  
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+
+  .vehicle-body-text {
+    font-size: clamp(17px, 2.6vh, 26px);
+    line-height: 1.4;
   }
-  
-  .slide-text h3,
-  .slide-checklist h3 {
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(22px, 3vw, 30px);
-    color: #222;
+
+  .vehicle-seats-layer {
+    margin-top: 16px;
   }
-  
-  .slide-text p {
-    max-width: 650px;
-    font-size: clamp(17px, 2vw, 23px);
-    line-height: 1.7;
-    text-align: center;
-    color: #222;
+
+  .diagram-minibus,
+  .diagram-nine-seater,
+  .diagram-sorento {
+    max-height: 38vh;
   }
-  
-  /* צ'קליסט */
-  
-  .vehicle-checklist-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    overflow: visible;
-    z-index: 5;
-    pointer-events: auto;
-  }
-  
-  .vehicle-checklist-wrapper .checklist-container {
-    height: 100%;
-    min-height: 0;
-    overflow: visible;
-    pointer-events: auto;
-  }
-  
-  .vehicle-checklist-wrapper .clipboard-wrapper {
-    transform: none;
-    max-height: 100%;
-    min-height: 0;
-  }
-  
-  .vehicle-checklist-hint {
-    font-size: 15px;
-    margin-top: 8px;
-    text-align: center;
-  }
-  
-  /* מושבים - עיצוב כללי */
-  
-  .seats-instruction {
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(17px, 2vw, 23px);
-    text-align: center;
-    color: #222;
-    margin: 0 0 15px;
-  }
-  
-  .seats-beige-box {
-    width: 100%;
-    max-height: 65%;
-    overflow-y: auto;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    padding: 20px;
-    background: #fdf5e6;
-    border-radius: 14px;
-  }
-  
-  .seats-grid {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(55px, 1fr));
-    gap: 12px;
-  }
-  
-  .seat-card {
-    height: 65px;
-    perspective: 1000px;
-    cursor: pointer;
-  }
-  
-  .seat-inner {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  
-    transform-style: preserve-3d;
-    transition: transform 0.6s;
-  }
-  
-  .seat-card.is-flipped .seat-inner {
-    transform: rotateY(180deg);
-  }
-  
-  .seat-front,
-  .seat-back {
-    position: absolute;
-    inset: 0;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    border-radius: 8px;
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(14px, 1.5vw, 18px);
-  
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-  }
-  
-  .seat-front {
-    background: #1e2635;
-    color: white;
-  }
-  
-  .seat-back {
-    background: #d49a38;
-    color: white;
-    transform: rotateY(180deg);
-  }
-  
-  /* ==========================================
-     רכב ראשון - סיטרואן מ"צ
-     ========================================== */
-  
-  .first-vehicle-seats-slide {
-    justify-content: flex-start;
-  }
-  
-  .first-vehicle-layout {
-    width: 100%;
-    max-height: none;
-    height: auto;
-    min-height: 0;
-  
-    padding: 16px 14px;
-    overflow: visible;
-  }
-  
-  .first-vehicle-grid {
-    width: 100%;
-  
-    display: grid;
-    direction: ltr;
-  
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    grid-template-rows: repeat(4, minmax(58px, 1fr));
-  
-    gap: 12px;
-    align-items: stretch;
-  }
-  
-  /* מושבי המלווים */
-  
-  .first-vehicle-seat {
-    width: 100%;
-    height: 100%;
-    min-height: 58px;
-    perspective: 1000px;
-  }
-  
-  .first-vehicle-seat .seat-front,
-  .first-vehicle-seat .seat-back {
-    border-radius: 999px;
-    font-size: clamp(14px, 1.8vw, 22px);
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  
-  .first-vehicle-seat .seat-front {
-    background: #1e2635;
-    color: #fff;
-  }
-  
-  .first-vehicle-seat .seat-back {
-    background: #d49a38;
-    color: #fff;
-  }
-  
-  /* נהג ומפקד משימה - קבועים */
-  
-  .first-vehicle-role {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    background: #d49a38;
-    color: #fff;
-  
-    border: 1px solid #a8752c;
-    border-radius: 999px;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(15px, 1.8vw, 22px);
-    font-weight: bold;
-    text-align: center;
-    line-height: 1.15;
-  
-    padding: 5px;
-    min-width: 0;
-  }
-  
-  .driver-seat {
-    grid-row: 1;
-    grid-column: 7;
-  }
-  
-  .commander-seat {
-    grid-row: 4;
-    grid-column: 7;
-  }
-  
-  /* התקדמות */
-  
-  .seats-progress {
-    margin-top: 10px;
-    font-size: 16px;
-    color: #222;
-  }
-  
-  /* כפתור סיום */
-  
-  .vehicle-finish-btn {
-    margin-top: 12px;
-    padding: 10px 28px;
-  
-    border: none;
-    border-radius: 12px;
-  
-    background: #263c32;
-    color: white;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: 20px;
-    cursor: pointer;
-  
-    animation: finishButtonAppear 0.4s ease-out;
-  }
-  
-  .vehicle-finish-btn:hover {
-    background: #355b45;
-  }
-  
-  @keyframes finishButtonAppear {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-  
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* חיצי ניווט */
-  
-  .vehicle-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 5;
-  
-    width: 44px;
-    height: 44px;
-  
-    border: none;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.4);
-  
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  .vehicle-arrow:hover {
-    background: rgba(255,255,255,0.7);
-  }
-  
-  .vehicle-arrow.right-arrow {
-    right: 12px;
-  }
-  
-  .vehicle-arrow.left-arrow {
-    left: 12px;
-  }
-  
-  .vehicle-arrow.disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    pointer-events: none;
-  }
-  
-  /* נקודות ניווט */
-  
-  .vehicle-carousel-dots {
-    display: flex;
-    gap: 10px;
-    margin-top: 12px;
-  }
-  
-  .vehicle-carousel-dots span {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #a88133;
-  }
-  
-  .vehicle-carousel-dots span.active {
-    background: #fff0c2;
-  }
-  
-  /* התאמה למסכים קטנים */
-  
-  @media (max-width: 650px) {
-    .vehicle-info-modal {
-      width: 96%;
-      padding: 25px 15px;
-    }
-  
-    .seats-grid {
-      grid-template-columns: repeat(3, minmax(55px, 1fr));
-    }
-  
-    .seat-card {
-      height: 55px;
-    }
-  
-    .first-vehicle-layout {
-      padding: 10px 7px;
-    }
-  
-    .first-vehicle-grid {
-      grid-template-rows: repeat(4, minmax(42px, 1fr));
-      gap: 6px;
-    }
-  
-    .first-vehicle-seat {
-      min-height: 42px;
-    }
-  
-    .first-vehicle-seat .seat-front,
-    .first-vehicle-seat .seat-back,
-    .first-vehicle-role {
-      font-size: clamp(10px, 2.2vw, 15px);
-    }
-  }
-  
-  @media (max-height: 650px) {
-    .vehicle-info-modal {
-      height: 90vh;
-      min-height: 0;
-      padding-top: 15px;
-      padding-bottom: 15px;
-    }
-  
-    .seat-card {
-      height: 48px;
-    }
-  
-    .seats-grid {
-      gap: 7px;
-    }
-  
-    .first-vehicle-grid {
-      grid-template-rows: repeat(4, minmax(42px, 1fr));
-      gap: 7px;
-    }
-  
-    .first-vehicle-seat {
-      min-height: 42px;
-    }
-  }
-     
+}

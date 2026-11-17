@@ -1,249 +1,480 @@
-
 .lock-carousel-overlay {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 100;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    background: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(6px);
-    direction: rtl;
-  }
-  
-  .lock-carousel-container {
-    position: relative;
-    width: 90%;
-    max-width: 750px;
-    height: 65vh;
-    min-height: 420px;
-  
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .lock-close-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 120;
-  
-    width: 34px;
-    height: 34px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.5);
-    cursor: pointer;
-  }
-  
-  .lock-top-img {
-    position: absolute;
-    top: -45px;
-    z-index: 110;
-  }
-  
-  .lock-top-img img {
-    width: clamp(90px, 12vw, 130px);
-  }
-  
-  .lock-content-box {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    padding: 40px 20px 20px;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  
-    background: #d4a34b;
-    border-radius: 16px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-  }
-  
-  .lock-slide-content {
-    width: 85%;
-    height: 100%;
-  
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-  
-  .lock-slide {
-    width: 100%;
-    height: 100%;
-  
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .lock-slide h2 {
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(24px, 3.5vw, 36px);
-    color: #222;
-    margin-bottom: 12px;
-  }
-  
-  .lock-slide p {
-    max-width: 90%;
-    font-size: clamp(15px, 1.8vw, 20px);
-    line-height: 1.6;
-    color: #222;
-  }
-  
-  .lock-checklist-wrapper {
-    width: 100%;
-    height: 70%;
-    overflow: hidden;
-  }
-  
-  .lock-checklist-wrapper .checklist-container {
-    width: 100%;
-    height: 100%;
-  }
-  
-  .lock-checklist-wrapper .clipboard-wrapper.clipboard-mini {
-    width: 90%;
-    max-height: 100%;
-  }
-  
-  .lock-table-container {
-    width: 100%;
-    height: 70%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .lock-table-container img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-  
-  .open-gate-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  
-    padding: 12px 28px;
-    margin-top: 20px;
-  
-    border: 1.5px solid #222;
-    border-radius: 24px;
-    background: #ba8c35;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: 22px;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-  
-  .open-gate-btn:hover {
-    transform: scale(1.05);
-  }
-  
-  .open-gate-btn img {
-    width: 25px;
-  }
-  
-  .lock-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-  
-    width: 44px;
-    height: 44px;
-    border: none;
-    border-radius: 50%;
-  
-    background: rgba(255,255,255,0.35);
-    font-size: 24px;
-    cursor: pointer;
-  }
-  
-  .lock-arrow:hover {
-    background: rgba(255,255,255,0.65);
-  }
-  
-  .lock-arrow.right-arrow {
-    right: 10px;
-  }
-  
-  .lock-arrow.left-arrow {
-    left: 10px;
-  }
-  
-  .lock-dots {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-  }
-  
-  .lock-dots span {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: #a88133;
-  }
-  
-  .lock-dots span.active {
-    background: #f5cf7b;
-  }
-  
-  .lock-parking-screen {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
-  }
-  
-  @media (max-height: 650px) {
-    .lock-carousel-container {
-      height: 75vh;
-      min-height: 0;
-    }
-  }
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
 
+  z-index: 100;
 
-/* תיקון הצגת הצ'קליסט בתוך Lock */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  direction: rtl;
+
+  pointer-events: auto;
+}
+
+.lock-carousel-container {
+  position: relative;
+  width: min(820px, 56vw);
+  height: min(720px, 76vh);
+  min-height: 430px;
+  margin-top: clamp(24px, 3.5vh, 46px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* תמונת המנעול מאחורי הדיב הצהוב */
+.lock-behind-img {
+  position: absolute;
+  top: clamp(-88px, -8.5vh, -56px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.lock-behind-img img {
+  width: clamp(110px, 12vw, 175px);
+  height: auto;
+  display: block;
+}
+
+.lock-content-box {
+  position: relative;
+  z-index: 2;
+
+  width: 100%;
+  height: 100%;
+  padding: clamp(32px, 4vh, 52px) clamp(32px, 3.5vw, 56px) clamp(20px, 2.5vh, 32px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #d4a34b;
+  border-radius: 24px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  box-sizing: border-box;
+}
+
+/* כפתור סגירה X בצד ימין */
+.lock-close-btn {
+  position: absolute;
+  top: clamp(14px, 1.8vh, 22px);
+  right: clamp(14px, 1.5vw, 24px);
+  z-index: 20;
+
+  width: clamp(34px, 2.8vw, 44px);
+  height: clamp(34px, 2.8vw, 44px);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  border: none;
+  border-radius: 50%;
+  background: rgba(68, 42, 21, 0.16);
+  color: rgba(68, 42, 21, 1);
+
+  font-family: 'Rubik', sans-serif;
+  font-size: clamp(18px, 1.5vw, 24px);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.lock-close-btn:hover {
+  background: rgba(68, 42, 21, 0.3);
+  transform: scale(1.06);
+}
+
+.lock-slide-content {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.lock-slide {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: clamp(8px, 1.4vh, 18px);
+}
+
+.lock-title {
+  margin: 0;
+  max-width: 88%;
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 4.2vw, 60px);
+  line-height: 1.17;
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+}
+
+.lock-body-text {
+  margin: auto 0;
+  max-width: min(740px, 92%);
+
+  font-family: 'Rubik', sans-serif;
+  font-weight: 400;
+  font-size: clamp(20px, 2.6vw, 38px);
+  line-height: clamp(32px, 4.8vw, 68px);
+  letter-spacing: 0;
+  text-align: center;
+  color: rgba(68, 42, 21, 1);
+}
+
+/* צ'קליסט מיני במרכז */
 .lock-checklist-wrapper {
-    position: relative;
-    z-index: 5;
-    pointer-events: auto;
-  }
-  
-  .lock-checklist-wrapper .checklist-container {
-    height: 100%;
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.lock-checklist-wrapper .checklist-container.mini-checklist {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  align-items: center;
+  overflow: visible;
+}
+
+.lock-checklist-wrapper .mini-checklist .checklist-scroll-area {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  overflow: visible;
+}
+
+.lock-checklist-wrapper .mini-checklist .clipboard-wrapper {
+  width: min(540px, 92%);
+  height: auto;
+  min-height: 0;
+  padding: 13% 6% 8%;
+}
+
+.lock-checklist-wrapper .mini-checklist .checklist-items {
+  width: 92%;
+  right: 4%;
+  gap: clamp(10px, 1.8vh, 18px);
+}
+
+.lock-checklist-wrapper .mini-checklist .checklist-item {
+  gap: clamp(12px, 1.5vw, 20px);
+}
+
+.lock-checklist-wrapper .mini-checklist .item-text {
+  font-size: clamp(18px, 2.2vh, 28px);
+  line-height: 1.15;
+}
+
+.lock-checklist-wrapper .mini-checklist .checkbox-box {
+  width: clamp(24px, 2.3vw, 32px);
+  height: clamp(24px, 2.3vw, 32px);
+  flex-basis: clamp(24px, 2.3vw, 32px);
+}
+
+/* טבלה */
+.lock-table-container {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lock-table-container img {
+  max-width: 92%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+/* כפתור פתח את השער */
+.open-gate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1vw, 16px);
+
+  width: clamp(190px, 15.76vw, 240px);
+  height: clamp(48px, 5.86vh, 64px);
+  padding: 0 clamp(8px, 0.7vw, 12px) 0 clamp(14px, 1.3vw, 20px);
+
+  border: none;
+  border-radius: 37.5px;
+  background: rgba(149, 106, 54, 1);
+
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.open-gate-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.06);
+}
+
+.open-gate-btn-text {
+  font-family: 'Rubik', sans-serif;
+  font-weight: 700;
+  font-style: italic;
+  font-size: clamp(18px, 1.67vw, 24px);
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-align: right;
+  color: rgba(27, 20, 16, 1);
+  white-space: nowrap;
+}
+
+.open-gate-btn-img {
+  width: clamp(36px, 3.26vw, 47px);
+  height: clamp(36px, 3.26vw, 47px);
+  border-radius: 132.5px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   חיצי ניווט זהים לפיגמה (1440x1024) - מופיעים רק כשזמינים
+===================================================== */
+
+.carousel-nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 35;
+
+  width: clamp(46px, 5.69vw, 82px);  /* 82px מתוך 1440px */
+  height: clamp(46px, 5.69vw, 82px); /* 82px */
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+  background: rgba(211, 150, 59, 1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+  opacity: 1;
+  transition: transform 0.2s ease, filter 0.2s ease;
+
+  pointer-events: auto;
+}
+
+/* חץ חזור (ימין) -> left: 1157px מתוך 1440px => right: 201px (13.96vw) */
+.carousel-nav-arrow.right-arrow {
+  right: 13.96vw;
+}
+
+/* חץ קדימה (שמאל) -> סימטרי משמאל: 201px (13.96vw) */
+.carousel-nav-arrow.left-arrow {
+  left: 13.96vw;
+}
+
+.carousel-nav-arrow img {
+  width: clamp(28px, 3.47vw, 50px);  /* 50px מתוך 1440px */
+  height: clamp(28px, 3.47vw, 50px); /* 50px */
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.carousel-nav-arrow.right-arrow img {
+  transform: rotate(180deg);
+}
+
+.carousel-nav-arrow:hover {
+  filter: brightness(1.06);
+  transform: translateY(-50%) scale(1.06);
+}
+
+/* נקודות ניווט */
+.lock-dots {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 10px;
+  margin-top: clamp(10px, 1.5vh, 16px);
+}
+
+.lock-dots span {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #a88133;
+  transition: background 0.2s ease;
+}
+
+.lock-dots span.active {
+  background: #f5cf7b;
+}
+
+@media (max-height: 700px) {
+  .lock-carousel-container {
+    height: 82vh;
     min-height: 0;
-    overflow: visible;
-    pointer-events: auto;
   }
-  
-  .lock-checklist-wrapper .clipboard-wrapper {
-    transform: none;
+
+  .lock-content-box {
+    padding-top: 28px;
   }
-  
-  /* חץ נעול */
-  .lock-arrow.disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-    pointer-events: none;
+
+  .lock-title {
+    font-size: clamp(24px, 4vh, 42px);
   }
-  
-  /* הודעה מתחת לצ'קליסט */
-  .checklist-hint {
-    font-size: 15px;
-    margin-top: 8px;
+
+  .lock-body-text {
+    font-size: clamp(18px, 2.8vh, 28px);
+    line-height: 1.45;
   }
-  
-  
+}
+
+
+/* =====================================================
+   מסכים גדולים במיוחד – 2560x1440 ומעלה
+===================================================== */
+
+@media (min-width: 2200px) and (min-height: 1100px) {
+  .lock-carousel-container {
+    width: min(1120px, 58vw);
+    height: min(1000px, 76vh);
+    margin-top: 48px;
+  }
+
+  .lock-behind-img {
+    top: -120px;
+  }
+
+  .lock-behind-img img {
+    width: 240px;
+  }
+
+  .lock-content-box {
+    padding: 72px 80px 48px;
+    border-radius: 32px;
+  }
+
+  .lock-close-btn {
+    top: 24px;
+    right: 28px;
+    width: 54px;
+    height: 54px;
+    font-size: 30px;
+  }
+
+  .lock-title {
+    font-size: 76px;
+  }
+
+  .lock-body-text {
+    max-width: 950px;
+    font-size: 48px;
+    line-height: 1.5;
+  }
+
+  /* צ'קליסט מיני */
+  .lock-checklist-wrapper .mini-checklist .clipboard-wrapper {
+    width: min(760px, 96%);
+    padding: 13% 6% 8%;
+  }
+
+  .lock-checklist-wrapper .mini-checklist .checklist-items {
+    gap: 26px;
+  }
+
+  .lock-checklist-wrapper .mini-checklist .checklist-item {
+    gap: 28px;
+  }
+
+  .lock-checklist-wrapper .mini-checklist .item-text {
+    font-size: 36px;
+    line-height: 1.2;
+  }
+
+  .lock-checklist-wrapper .mini-checklist .checkbox-box {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  /* טבלה */
+  .lock-table-container img {
+    max-width: 96%;
+  }
+
+  /* כפתור פתיחת השער */
+  .open-gate-btn {
+    width: 300px;
+    height: 76px;
+    padding: 0 18px;
+  }
+
+  .open-gate-btn-text {
+    font-size: 30px;
+  }
+
+  .open-gate-btn-img {
+    width: 58px;
+    height: 58px;
+  }
+
+  /* חצים */
+  .carousel-nav-arrow {
+    width: 100px;
+    height: 100px;
+  }
+
+  .carousel-nav-arrow img {
+    width: 62px;
+    height: 62px;
+  }
+
+  .lock-dots {
+    gap: 14px;
+    margin-top: 20px;
+  }
+
+  .lock-dots span {
+    width: 16px;
+    height: 16px;
+  }
+}
+

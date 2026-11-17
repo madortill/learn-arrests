@@ -1,343 +1,464 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import './VehicleInfo.css';
 
 import ChecklistScreen from '../ChecklistScreen/ChecklistScreen';
+import SpeechBubble from '../SpeechBubble/SpeechBubble';
+import continueIcon from '../../assets/parking/continue_icon.png';
+import carouselArrow from '../../assets/parking/carousel_arrow.png';
 
-const vehicleChecklistItems = [
-  {
-    id: 'vehicleCheck1',
-    text: 'בדיקת תקינות הרכב'
-  },
-  {
-    id: 'vehicleCheck2',
-    text: 'בדיקת ציוד הליווי'
-  },
-  {
-    id: 'vehicleCheck3',
-    text: 'בדיקת מסמכים נדרשים'
+const parkingAssets = import.meta.glob('../../assets/parking/*', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+});
+
+const parkingImageMap = Object.fromEntries(
+  Object.entries(parkingAssets).map(([path, url]) => [
+    path.split('/').pop().toLowerCase(),
+    url,
+  ])
+);
+
+const getParkingImage = (name) => {
+  if (!name) return null;
+  return parkingImageMap[name.split('/').pop().toLowerCase()] || null;
+};
+
+// ==========================================
+// 1. מיניבוס אזרחי - 20 מושבים (7 עמודות × 8 תתי-שורות)
+// ==========================================
+const MINIBUS_SEATS = [
+  { id: 'mb_1', label: 'מלווה', col: 1, row: '1 / 3' },
+  { id: 'mb_2', label: 'מלווה', col: 1, row: '3 / 5' },
+  { id: 'mb_3', label: 'מלווה', col: 1, row: '5 / 7' },
+  { id: 'mb_4', label: 'מלווה', col: 1, row: '7 / 9' },
+
+  { id: 'mb_5', label: 'כלוא', col: 2, row: '1 / 3' },
+  { id: 'mb_6', label: 'כלוא', col: 2, row: '3 / 5' },
+
+  { id: 'mb_7', label: 'כלוא', col: 3, row: '1 / 3' },
+  { id: 'mb_8', label: 'כלוא', col: 3, row: '3 / 5' },
+  { id: 'mb_9', label: 'מלווה', col: 3, row: '7 / 9' },
+
+  { id: 'mb_10', label: 'כלוא', col: 4, row: '1 / 3' },
+  { id: 'mb_11', label: 'כלוא', col: 4, row: '3 / 5' },
+  { id: 'mb_12', label: 'מלווה', col: 4, row: '7 / 9' },
+
+  { id: 'mb_13', label: 'כלוא', col: 5, row: '1 / 3' },
+  { id: 'mb_14', label: 'כלוא', col: 5, row: '3 / 5' },
+  { id: 'mb_15', label: 'מלווה', col: 5, row: '7 / 9' },
+
+  { id: 'mb_16', label: 'מלווה', col: 6, row: '1 / 3' },
+  { id: 'mb_17', label: 'מלווה', col: 6, row: '3 / 5' },
+  { id: 'mb_18', label: 'מלווה', col: 6, row: '7 / 9' },
+
+  { id: 'mb_19', label: 'נהג', col: 7, row: '2 / 4' },
+  { id: 'mb_20', label: 'מפקד\nמשימה', col: 7, row: '6 / 8' },
+];
+
+// ==========================================
+// 2. רכב 9 מקומות - 8 מושבים (3×3)
+// ==========================================
+const NINE_SEATER_SEATS = [
+  { id: 'ns_1', label: 'כלוא', col: 1, row: 1 },
+  { id: 'ns_2', label: 'כלוא', col: 1, row: 2 },
+  { id: 'ns_3', label: 'מלווה', col: 1, row: 3 },
+
+  { id: 'ns_4', label: 'מלווה', col: 2, row: 1 },
+  { id: 'ns_5', label: 'כלוא', col: 2, row: 2 },
+  { id: 'ns_6', label: 'מלווה', col: 2, row: 3 },
+
+  { id: 'ns_7', label: 'נהג', col: 3, row: 1 },
+  { id: 'ns_8', label: 'מפקד\nמשימה', col: 3, row: 3 },
+];
+
+// ==========================================
+// 3. קיה סורנטו - 4 מושבים (2×2 עם כלוב מקווקו)
+// ==========================================
+const SORENTO_CAGE_SEATS = [
+  { id: 'sr_1', label: 'כלוא' },
+  { id: 'sr_2', label: 'כלוא' },
+];
+
+const SORENTO_FRONT_SEATS = [
+  { id: 'sr_3', label: 'נהג' },
+  { id: 'sr_4', label: 'מפקד\nמשימה' },
+];
+
+function getSeatsForLayout(layoutType) {
+  if (layoutType === 'minibus') return MINIBUS_SEATS;
+  if (layoutType === 'nine-seater') return NINE_SEATER_SEATS;
+  if (layoutType === 'sorento') {
+    return [...SORENTO_CAGE_SEATS, ...SORENTO_FRONT_SEATS];
   }
-];
+  return [];
+}
 
-// המושבים של שאר הרכבים – ללא שינוי
-const seatsData = [
-  { id: 1, label: 'נהג' },
-  { id: 2, label: 'מפקד משימה' },
-  { id: 3, label: 'מושב' },
-  { id: 4, label: 'מושב' },
-  { id: 5, label: 'מושב' },
-  { id: 6, label: 'מושב' },
-  { id: 7, label: 'מושב' },
-  { id: 8, label: 'מושב' },
-  { id: 9, label: 'מושב' },
-  { id: 10, label: 'מושב' },
-  { id: 11, label: 'מושב' },
-  { id: 12, label: 'מושב' },
-  { id: 13, label: 'מושב' },
-  { id: 14, label: 'מושב' },
-  { id: 15, label: 'מושב' }
-];
-
-// 18 מקומות למלווים ברכב הראשון
-// row = שורה, col = עמודה
-const firstVehicleSeats = [
-  // שורה ראשונה
-  { id: 1, row: 1, col: 1 },
-  { id: 2, row: 1, col: 2 },
-  { id: 3, row: 1, col: 3 },
-  { id: 4, row: 1, col: 4 },
-  { id: 5, row: 1, col: 5 },
-  { id: 6, row: 1, col: 6 },
-
-  // שורה שנייה
-  { id: 7, row: 2, col: 1 },
-  { id: 8, row: 2, col: 2 },
-  { id: 9, row: 2, col: 3 },
-  { id: 10, row: 2, col: 4 },
-  { id: 11, row: 2, col: 5 },
-  { id: 12, row: 2, col: 6 },
-
-  // שורה שלישית
-  { id: 13, row: 3, col: 1 },
-
-  // שורה רביעית
-  { id: 14, row: 4, col: 1 },
-  { id: 15, row: 4, col: 3 },
-  { id: 16, row: 4, col: 4 },
-  { id: 17, row: 4, col: 5 },
-  { id: 18, row: 4, col: 6 }
-];
+function SeatPill({ seat, isFlipped, onReveal, hasOutline = false }) {
+  return (
+    <div
+      className={`seat-card ${isFlipped ? 'is-flipped' : ''} ${
+        hasOutline ? 'seat-outlined' : ''
+      }`}
+      style={
+        seat.col
+          ? {
+              gridColumn: seat.col,
+              gridRow: seat.row,
+            }
+          : undefined
+      }
+      onMouseEnter={() => onReveal(seat.id)}
+      onClick={() => onReveal(seat.id)}
+      role="button"
+      tabIndex={0}
+      aria-label={isFlipped ? seat.label : 'מושב'}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onReveal(seat.id);
+        }
+      }}
+    >
+      <div className="seat-inner">
+        <div className="seat-front">
+          <span className="seat-label-text">מושב</span>
+        </div>
+        <div className="seat-back">
+          <span className="seat-label-text">{seat.label}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function VehicleInfo({
-  vehicleName,
-  onFinishVehicle
+  vehicle,
+  vehicleProgress = {},
+  onVehicleProgressChange,
+  onCloseVehicle,
+  onFinishVehicle,
 }) {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [checkedItems, setCheckedItems] = useState({});
-  const [flippedSeats, setFlippedSeats] = useState({});
+  const slides = vehicle?.slides || [];
+  const totalSlides = slides.length;
 
-  // זיהוי הרכב הראשון בלבד
-  const isFirstVehicle = vehicleName === 'סיטרואן מ"צ';
-
-  const checklistCompleted = vehicleChecklistItems.every(
-    item => Boolean(checkedItems[item.id])
+  const currentSlide = Math.min(
+    vehicleProgress.slide ?? 0,
+    Math.max(0, totalSlides - 1)
   );
 
-  const handleNextSlide = () => {
-    if (currentSlide === 1 && !checklistCompleted) return;
+  const activeSlide = slides[currentSlide] || {};
+  const textSlide = slides.find((s) => s.type === 'text') || activeSlide;
 
-    setCurrentSlide(prev => Math.min(prev + 1, 2));
+  const checkedItems = vehicleProgress.checkedItems || {};
+  const flippedSeats = vehicleProgress.flippedSeats || {};
+
+  // בדיקת השלמת צ'קליסט
+  const checklistItems =
+    activeSlide.type === 'checklist' ? activeSlide.items || [] : [];
+
+  const checklistCompleted =
+    checklistItems.length === 0 ||
+    checklistItems.every((item) => Boolean(checkedItems[item.id]));
+
+  // בדיקת חשיפת כל המושבים
+  const layoutType = activeSlide.layoutType;
+  const activeSeats =
+    activeSlide.type === 'seats' ? getSeatsForLayout(layoutType) : [];
+
+  const allSeatsFlipped =
+    activeSeats.length === 0 ||
+    activeSeats.every((seat) => Boolean(flippedSeats[seat.id]));
+
+  const isLastSlide = currentSlide === totalSlides - 1;
+
+  const canGoPrev = currentSlide > 0;
+  const canGoNext =
+    currentSlide < totalSlides - 1 &&
+    (activeSlide.type !== 'checklist' || checklistCompleted);
+
+  const showBackToLotButton =
+    isLastSlide &&
+    (activeSlide.type !== 'seats' || allSeatsFlipped) &&
+    (activeSlide.type !== 'checklist' || checklistCompleted);
+
+  const handlePrevSlide = () => {
+    if (!canGoPrev) return;
+    onVehicleProgressChange?.((prev) => ({
+      ...prev,
+      slide: currentSlide - 1,
+    }));
   };
 
-  const prevSlide = () => {
-    setCurrentSlide(prev => Math.max(prev - 1, 0));
+  const handleNextSlide = () => {
+    if (!canGoNext) return;
+    onVehicleProgressChange?.((prev) => ({
+      ...prev,
+      slide: currentSlide + 1,
+    }));
+  };
+
+  const handleCheckedItemsChange = (updatedChecked) => {
+    onVehicleProgressChange?.((prev) => ({
+      ...prev,
+      checkedItems: updatedChecked,
+    }));
   };
 
   const handleSeatReveal = (seatId) => {
-    setFlippedSeats(prev => {
-      if (prev[seatId]) return prev;
-
-      return {
-        ...prev,
-        [seatId]: true
-      };
-    });
+    if (flippedSeats[seatId]) return;
+    onVehicleProgressChange?.((prev) => ({
+      ...prev,
+      flippedSeats: {
+        ...(prev.flippedSeats || {}),
+        [seatId]: true,
+      },
+    }));
   };
 
-  // בחירת מערך המושבים לפי סוג הרכב
-  const activeSeats = isFirstVehicle
-    ? firstVehicleSeats
-    : seatsData;
-
-  const allSeatsFlipped = activeSeats.every(
-    seat => Boolean(flippedSeats[seat.id])
-  );
-
-  const revealedCount = activeSeats.filter(
-    seat => Boolean(flippedSeats[seat.id])
-  ).length;
+  const activeVehicleImgSrc = getParkingImage(vehicle?.image);
+  const vehiclePlacementClass =
+    vehicle?.id === 'v1'
+      ? 'car-pos-v1'
+      : vehicle?.id === 'v2'
+      ? 'car-pos-v2'
+      : vehicle?.id === 'v3'
+      ? 'car-pos-v3'
+      : 'car-pos-v4';
 
   return (
-    <div className="vehicle-info-overlay">
+    <div className="vehicle-info-overlay" dir="rtl">
+      {/* תמונת הרכב הנבחר (z-index: 15 - מתחת למבנה הרכב ולצ'קליסט) */}
+      {activeVehicleImgSrc && (
+        <img
+          src={activeVehicleImgSrc}
+          alt={vehicle?.name || ''}
+          className={`vehicle-active-car-img ${vehiclePlacementClass}`}
+        />
+      )}
 
-      <div className="vehicle-info-modal" dir="rtl">
+      {/* חץ חזור (ימין) - מופיע רק כשניתן לחזור */}
+      {canGoPrev && (
+        <button
+          type="button"
+          className="carousel-nav-arrow right-arrow"
+          onClick={handlePrevSlide}
+          aria-label="שקופית קודמת"
+        >
+          <img src={carouselArrow} alt="" />
+        </button>
+      )}
 
-        <h2 className="vehicle-title">
-          {vehicleName}
-        </h2>
+      {/* חץ קדימה (שמאל) - מופיע רק כשניתן להתקדם */}
+      {canGoNext && (
+        <button
+          type="button"
+          className="carousel-nav-arrow left-arrow"
+          onClick={handleNextSlide}
+          aria-label="שקופית הבאה"
+        >
+          <img src={carouselArrow} alt="" />
+        </button>
+      )}
 
-        {/* חזרה */}
-        {currentSlide > 0 && (
+      <div className="vehicle-info-stage">
+        {/* הדיב הצהוב (1270px במסך 1440x1024) */}
+        <div className="vehicle-info-modal">
+          {/* רקע הדיב הצהוב (z-index: 1) */}
+          <div className="vehicle-yellow-bg" aria-hidden="true" />
+
+          {/* כפתור סגירה X בצד ימין */}
           <button
-            className="vehicle-arrow right-arrow"
-            onClick={prevSlide}
-            aria-label="שקופית קודמת"
+            type="button"
+            className="vehicle-close-btn"
+            onClick={onCloseVehicle}
+            aria-label="סגירת כרטיסיית רכב"
           >
-            &#10095;
+            &#10005;
           </button>
-        )}
 
-        <div className="vehicle-slide-body">
+          {activeSlide.type === 'text' ? (
+            /* במצב טקסט: גובה הדיב הצהוב נקבע לפי כמות הטקסט */
+            <div className="vehicle-text-flow">
+              <h2 className="vehicle-title">
+                {activeSlide.title || vehicle?.name}
+              </h2>
 
-          {/* שקופית 1 - מידע */}
-          {currentSlide === 0 && (
-            <div className="vehicle-slide slide-text">
-
-              <h3>היכרות עם הרכב</h3>
-
-              <p>
-                כאן יוצג המידע על הרכב הנבחר,
-                מאפייניו והשימושים שלו במסגרת הליווי.
-              </p>
-
-            </div>
-          )}
-
-          {/* שקופית 2 - צ'קליסט */}
-          {currentSlide === 1 && (
-            <div className="vehicle-slide slide-checklist">
-
-              <h3>בדיקות לפני יציאה</h3>
-
-              <div className="vehicle-checklist-wrapper">
-                <ChecklistScreen
-                  items={vehicleChecklistItems}
-                  variant="default"
-                  checkedItems={checkedItems}
-                  onCheckedItemsChange={setCheckedItems}
-                />
-              </div>
-
-              {!checklistCompleted && (
-                <p className="vehicle-checklist-hint">
-                  יש לסמן את כל הבדיקות כדי להמשיך
-                </p>
+              {activeSlide.subtitle && (
+                <h3 className="vehicle-subtitle">{activeSlide.subtitle}</h3>
               )}
 
+              {activeSlide.text && (
+                <p className="vehicle-body-text">{activeSlide.text}</p>
+              )}
             </div>
-          )}
+          ) : (
+            /* בשקופיות צ'קליסט ומבנה רכב: הדיב הצהוב שומר על גובה זהה לשקופית הטקסט */
+            <>
+              {/* עוגן גובה נסתר הזהה בגובהו לשקופית הטקסט */}
+              <div
+                className="vehicle-text-flow vehicle-height-anchor"
+                aria-hidden="true"
+              >
+                <h2 className="vehicle-title">
+                  {textSlide.title || vehicle?.name}
+                </h2>
 
-          {/* שקופית 3 - מושבים */}
-          {currentSlide === 2 && (
-            <div className={`vehicle-slide slide-seats ${
-              isFirstVehicle ? 'first-vehicle-seats-slide' : ''
-            }`}>
-
-              <p className="seats-instruction">
-                עברו על מקומות הישיבה כדי לחשוף
-                מי צריך לשבת בכל מקום.
-              </p>
-
-              <div className={`seats-beige-box ${
-                isFirstVehicle ? 'first-vehicle-layout' : ''
-              }`}>
-
-                {isFirstVehicle ? (
-
-                  /* סידור מיוחד לרכב הראשון */
-                  <div className="first-vehicle-grid">
-
-                    {firstVehicleSeats.map(seat => {
-                      const isFlipped = Boolean(
-                        flippedSeats[seat.id]
-                      );
-
-                      return (
-                        <div
-                          key={seat.id}
-                          className={`seat-card first-vehicle-seat ${
-                            isFlipped ? 'is-flipped' : ''
-                          }`}
-                          style={{
-                            gridRow: seat.row,
-                            gridColumn: seat.col
-                          }}
-                          onMouseEnter={() =>
-                            handleSeatReveal(seat.id)
-                          }
-                          onClick={() =>
-                            handleSeatReveal(seat.id)
-                          }
-                        >
-                          <div className="seat-inner">
-
-                            <div className="seat-front">
-                              מושב
-                            </div>
-
-                            <div className="seat-back">
-                              מלווה
-                            </div>
-
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {/* נהג - מיקום קבוע */}
-                    <div className="first-vehicle-role driver-seat">
-                      נהג
-                    </div>
-
-                    {/* מפקד משימה - מיקום קבוע */}
-                    <div className="first-vehicle-role commander-seat">
-                      מפקד<br />משימה
-                    </div>
-
-                  </div>
-
-                ) : (
-
-                  /* סידור המושבים המקורי של שאר הרכבים */
-                  <div className="seats-grid">
-
-                    {seatsData.map(seat => {
-                      const isFlipped = Boolean(
-                        flippedSeats[seat.id]
-                      );
-
-                      return (
-                        <div
-                          key={seat.id}
-                          className={`seat-card ${
-                            isFlipped ? 'is-flipped' : ''
-                          }`}
-                          onMouseEnter={() =>
-                            handleSeatReveal(seat.id)
-                          }
-                          onClick={() =>
-                            handleSeatReveal(seat.id)
-                          }
-                        >
-                          <div className="seat-inner">
-
-                            <div className="seat-front">
-                              מושב
-                            </div>
-
-                            <div className="seat-back">
-                              {seat.label}
-                            </div>
-
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                  </div>
-
+                {textSlide.subtitle && (
+                  <h3 className="vehicle-subtitle">{textSlide.subtitle}</h3>
                 )}
 
+                {textSlide.text && (
+                  <p className="vehicle-body-text">{textSlide.text}</p>
+                )}
               </div>
 
-              <div className="seats-progress">
-                {revealedCount} / {activeSeats.length}
-                {' '}מקומות נחשפו
+              {/* זרימה אנכית של הכותרת/טקסט ומעליהם/מתחתם מבנה הרכב עם מרווח ברור */}
+              <div className="vehicle-slide-overlay-flow">
+                <div className="vehicle-header-block">
+                  <h2 className="vehicle-title">
+                    {activeSlide.title || vehicle?.name}
+                  </h2>
+
+                  {activeSlide.subtitle && (
+                    <h3 className="vehicle-subtitle">{activeSlide.subtitle}</h3>
+                  )}
+
+                  {activeSlide.type === 'seats' && activeSlide.text && (
+                    <p className="vehicle-seats-text">{activeSlide.text}</p>
+                  )}
+                </div>
+
+                {activeSlide.type === 'seats' && (
+                  <div className="vehicle-seats-layer">
+                    {/* 1. תרשים מיניבוס אזרחי */}
+                    {layoutType === 'minibus' && (
+                      <div className="vehicle-diagram-shell diagram-minibus">
+                        <div className="minibus-grid">
+                          {MINIBUS_SEATS.map((seat) => (
+                            <SeatPill
+                              key={seat.id}
+                              seat={seat}
+                              isFlipped={Boolean(flippedSeats[seat.id])}
+                              onReveal={handleSeatReveal}
+                              hasOutline={true}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* 2. תרשים רכב 9 מקומות */}
+                    {layoutType === 'nine-seater' && (
+                      <div className="vehicle-diagram-shell diagram-nine-seater">
+                        <div className="car-door door-top door-nine-top" />
+
+                        <div className="nine-seater-grid">
+                          {NINE_SEATER_SEATS.map((seat) => (
+                            <SeatPill
+                              key={seat.id}
+                              seat={seat}
+                              isFlipped={Boolean(flippedSeats[seat.id])}
+                              onReveal={handleSeatReveal}
+                            />
+                          ))}
+                        </div>
+
+                        <div className="car-door door-bottom door-nine-bottom-mid" />
+                        <div className="car-door door-bottom door-nine-bottom-front" />
+                      </div>
+                    )}
+
+                    {/* 3. תרשים רכב קיה סורנטו */}
+                    {layoutType === 'sorento' && (
+                      <div className="vehicle-diagram-shell diagram-sorento">
+                        <div className="car-door door-top door-sorento-top" />
+
+                        <div className="sorento-grid">
+                          <div className="sorento-cage-box">
+                            {SORENTO_CAGE_SEATS.map((seat) => (
+                              <SeatPill
+                                key={seat.id}
+                                seat={seat}
+                                isFlipped={Boolean(flippedSeats[seat.id])}
+                                onReveal={handleSeatReveal}
+                              />
+                            ))}
+                          </div>
+
+                          <div className="sorento-front-col">
+                            {SORENTO_FRONT_SEATS.map((seat) => (
+                              <SeatPill
+                                key={seat.id}
+                                seat={seat}
+                                isFlipped={Boolean(flippedSeats[seat.id])}
+                                onReveal={handleSeatReveal}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="car-door door-bottom door-sorento-bottom-cage" />
+                        <div className="car-door door-bottom door-sorento-bottom-front" />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-
-              {allSeatsFlipped && (
-                <button
-                  className="vehicle-finish-btn"
-                  onClick={onFinishVehicle}
-                >
-                  סיום ולרכב הבא
-                </button>
-              )}
-
-            </div>
+            </>
           )}
-
         </div>
+      </div>
 
-        {/* הבא */}
-        {currentSlide < 2 && (
-          <button
-            className={`vehicle-arrow left-arrow ${
-              currentSlide === 1 && !checklistCompleted
-                ? 'disabled'
-                : ''
-            }`}
-            onClick={handleNextSlide}
-            disabled={
-              currentSlide === 1 && !checklistCompleted
-            }
-            aria-label="שקופית הבאה"
-          >
-            &#10094;
-          </button>
-        )}
+      {/* צ'קליסט רגיל במרכז בגודלו הטבעי עם מנגנון הגלילה הקיים */}
+      {activeSlide.type === 'checklist' && (
+        <div className="vehicle-checklist-fullscreen-layer">
+          <ChecklistScreen
+            items={checklistItems}
+            variant="default"
+            side="center"
+            checkedItems={checkedItems}
+            onCheckedItemsChange={handleCheckedItemsChange}
+          />
+        </div>
+      )}
 
-        {/* נקודות ניווט */}
+      {/* 3 נקודות הקרוסלה - מחוץ לדיב הצהוב */}
+      {totalSlides > 1 && (
         <div className="vehicle-carousel-dots">
-          {[0, 1, 2].map(dot => (
+          {slides.map((_, dotIndex) => (
             <span
-              key={dot}
-              className={currentSlide === dot ? 'active' : ''}
+              key={dotIndex}
+              className={currentSlide === dotIndex ? 'active' : ''}
             />
           ))}
         </div>
+      )}
 
-      </div>
+      {/* כפתור חזרה למגרש - מחוץ לדיב הצהוב */}
+      {showBackToLotButton && (
+        <button
+          type="button"
+          className="vehicle-continue-btn"
+          onClick={onFinishVehicle}
+        >
+          <span className="vehicle-continue-btn-text">חזרה למגרש</span>
+          <img
+            src={continueIcon}
+            alt=""
+            className="vehicle-continue-btn-icon"
+          />
+        </button>
+      )}
+
+      {/* בועת דיבור ממורכזת מעל הכרטיסייה אם הוגדרה בשקופית */}
+      {activeSlide.speechBubble && (
+        <SpeechBubble
+          {...activeSlide.speechBubble}
+          centered={true}
+          zIndex={40}
+        />
+      )}
     </div>
   );
 }
