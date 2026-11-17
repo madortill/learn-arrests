@@ -1,70 +1,190 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from 'react';
+
 import './DepositsScreen.css';
 
-import filmRollTop from '../../assets/film_roll_top.png';
-import textFrameBg from '../../assets/text_frame_bg.png';
+// תמונות קבועות של העיצוב
+import filmRollTop from '../../assets/Deposits/film_roll_top.png';
+import filmHand from '../../assets/Deposits/film_hand.png';
+import textFrameBg from '../../assets/Deposits/text_frame_bg.png';
 
-import filmFrame1 from '../../assets/film_frame_1.png';
-import filmFrame2 from '../../assets/film_frame_2.png';
-import filmFrame3 from '../../assets/film_frame_3.png';
-import filmFrame4 from '../../assets/film_frame_4.png';
-import filmFrame5 from '../../assets/film_frame_5.png';
-import filmFrame6 from '../../assets/film_frame_6.png';
-import filmFrame7 from '../../assets/film_frame_7.png';
+// טעינת כל התמונות מתיקיית הפיקדונות
+const assets = import.meta.glob(
+  '../../assets/Deposits/*',
+  {
+    eager: true,
+    query: '?url',
+    import: 'default',
+  }
+);
 
-const filmFrames = [
-  filmFrame7,
-  filmFrame6,
-  filmFrame5,
-  filmFrame4,
-  filmFrame3,
-  filmFrame2,
-  filmFrame1,
-];
+// יצירת מפת תמונות לפי שם הקובץ
+const imageMap = Object.fromEntries(
+  Object.entries(assets).map(([path, url]) => [
+    path.split('/').pop(),
+    url,
+  ])
+);
 
-const stepTexts = [
-  'סיום תהליך והעברת אחריות.',
-  'נעילת כספת...',
-  'חתימה על טפסים...',
-  'אחסון מאובטח...',
-  'בדיקת תקינות...',
-  'רישום מדויק...',
-  'קבלת פיקדונות...',
-];
+const getImage = (fileName) => {
+  if (!fileName) return '';
 
-const TOTAL_STEPS = 7;
+  const image = imageMap[fileName];
+
+  if (!image) {
+    console.warn(`Deposits image not found: ${fileName}`);
+    return '';
+  }
+
+  return image;
+};
+
 const DRAG_THRESHOLD = 45;
 
-const DepositsScreen = ({ onComplete }) => {
-  const [currentStep, setCurrentStep] = useState(6);
+const DepositsScreen = ({
+  content,
+  initialStep = 0,
+  onProgressChange,
+  onComplete,
+}) => {
+  const steps = content?.steps || [];
+  const finalFrame = content?.finalFrame || {};
+  const TOTAL_STEPS = steps.length;
+
+  const safeInitialStep = Math.max(
+    0,
+    Math.min(initialStep, TOTAL_STEPS)
+  );
+
+  // 0 = פריים ראשון, TOTAL_STEPS = פריים אחרון
+  const [activeStep, setActiveStep] = useState(safeInitialStep);
 
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [isFinished, setIsFinished] = useState(false);
+  const [filmPosition, setFilmPosition] = useState(0);
+
+  const filmAreaRef = useRef(null);
+  const filmAssemblyRef = useRef(null);
 
   const dragStartY = useRef(0);
   const dragOffsetRef = useRef(0);
   const pointerIdRef = useRef(null);
 
-  const currentStepRef = useRef(6);
-  const finishedRef = useRef(false);
+  const activeStepRef = useRef(safeInitialStep);
 
-  const progress = TOTAL_STEPS - 1 - currentStep;
+  // מונע שליחת השלמה חוזרת כאשר חוזרים לפריים האחרון
+  const completionNotifiedRef = useRef(
+    safeInitialStep >= TOTAL_STEPS
+  );
 
-  // התחלת משיכה מכל נקודה באזור סרט הצילום
-  const handlePointerDown = (e) => {
-    if (finishedRef.current) return;
+  // =========================================
+  // מיקום הסרט לפי מרכז הפריים הפעיל
+  // =========================================
 
-    if (e.pointerType === 'mouse' && e.button !== 0) {
-      return;
+  const updateFilmPosition = useCallback(() => {
+    const area = filmAreaRef.current;
+    const assembly = filmAssemblyRef.current;
+
+    if (!area || !assembly) return;
+
+    const activeFrame = assembly.querySelector(
+      `[data-step-index="${activeStepRef.current}"]`
+    );
+
+    if (!activeFrame) return;
+
+    const frameTop =
+      activeFrame.getBoundingClientRect().top -
+      assembly.getBoundingClientRect().top;
+
+    const frameCenter =
+      frameTop + activeFrame.offsetHeight / 2;
+
+    const areaCenter = area.clientHeight * 0.43;
+
+    setFilmPosition(areaCenter - frameCenter);
+  }, []);
+
+  useEffect(() => {
+    updateFilmPosition();
+
+    const observer = new ResizeObserver(() => {
+      updateFilmPosition();
+    });
+
+    if (filmAreaRef.current) {
+      observer.observe(filmAreaRef.current);
     }
+
+    if (filmAssemblyRef.current) {
+      observer.observe(filmAssemblyRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [activeStep, updateFilmPosition]);
+
+  // =========================================
+  // עדכון שלב ושמירת התקדמות
+  // =========================================
+
+  const changeStep = (nextStep) => {
+    activeStepRef.current = nextStep;
+    setActiveStep(nextStep);
+
+    onProgressChange?.(nextStep);
+  };
+
+  // =========================================
+  // מעבר לשלב הבא
+  // =========================================
+
+  const advanceStep = () => {
+    const currentStep = activeStepRef.current;
+
+    if (currentStep >= TOTAL_STEPS) return;
+
+    const nextStep = currentStep + 1;
+
+    changeStep(nextStep);
+
+    // הגעה ראשונה לפריים האחרון
+    if (
+      nextStep === TOTAL_STEPS &&
+      !completionNotifiedRef.current
+    ) {
+      completionNotifiedRef.current = true;
+      onComplete?.();
+    }
+  };
+
+  // =========================================
+  // חזרה לשלב הקודם
+  // =========================================
+
+  const returnStep = () => {
+    const currentStep = activeStepRef.current;
+
+    if (currentStep <= 0) return;
+
+    changeStep(currentStep - 1);
+  };
+
+  // =========================================
+  // התחלת גרירה
+  // =========================================
+
+  const handlePointerDown = (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
 
     e.preventDefault();
 
     pointerIdRef.current = e.pointerId;
     dragStartY.current = e.clientY;
-
     dragOffsetRef.current = 0;
 
     setDragOffset(0);
@@ -77,12 +197,14 @@ const DepositsScreen = ({ onComplete }) => {
     }
   };
 
-  // מעקב אחרי תנועת העכבר או האצבע
+  // =========================================
+  // תנועת הגרירה
+  // =========================================
+
   const handlePointerMove = (e) => {
     if (
       pointerIdRef.current === null ||
-      pointerIdRef.current !== e.pointerId ||
-      finishedRef.current
+      pointerIdRef.current !== e.pointerId
     ) {
       return;
     }
@@ -91,15 +213,24 @@ const DepositsScreen = ({ onComplete }) => {
 
     const distance = e.clientY - dragStartY.current;
 
-    // רק משיכה כלפי מעלה
-    const upwardDistance = Math.min(0, distance);
+    const maxDistance = Math.max(
+      100,
+      (filmAreaRef.current?.clientHeight || 600) * 0.3
+    );
 
-    dragOffsetRef.current = upwardDistance;
+    const limitedDistance = Math.max(
+      -maxDistance,
+      Math.min(maxDistance, distance)
+    );
 
-    setDragOffset(upwardDistance);
+    dragOffsetRef.current = limitedDistance;
+    setDragOffset(limitedDistance);
   };
 
-  // סיום משיכה
+  // =========================================
+  // סיום גרירה
+  // =========================================
+
   const handlePointerUp = (e) => {
     if (
       pointerIdRef.current === null ||
@@ -116,15 +247,19 @@ const DepositsScreen = ({ onComplete }) => {
     setIsDragging(false);
     setDragOffset(0);
 
-    // משיכה קצרה מדי
-    if (Math.abs(distance) < DRAG_THRESHOLD) {
-      return;
-    }
+    if (Math.abs(distance) < DRAG_THRESHOLD) return;
 
-    advanceStep();
+    if (distance > 0) {
+      advanceStep();
+    } else {
+      returnStep();
+    }
   };
 
-  // ביטול משיכה
+  // =========================================
+  // ביטול גרירה
+  // =========================================
+
   const handlePointerCancel = () => {
     pointerIdRef.current = null;
     dragOffsetRef.current = 0;
@@ -133,125 +268,118 @@ const DepositsScreen = ({ onComplete }) => {
     setDragOffset(0);
   };
 
-  // התקדמות לשלב הבא
-  const advanceStep = () => {
-    if (finishedRef.current) return;
+  // =========================================
+  // תמונות הסרט לפי הסדר הפיזי
+  // =========================================
 
-    const step = currentStepRef.current;
+  const orderedFrames = [
+    {
+      ...finalFrame,
+      step: TOTAL_STEPS,
+      isLast: true,
+    },
+    ...steps
+      .map((frame, index) => ({
+        ...frame,
+        step: index,
+        isLast: false,
+      }))
+      .reverse(),
+  ];
 
-    if (step > 0) {
-      const nextStep = step - 1;
+  const currentText =
+    activeStep === TOTAL_STEPS
+      ? finalFrame.text
+      : steps[activeStep]?.text;
 
-      currentStepRef.current = nextStep;
-
-      setCurrentStep(nextStep);
-
-      return;
-    }
-
-    // כל שבע המשיכות הושלמו
-    finishedRef.current = true;
-
-    setIsFinished(true);
-
-    // מודיעים ל-System שהשלב הושלם
-    // המסך נשאר פתוח!
-    onComplete?.();
-  };
-
-  // תנועת הסרט כולו, כולל ראש הגליל
-  const filmTransform = `translate3d(
-    0,
-    calc(-${progress * 22}vh + ${dragOffset}px),
-    0
-  )`;
+  // =========================================
+  // RENDER
+  // =========================================
 
   return (
     <div className="deposits-screen-overlay" dir="ltr">
 
-      {/* סרט הצילום */}
+      {/* צד שמאל – סרט הצילום */}
+
       <div
-        className={`film-area ${isDragging ? 'is-dragging' : ''} ${
-          isFinished ? 'is-finished' : ''
-        }`}
+        ref={filmAreaRef}
+        className={`film-area ${isDragging ? 'is-dragging' : ''}`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerCancel}
       >
-
-        {/* כל הסרט זז יחד */}
         <div
           className="film-track-position"
           style={{
-            transform: filmTransform,
+            transform: `translate3d(0, ${filmPosition + dragOffset}px, 0)`,
             transition: isDragging
               ? 'none'
-              : 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
+              : 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
+          <div ref={filmAssemblyRef} className="film-assembly">
 
-          <div className="film-assembly">
+            {/* גליל עליון – תמונה קבועה */}
 
-            {/* ראש הגליל */}
             <div className="film-roll-top">
               <img
                 src={filmRollTop}
-                alt="ראש גליל סרט הצילום"
+                alt=""
                 draggable="false"
               />
             </div>
 
-            {/* שבעת הפריימים */}
-            <div className="film-frames">
+            {/* כל פריימי הסרט */}
 
-              {filmFrames.map((frame, index) => {
-                const isCurrentFrame = index === progress;
+            <div className="film-frames">
+              {orderedFrames.map((frame) => {
+                const isActive = activeStep === frame.step;
 
                 return (
                   <div
-                    key={index}
+                    key={frame.step}
+                    data-step-index={frame.step}
                     className={`film-frame-wrapper ${
-                      isCurrentFrame ? 'active-frame' : ''
-                    }`}
+                      isActive ? 'active-frame' : ''
+                    } ${frame.isLast ? 'last-film-frame' : ''}`}
                   >
                     <img
-                      src={frame}
-                      alt={`פריים ${index + 1}`}
+                      src={getImage(frame.image)}
+                      alt={frame.alt || ''}
                       draggable="false"
                       className={`film-frame-img ${
-                        isCurrentFrame ? 'clear' : 'blurred'
+                        isActive ? 'clear' : 'blurred'
                       }`}
                     />
                   </div>
                 );
               })}
-
             </div>
+
+            {/* אזור ההנחיה בתחתית הסרט */}
+
+            <div className="film-end-panel">
+              <span>משוך למטה כדי להמשיך</span>
+
+              <img
+                src={filmHand}
+                alt=""
+                className="film-hand-icon"
+                draggable="false"
+              />
+            </div>
+
           </div>
         </div>
-
-        {/* הנחיית משיכה */}
-        {!isFinished && (
-          <div className="pull-hint">
-            <span>משכו את סרט הצילום כלפי מעלה</span>
-            <span className="pull-arrow">↑</span>
-          </div>
-        )}
-
-        {/* הודעה לאחר השלמת המשיכות */}
-        {isFinished && (
-          <div className="pull-hint finished-hint">
-            <span>השלמתם את תהליך הפיקדונות!</span>
-          </div>
-        )}
-
       </div>
 
-      {/* אזור הטקסט */}
-      <div className="text-area" dir="rtl">
+      {/* צד ימין – תיבת הטקסט */}
 
+      <div className="text-area" dir="rtl">
         <div className="text-frame-container">
+
+          {/* מסגרת קבועה */}
 
           <img
             src={textFrameBg}
@@ -261,19 +389,15 @@ const DepositsScreen = ({ onComplete }) => {
           />
 
           <div className="text-content">
-
-            <p
-              key={currentStep}
-              className="deposits-text"
-            >
-              {stepTexts[currentStep]}
+            <p key={activeStep} className="deposits-text">
+              {currentText}
             </p>
 
             <span className="step-indicator">
-              {7 - currentStep} / 7
+              {activeStep} / {TOTAL_STEPS}
             </span>
-
           </div>
+
         </div>
       </div>
 

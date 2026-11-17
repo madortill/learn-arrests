@@ -406,7 +406,7 @@
       "primaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח",
+          "text": "כל הכבוד עכשיו אלינו לצאת על השטח וללות את העצור.",
           "typeAnimation": false,
           "position": {
             "top": "12%",
@@ -479,7 +479,44 @@
       "background": "bg-1",
       "primaryComponent": {
         "type": "DepositsBtn",
-        "props": {}
+        "props": {
+          "content": {
+            "steps": [
+              {
+                "text": "קבלת פיקדונות...",
+                "image": "film_frame_1.png"
+              },
+              {
+                "text": "רישום מדויק...",
+                "image": "film_frame_2.png"
+              },
+              {
+                "text": "בדיקת תקינות...",
+                "image": "film_frame_3.png"
+              },
+              {
+                "text": "אחסון מאובטח...",
+                "image": "film_frame_4.png"
+              },
+              {
+                "text": "חתימה על טפסים...",
+                "image": "film_frame_5.png"
+              },
+              {
+                "text": "נעילת כספת...",
+                "image": "film_frame_6.png"
+              },
+              {
+                "text": "סיום תהליך והעברת אחריות.",
+                "image": "film_frame_7.png"
+              }
+            ],
+            "finalFrame": {
+              "text": "סיום תהליך הפיקדונות.",
+              "image": "film_last_frame.png"
+            }
+          }
+        }
       },
       "secondaryComponent": {
         "type": "SpeechBubble",
@@ -637,12 +674,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "הגעתם למגרש החניה. היכנסו למגרש ולמדו על ארבעת רכבי הליווי.",
+          "text": "הגעתם למגרש החניה. בשלב הזה תלמדו על ארבעת רכבי הליווי",
+          "typeAnimation": false,
           "position": {
-            "bottom": "15%",
+            "top": "15%",
             "right": "10%"
           },
-          "tailPosition": "right-bottom"
+          "tailTarget": {
+            "x": "25%",
+            "y": "24%"
+          }
         }
       }
     },

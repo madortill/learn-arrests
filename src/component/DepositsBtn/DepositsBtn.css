@@ -1,53 +1,102 @@
 
+/* =========================================
+   CONTAINER
+========================================= */
+
 .deposits-btn-container {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 20;
-  }
-  
-  .deposit-hand-btn {
-    position: absolute;
-    bottom: 10%;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* =========================================
+   OPEN BUTTON
+========================================= */
+
+.deposit-hand-btn {
+  position: absolute;
+  right: -50%;
+  bottom: 10%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  background: none;
+  border: none;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  animation:
+    slideInFromRight 1s forwards ease-out,
+    glowYellow 2s infinite alternate ease-in-out 1s;
+}
+
+.deposit-bag-img {
+  display: block;
+  width: clamp(180px, 32vw, 440px);
+  height: auto;
+  object-fit: contain;
+
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4));
+
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes slideInFromRight {
+  from {
     right: -50%;
-  
-    background: none;
-    border: none;
-    cursor: pointer;
-  
-    pointer-events: auto;
-  
-    animation:
-      slideInFromRight 1s forwards ease-out,
-      glowYellow 2s infinite alternate ease-in-out 1s;
   }
-  
+
+  to {
+    right: -1%;
+  }
+}
+
+@keyframes glowYellow {
+  from {
+    filter:
+      drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 5px rgba(255, 215, 0, 0));
+  }
+
+  to {
+    filter:
+      drop-shadow(0 8px 10px rgba(0, 0, 0, 0.4))
+      drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 1100px) {
   .deposit-bag-img {
-    width: clamp(200px, 50vw, 500px);
-    height: auto;
-    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+    width: clamp(170px, 35vw, 340px);
   }
-  
-  @keyframes slideInFromRight {
-    to {
-      right: -1%;
-    }
+}
+
+@media (max-height: 650px) {
+  .deposit-bag-img {
+    width: clamp(150px, 26vw, 300px);
   }
-  
-  @keyframes glowYellow {
-    from {
-      filter:
-        drop-shadow(0 10px 10px rgba(0,0,0,0.5))
-        drop-shadow(0 0 5px rgba(255,215,0,0));
-    }
-  
-    to {
-      filter:
-        drop-shadow(0 10px 10px rgba(0,0,0,0.5))
-        drop-shadow(0 0 20px rgba(255,215,0,0.8));
-    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deposit-hand-btn {
+    animation: none;
+    right: 2%;
   }
-  
+}
