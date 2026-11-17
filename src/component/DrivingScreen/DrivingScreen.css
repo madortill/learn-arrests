@@ -4,297 +4,455 @@
 ================================= */
 
 .driving-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    min-height: 100vh;
-    overflow: hidden;
-  
-    background: #87CEEB;
-  
-    isolation: isolate;
-    touch-action: pan-y;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow: hidden;
+  isolation: isolate;
+
+  background: #87ceeb;
+  touch-action: pan-y;
+}
+
+/* =================================
+   שכבה 1 – סרטון הכביש
+================================= */
+
+.driving-road-video {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* =================================
+   שכבה 2 – תמונת הרקע
+================================= */
+
+.road-background {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: fill;
+
+  z-index: 2;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =================================
+   שכבה 3 – מיקום השלטים
+================================= */
+
+.sign-container {
+  position: absolute;
+
+  top: 13%;
+  right: 13%;
+
+  z-index: 3;
+
+  transform-origin: center center;
+
+  animation: signApproach 1.1s
+    cubic-bezier(0.2, 0.75, 0.25, 1) both;
+
+  will-change: transform, opacity;
+
+  max-width: 65%;
+}
+
+/* אנימציית התקרבות */
+
+@keyframes signApproach {
+  0% {
+    opacity: 0;
+    transform: translate(45vw, 35vh) scale(0.15);
   }
-  
-  /* =================================
-     שכבה 1 – סרטון הכביש
-  ================================= */
-  
-  .driving-road-video {
-    position: absolute;
-    inset: 0;
-  
-    width: 100%;
-    height: 100%;
-  
-    object-fit: cover;
-    object-position: center;
-  
-    z-index: 1;
-  
-    pointer-events: none;
+
+  65% {
+    opacity: 1;
+    transform: translate(-2vw, -1vh) scale(1.08);
   }
-  
-  /* =================================
-     שכבה 2 – תמונת הרקע
-     התמונה מעל הסרטון
-  ================================= */
-  
-  .road-background {
-    position: absolute;
-    inset: 0;
-  
-    width: 100%;
-    height: 100%;
-  
-    object-fit: fill;
-  
-    z-index: 2;
-  
-    pointer-events: none;
-    user-select: none;
+
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
   }
-  
-  /* =================================
-     שכבה 3 – שלטים
-  ================================= */
-  
+}
+
+/* =================================
+   שלט כותרת – כחול
+================================= */
+
+.blue-sign-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: clamp(12px, 1.5vw, 22px);
+
+  min-width: 280px;
+  max-width: 100%;
+
+  padding: clamp(16px, 2vw, 28px)
+    clamp(22px, 2.5vw, 36px);
+
+  background: #005a9c;
+
+  border: 4px solid #fff;
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.45),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.blue-sign-content .sign-arrow {
+  flex-shrink: 0;
+
+  color: #fff;
+
+  font-size: clamp(38px, 4vw, 60px);
+  font-weight: bold;
+}
+
+.blue-sign-content .sign-text {
+  color: #fff;
+
+  font-family: 'Rubik', sans-serif;
+  font-size: clamp(34px, 4.45vw, 64px);
+  font-weight: 600;
+
+  line-height: 1;
+  white-space: pre-line;
+
+  text-align: center;
+  direction: rtl;
+}
+
+/* =================================
+   קבוצת שלטים ירוקים
+================================= */
+
+.green-sign-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: clamp(12px, 1.5vh, 22px);
+
+  width: 100%;
+}
+
+/* =================================
+   שלט תוכן – ירוק
+================================= */
+
+.green-sign-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 260px;
+  max-width: 600px;
+
+  min-height: 90px;
+
+  padding: clamp(18px, 2vw, 28px)
+    clamp(22px, 2.5vw, 36px);
+
+  background: #007a33;
+
+  border: 4px solid #fff;
+  border-radius: 12px;
+
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.green-sign-content .sign-text {
+  width: 100%;
+
+  color: #fff;
+
+  font-family: 'Rubik', sans-serif;
+  font-size: clamp(24px, 2.78vw, 40px);
+  font-weight: 400;
+
+  line-height: 1;
+  white-space: pre-line;
+
+  text-align: center;
+  direction: rtl;
+}
+
+/* =================================
+   שכבה 4 – מסגרת הדשבורד
+================================= */
+
+.dashboard-frame {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: fill;
+
+  z-index: 4;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =================================
+   שכבה 5 – צג הדשבורד
+   מיקום לפי פיגמה 1440x1024
+================================= */
+
+.dashboard-display {
+  position: absolute;
+
+  left: 51.25%;
+  top: 81.64%;
+
+  width: 13.75%;
+  height: 9.86%;
+
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+.display-text {
+  color: #fff;
+
+  font-family: 'Rubik', sans-serif;
+  font-size: clamp(26px, 3.33vw, 48px);
+  font-weight: 400;
+
+  letter-spacing: -0.05em;
+  line-height: 40px;
+
+  white-space: pre-line;
+
+  text-align: center;
+  direction: rtl;
+
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+/* =================================
+   שכבה 6 – הגה
+================================= */
+
+.steering-wheel-wrapper {
+  position: absolute;
+  bottom: -5%;
+  left: 10%;
+  width: clamp(250px, 31.25vw, 450px);
+  z-index: 6;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  isolation: isolate;
+}
+
+.steering-wheel-wrapper::before {
+  content: '';
+  position: absolute;
+
+  inset: -18%;
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 230, 70, 0.26) 0%,
+    rgba(82, 70, 1, 0.3) 35%,
+    rgba(255, 208, 0, 0.226) 60%,
+    transparent 75%
+  );
+
+  filter: blur(18px);
+  z-index: -2;
+
+  animation: steeringGlow 2s ease-in-out infinite;
+}
+
+.steering-wheel-wrapper::after {
+  content: '';
+  position: absolute;
+
+  inset: -5%;
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 18px rgba(255, 224, 50, 0),
+    0 0 40px rgba(255, 221, 30, 0),
+    0 0 70px rgba(133, 111, 16, 0);
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+.steering-wheel {
+  position: relative;
+  width: 100%;
+  height: auto;
+
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+
+  filter: drop-shadow(0 0 10px rgba(87, 71, 3, 0));
+}
+
+.steering-wheel:active {
+  cursor: grabbing;
+}
+
+.steering-wheel:active {
+  cursor: grabbing;
+
+  filter:
+    drop-shadow(0 0 1px rgba(95, 86, 2, 0))
+    drop-shadow(0 0 8px rgba(53, 45, 3, 0));
+}
+
+@keyframes steeringGlow {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* =================================
+   מסכים גדולים – 2560 ומעלה
+================================= */
+
+@media (min-width: 1920px) {
   .sign-container {
-    position: absolute;
-  
-    top: 13%;
-    right: 13%;
-  
-    z-index: 3;
-  
-    transform-origin: center center;
-  
-    animation: signApproach 1.1s
-      cubic-bezier(0.2, 0.75, 0.25, 1) both;
-  
-    will-change: transform, opacity;
+    max-width: 60%;
   }
-  
-  /* השלט מגיע מהפינה הימנית
-     וגדל בהדרגה כאילו הרכב מתקרב אליו */
-  
-  @keyframes signApproach {
-    0% {
-      opacity: 0;
-      transform: translate(45vw, 35vh) scale(0.15);
-    }
-  
-    65% {
-      opacity: 1;
-      transform: translate(-2vw, -1vh) scale(1.08);
-    }
-  
-    100% {
-      opacity: 1;
-      transform: translate(0, 0) scale(1);
-    }
-  }
-  
-  /* =================================
-     שלט כחול
-  ================================= */
-  
-  .blue-sign-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  
-    gap: 22px;
-    min-width: 280px;
-  
-    padding: 22px 35px;
-  
-    background: #005A9C;
-    border: 4px solid #fff;
-    border-radius: 12px;
-  
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-  }
-  
-  .blue-sign-content .sign-arrow {
-    color: white;
-    font-size: clamp(38px, 5vw, 60px);
-    font-weight: bold;
-  }
-  
-  .blue-sign-content .sign-text {
-    color: white;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(26px, 3.5vw, 45px);
-  
-    line-height: 1.2;
-    white-space: pre-line;
-  
-    text-align: center;
-    direction: rtl;
-  }
-  
-  /* =================================
-     שלט ירוק
-  ================================= */
-  
+
   .green-sign-content {
-    max-width: 420px;
-    min-width: 260px;
-  
-    padding: 25px 30px;
-  
-    background: #007A33;
-    border: 4px solid white;
-    border-radius: 12px;
-  
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    max-width: 750px;
   }
-  
-  .green-sign-content .sign-text {
-    color: white;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(20px, 2.2vw, 27px);
-  
-    line-height: 1.5;
-  
-    text-align: right;
-    direction: rtl;
-  }
-  
-  /* =================================
-     שכבה 4 – מסגרת הדשבורד
-  ================================= */
-  
-  .dashboard-frame {
-    position: absolute;
-    inset: 0;
-  
-    width: 100%;
-    height: 100%;
-  
-    object-fit: fill;
-  
-    z-index: 4;
-  
-    pointer-events: none;
-    user-select: none;
-  }
-  
-  /* =================================
-     שכבה 5 – צג הדשבורד
-  ================================= */
-  
-  .dashboard-display {
-    position: absolute;
-  
-    bottom: 12%;
-    right: 35%;
-  
-    z-index: 5;
-  
-    width: 150px;
-    height: 80px;
-  
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  
-    text-align: center;
-    pointer-events: none;
-  }
-  
-  .display-text {
-    color: white;
-  
-    font-family: 'Dana Yad AlefAlefAlef', sans-serif;
-    font-size: clamp(20px, 2vw, 28px);
-  
-    white-space: pre-line;
-    line-height: 1.1;
-  
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-  }
-  
-  /* =================================
-     שכבה 6 – הגה
-  ================================= */
-  
+
   .steering-wheel-wrapper {
-    position: absolute;
-  
-    bottom: -5%;
-    left: 10%;
-  
-    width: clamp(250px, 40vw, 450px);
-  
-    z-index: 6;
+    width: clamp(450px, 25vw, 650px);
   }
-  
+}
+
+/* =================================
+   מחשבים קטנים / מסכים נמוכים
+================================= */
+
+@media (max-width: 1200px) {
+  .sign-container {
+    top: 11%;
+    right: 8%;
+    max-width: 65%;
+  }
+
+  .blue-sign-content {
+    min-width: 240px;
+  }
+
+  .green-sign-content {
+    min-width: 220px;
+    min-height: 75px;
+  }
+
+  .steering-wheel-wrapper {
+    width: clamp(220px, 32vw, 380px);
+    left: 6%;
+  }
+}
+
+/* =================================
+   מסכים קטנים
+================================= */
+
+@media (max-width: 768px) {
+  .sign-container {
+    top: 9%;
+    right: 5%;
+    max-width: 85%;
+  }
+
+  .blue-sign-content {
+    min-width: 0;
+    padding: 15px 20px;
+    gap: 12px;
+  }
+
+  .green-sign-content {
+    min-width: 0;
+    max-width: 100%;
+    min-height: 65px;
+    padding: 15px;
+  }
+
+  .dashboard-display {
+    width: 15%;
+    height: 9%;
+  }
+
+  .display-text {
+    font-size: clamp(16px, 3vw, 26px);
+    line-height: 1;
+  }
+
+  .steering-wheel-wrapper {
+    width: clamp(190px, 38vw, 300px);
+    left: 4%;
+  }
+}
+
+/* =================================
+   נגישות – הפחתת תנועה
+================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .sign-container {
+    animation-duration: 0.01ms;
+  }
+
   .steering-wheel {
-    display: block;
-  
-    width: 100%;
-    height: auto;
-  
-    cursor: grab;
-  
-    transition: transform 0.25s ease-out;
-  
-    touch-action: none;
-    user-select: none;
-    -webkit-user-drag: none;
+    transition-duration: 0.01ms;
   }
-  
-  .steering-wheel:active {
-    cursor: grabbing;
-    transition: none;
-  }
-  
-  /* =================================
-     מסכים קטנים
-  ================================= */
-  
-  @media (max-width: 768px) {
-  
-    .sign-container {
-      top: 10%;
-      right: 7%;
-    }
-  
-    .blue-sign-content {
-      min-width: 220px;
-      padding: 15px 20px;
-      gap: 12px;
-    }
-  
-    .green-sign-content {
-      min-width: 210px;
-      max-width: 300px;
-      padding: 18px;
-    }
-  
-    .dashboard-display {
-      right: 35%;
-      bottom: 12%;
-      transform: scale(0.8);
-    }
-  
-    .steering-wheel-wrapper {
-      width: clamp(200px, 38vw, 320px);
-      left: 5%;
-    }
-  }
-  
-  /* =================================
-     נגישות – הפחתת תנועה
-  ================================= */
-  
-  @media (prefers-reduced-motion: reduce) {
-    .sign-container {
-      animation-duration: 0.01ms;
-    }
-  }
-  
+}
+
+

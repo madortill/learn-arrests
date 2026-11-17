@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import './DrivingScreen.css';
 
@@ -7,38 +6,11 @@ import drivingVideo from '../../assets/DrivingScreenVid.mp4';
 import dashboardFrame from '../../assets/dashboard_frame.png';
 import steeringWheel from '../../assets/steering_wheel.png';
 
-const drivingSequence = [
-  // חלק 1 – דגשים בעת הליווי
-  {
-    id: 'h1_intro',
-    type: 'blue',
-    text: 'שלט פניה\nלדגשים בעת\nהליווי',
-  },
-  { id: 'h1_1', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Praesent nulla.' },
-  { id: 'h1_2', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Praesent nulla. (2)' },
-  { id: 'h1_3', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Praesent nulla. (3)' },
-  { id: 'h1_4', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Praesent nulla. (4)' },
-  { id: 'h1_5', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Praesent nulla. (5)' },
-
-  // חלק 2 – נקודות תורפה ברכב
-  {
-    id: 'h2_intro',
-    type: 'blue',
-    text: 'שלט פניה\nלנקודות\nתורפה ברכב',
-  },
-  { id: 'h2_1', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Commodo elit orci...' },
-  { id: 'h2_2', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Commodo elit orci... (2)' },
-  { id: 'h2_3', type: 'green', text: 'Lorem ipsum dolor sit amet consectetur. Commodo elit orci... (3)' },
-
-  // חלק 3 – הגעה ליעד
-  {
-    id: 'h3_intro',
-    type: 'blue',
-    text: 'שלט הגעה\nליעד',
-  },
-];
-
-export default function DrivingScreen({ onComplete }) {
+export default function DrivingScreen({
+  onComplete,
+  weakPoints = { title: '', items: [] },
+  emphasisPoints = { title: '', items: [] },
+}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [wheelRotation, setWheelRotation] = useState(0);
 
@@ -47,32 +19,73 @@ export default function DrivingScreen({ onComplete }) {
   const rotationRef = useRef(0);
   const completedRef = useRef(false);
 
+  const drivingSequence = [
+    {
+      id: 'weakPoints-title',
+      type: 'title',
+      text: weakPoints.title,
+      dashboardText: 'נקודות\nתורפה',
+    },
+
+    ...weakPoints.items.map((item) => ({
+      id: `weak-${item.id}`,
+      type: 'signs',
+      signs: [item.text],
+      dashboardText: 'נקודות\nתורפה',
+    })),
+
+    {
+      id: 'emphasis-title',
+      type: 'title',
+      text: emphasisPoints.title,
+      dashboardText: 'דגשים\nבעת ליווי',
+    },
+
+    ...emphasisPoints.items.map((item) => ({
+      id: `emphasis-${item.id}`,
+      type: 'signs',
+      signs: item.parts?.length
+        ? item.parts
+        : [item.text || ''],
+      dashboardText: 'דגשים\nבעת ליווי',
+    })),
+
+    // שלט סיום
+    {
+      id: 'destination-title',
+      type: 'title',
+      text: 'שלט הגעה ליעד',
+      dashboardText: 'הגעה\nליעד',
+      isDestination: true,
+    },
+  ];
+
   const currentSign = drivingSequence[currentIndex];
+  const destinationIndex = drivingSequence.length - 1;
 
-  const dashboardText = currentSign.id.startsWith('h1')
-    ? 'דגשים\nבעת ליווי'
-    : currentSign.id.startsWith('h2')
-      ? 'נקודות\nתורפה'
-      : 'הגעה\nליעד';
-
-  // מעבר לשלט הבא
   const handleNext = () => {
-    if (currentIndex < drivingSequence.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-    } else if (!completedRef.current) {
-      completedRef.current = true;
-      onComplete?.();
+    if (currentIndex < destinationIndex) {
+      const nextIndex = currentIndex + 1;
+
+      setCurrentIndex(nextIndex);
+
+      // השלמת השלב ברגע ששלט ההגעה ליעד מופיע
+      if (
+        nextIndex === destinationIndex &&
+        !completedRef.current
+      ) {
+        completedRef.current = true;
+        onComplete?.();
+      }
     }
   };
 
-  // חזרה לשלט הקודם
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex((prev) => prev - 1);
     }
   };
 
-  // תחילת סיבוב ההגה
   const handlePointerDown = (e) => {
     isDragging.current = true;
     startX.current = e.clientX;
@@ -81,12 +94,10 @@ export default function DrivingScreen({ onComplete }) {
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  // תנועת ההגה
   const handlePointerMove = (e) => {
     if (!isDragging.current) return;
 
     const deltaX = e.clientX - startX.current;
-
     const rotation = Math.max(
       -45,
       Math.min(45, deltaX * 0.55)
@@ -96,7 +107,6 @@ export default function DrivingScreen({ onComplete }) {
     setWheelRotation(rotation);
   };
 
-  // סיום סיבוב ההגה
   const handlePointerUp = (e) => {
     if (!isDragging.current) return;
 
@@ -120,11 +130,6 @@ export default function DrivingScreen({ onComplete }) {
 
   return (
     <div className="driving-container">
-
-      {/* =================================
-          שכבה 1 – סרטון הכביש
-      ================================= */}
-
       <video
         className="driving-road-video"
         src={drivingVideo}
@@ -135,11 +140,6 @@ export default function DrivingScreen({ onComplete }) {
         preload="auto"
       />
 
-      {/* =================================
-          שכבה 2 – תמונת הרקע השקופה
-          הכביש בסרטון נראה דרך האזור השקוף
-      ================================= */}
-
       <img
         src={roadBg}
         alt=""
@@ -147,44 +147,35 @@ export default function DrivingScreen({ onComplete }) {
         draggable="false"
       />
 
-      {/* =================================
-          שכבה 3 – שלטים
-      ================================= */}
-
       <div
         key={currentSign.id}
-        className={`sign-container ${currentSign.type}-sign`}
+        className={`sign-container ${
+          currentSign.type === 'title'
+            ? 'title-sign'
+            : 'content-sign'
+        }`}
       >
-
-        {currentSign.type === 'blue' && (
+        {currentSign.type === 'title' ? (
           <div className="blue-sign-content">
-
-            <div className="sign-arrow">
-              &#10140;
-            </div>
+            <div className="sign-arrow">➜</div>
 
             <div className="sign-text">
               {currentSign.text}
             </div>
-
+          </div>
+        ) : (
+          <div className="green-sign-group">
+            {currentSign.signs.map((text, index) => (
+              <div
+                className="green-sign-content"
+                key={`${currentSign.id}-${index}`}
+              >
+                <div className="sign-text">{text}</div>
+              </div>
+            ))}
           </div>
         )}
-
-        {currentSign.type === 'green' && (
-          <div className="green-sign-content">
-
-            <div className="sign-text">
-              {currentSign.text}
-            </div>
-
-          </div>
-        )}
-
       </div>
-
-      {/* =================================
-          שכבה 4 – מסגרת הדשבורד
-      ================================= */}
 
       <img
         src={dashboardFrame}
@@ -193,22 +184,13 @@ export default function DrivingScreen({ onComplete }) {
         draggable="false"
       />
 
-      {/* =================================
-          שכבה 5 – צג הדשבורד
-      ================================= */}
-
       <div className="dashboard-display">
         <span className="display-text">
-          {dashboardText}
+          {currentSign.dashboardText}
         </span>
       </div>
 
-      {/* =================================
-          שכבה 6 – הגה
-      ================================= */}
-
       <div className="steering-wheel-wrapper">
-
         <img
           src={steeringWheel}
           alt="הגה"
@@ -222,9 +204,7 @@ export default function DrivingScreen({ onComplete }) {
           onPointerCancel={handlePointerUp}
           draggable="false"
         />
-
       </div>
-
     </div>
   );
 }

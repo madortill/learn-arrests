@@ -58,6 +58,8 @@ export default function System() {
   const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
   const [continueSignal, setContinueSignal] = useState(0);
+  const [isDrivingDestinationReached, setIsDrivingDestinationReached] =
+  useState(false);
 
   // התקדמות צ'קליסטים
   const [checklistProgress, setChecklistProgress] = useState({});
@@ -71,6 +73,10 @@ export default function System() {
 
   useEffect(() => {
     setIsDepositsScreenOpen(false);
+  }, [currentStep]);
+
+  useEffect(() => {
+    setIsDrivingDestinationReached(false);
   }, [currentStep]);
 
   // מסכי טעינה
@@ -142,6 +148,9 @@ export default function System() {
 
   const PrimaryComponent = componentMap[primaryData?.type];
   const isBookend = primaryData?.type === 'BookendScreen';
+  const isDrivingStep =
+  primaryData?.type === 'DrivingScreen' &&
+  getStageNumber(stepData, currentStep) === 22;
 
   const isDoorsHubStep =
     primaryData?.type === 'DoorsScreen' &&
@@ -198,6 +207,11 @@ export default function System() {
   }, []);
 
   const handleComplete = useCallback(() => {
+    markStepCompleted(currentStep);
+  }, [currentStep, markStepCompleted]);
+
+  const handleDrivingComplete = useCallback(() => {
+    setIsDrivingDestinationReached(true);
     markStepCompleted(currentStep);
   }, [currentStep, markStepCompleted]);
 
@@ -472,7 +486,13 @@ export default function System() {
           {...(primaryData.props || {})}
           currentStep={currentStep}
           isCompleted={isCompleted}
-          onComplete={isDoorsHubStep ? handleNextStep : handleComplete}
+          onComplete={
+            isDoorsHubStep
+              ? handleNextStep
+              : isDrivingStep
+                ? handleDrivingComplete
+                : handleComplete
+          }
           onNext={handleNextStep}
           onRestart={handleRestart}
           continueSignal={continueSignal}
@@ -515,6 +535,13 @@ export default function System() {
       {showSecondarySpeechBubble && (
         <SpeechBubble
           {...(secondaryData.props || {})}
+          text={
+            isDrivingStep
+              ? isDrivingDestinationReached
+                ? 'בשביל לחזור על מה שעברנו משוך את ההגה שמאלה'
+                : 'משוך את ההגה ימינה בשביל להמשיך'
+              : secondaryData.props?.text
+          }
           typeAnimation={false}
           isCompleted={isCompleted}
         />
