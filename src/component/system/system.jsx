@@ -434,8 +434,9 @@ export default function System() {
     !isBookend &&
     !isParkingModalOpen;
 
-  const showSecondarySpeechBubble =
-    secondaryData?.type === 'SpeechBubble' &&
+    const showSecondarySpeechBubble =
+      !isDrivingStep &&
+      secondaryData?.type === 'SpeechBubble' &&
     !(isChecklistStep && checklistHasInteracted) &&
     (!isDepositsScreenOpen || primaryData?.type !== 'DepositsBtn') &&
     !(isParkingStep && Boolean(currentParkingState.isGateOpened));
