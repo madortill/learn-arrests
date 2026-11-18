@@ -1,9 +1,260 @@
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './WriteboardScreen.css';
 
-import whiteboardFrames from '../../assets/whiteboard_frames.png';
 import blueMarker from '../../assets/blue_marker.png';
+
+/* =========================================
+   REVEAL AREA
+   אזור חשיפה באמצעות תנועת הטוש
+========================================= */
+
+const RevealArea = ({
+  children,
+  className = '',
+  onComplete,
+  resetKey,
+  showGuideLine = false,
+}) => {
+  const areaRef = useRef(null);
+  const canvasRef = useRef(null);
+  const previousPoint = useRef(null);
+  const completedRef = useRef(false);
+
+  const [maskUrl, setMaskUrl] = useState('');
+  const [isComplete, setIsComplete] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [guideStyle, setGuideStyle] = useState({});
+
+  /* =========================================
+     מדידת הטקסט ומיקום הקו המקדים
+  ========================================= */
+
+  useEffect(() => {
+    if (!showGuideLine) return;
+
+    const area = areaRef.current;
+    if (!area) return;
+
+    const textElement = area.querySelector('.footer-text-content');
+    if (!textElement) return;
+
+    const updateGuideLine = () => {
+      const areaRect = area.getBoundingClientRect();
+      const textRect = textElement.getBoundingClientRect();
+
+      if (!areaRect.width || !textRect.width) return;
+
+      const fontSize = parseFloat(
+        window.getComputedStyle(textElement).fontSize
+      );
+
+      // רווח קטן בין הטקסט לבין הקו
+      const lineGap = fontSize * 0.18;
+
+      setGuideStyle({
+        width: `${textRect.width}px`,
+        left: `${textRect.left - areaRect.left}px`,
+        top: `${textRect.bottom - areaRect.top + lineGap}px`,
+      });
+    };
+
+    updateGuideLine();
+
+    const observer = new ResizeObserver(updateGuideLine);
+
+    observer.observe(area);
+    observer.observe(textElement);
+
+    return () => observer.disconnect();
+  }, [showGuideLine, resetKey]);
+
+  /* =========================================
+     יצירת מסכת החשיפה
+  ========================================= */
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const initializeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+
+      if (!rect.width || !rect.height) return;
+
+      canvas.width = Math.round(rect.width);
+      canvas.height = Math.round(rect.height);
+
+      const ctx = canvas.getContext('2d');
+
+      // שחור = מוסתר
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      setMaskUrl(canvas.toDataURL());
+    };
+
+    initializeCanvas();
+
+    const observer = new ResizeObserver(initializeCanvas);
+    observer.observe(canvas);
+
+    return () => observer.disconnect();
+  }, [resetKey]);
+
+  /* =========================================
+     איפוס בעת החלפת נתוני השלב
+  ========================================= */
+
+  useEffect(() => {
+    completedRef.current = false;
+    previousPoint.current = null;
+
+    setIsComplete(false);
+    setHasStarted(false);
+    setMaskUrl('');
+  }, [resetKey]);
+
+  /* =========================================
+     חשיפה באמצעות הטוש
+  ========================================= */
+
+  const handlePointerMove = (event) => {
+    if (completedRef.current || event.pointerType === 'touch') return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // ברגע שמתחילים לחשוף, הקו המקדים נעלם
+    if (showGuideLine) {
+      setHasStarted(true);
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const ctx = canvas.getContext('2d');
+
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const brushRadius = Math.min(
+      50,
+      Math.max(25, rect.height * 0.48)
+    );
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+      previousPoint.current?.x ?? x,
+      previousPoint.current?.y ?? y
+    );
+
+    ctx.lineTo(x, y);
+
+    ctx.lineWidth = brushRadius * 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#fff';
+
+    ctx.stroke();
+
+    previousPoint.current = { x, y };
+
+    /* =====================================
+       בדיקת אחוז השטח שנחשף
+    ===================================== */
+
+    const imageData = ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const pixels = imageData.data;
+
+    let revealedPixels = 0;
+    let totalPixels = 0;
+
+    // דגימה של כל 4 פיקסלים
+    for (let i = 0; i < pixels.length; i += 16) {
+      totalPixels++;
+
+      if (pixels[i] > 0) {
+        revealedPixels++;
+      }
+    }
+
+    const revealPercentage = revealedPixels / totalPixels;
+
+    // מעל 75% חשיפה - השלמת האזור
+    if (revealPercentage >= 0.75) {
+      completedRef.current = true;
+
+      setIsComplete(true);
+
+      previousPoint.current = null;
+
+      onComplete?.();
+
+      return;
+    }
+
+    // עדכון מסכת החשיפה
+    setMaskUrl(canvas.toDataURL());
+  };
+
+  return (
+    <div
+      ref={areaRef}
+      className={`reveal-area ${className} ${
+        isComplete ? 'reveal-complete' : ''
+      }`}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={() => {
+        previousPoint.current = null;
+      }}
+    >
+      {/* תוכן החשיפה */}
+
+      <div
+        className={`reveal-content ${
+          maskUrl ? 'reveal-ready' : ''
+        }`}
+        style={{
+          '--reveal-mask': maskUrl
+            ? `url("${maskUrl}")`
+            : 'none',
+        }}
+      >
+        {children}
+      </div>
+
+      {/* הקו המקדים של הערת הסיום */}
+
+      {showGuideLine && (
+        <span
+          className={`footer-guide-line ${
+            hasStarted || isComplete ? 'guide-hidden' : ''
+          }`}
+          style={guideStyle}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* שכבת הציור */}
+
+      <canvas
+        ref={canvasRef}
+        className="reveal-canvas"
+        aria-hidden="true"
+      />
+    </div>
+  );
+};
+
+/* =========================================
+   WRITEBOARD SCREEN
+========================================= */
 
 const WriteboardScreen = ({ whiteboardData, onComplete }) => {
   const {
@@ -13,91 +264,50 @@ const WriteboardScreen = ({ whiteboardData, onComplete }) => {
     footerNote = '',
   } = whiteboardData || {};
 
-  const [writtenWords, setWrittenWords] = useState({});
+  const [completedAreas, setCompletedAreas] = useState({});
   const completionSent = useRef(false);
 
-  // פירוק הטקסט למילים ומתן מזהה ייחודי לכל מילה
-  const { bulletsParsed, footerParsed, totalWordsCount } = useMemo(() => {
-    let count = 0;
+  /* =========================================
+     איפוס בעת החלפת נתוני השלב
+  ========================================= */
 
-    const parsedBullets = bulletPoints.map((point, bIdx) => {
-      const words = point.trim().split(/\s+/).filter(Boolean);
-      const startIdx = count;
-
-      count += words.length;
-
-      return { words, startIdx, bIdx };
-    });
-
-    const footerWords = footerNote.trim()
-      ? footerNote.trim().split(/\s+/).filter(Boolean)
-      : [];
-
-    const footerStartIdx = count;
-    count += footerWords.length;
-
-    return {
-      bulletsParsed: parsedBullets,
-      footerParsed: {
-        words: footerWords,
-        startIdx: footerStartIdx,
-      },
-      totalWordsCount: count,
-    };
-  }, [bulletPoints, footerNote]);
-
-  // איפוס החשיפה אם נתוני השלב משתנים
   useEffect(() => {
-    setWrittenWords({});
+    setCompletedAreas({});
     completionSent.current = false;
   }, [whiteboardData]);
 
-  const handleWordHover = (wordGlobalIdx) => {
-    setWrittenWords((prev) => {
-      if (prev[wordGlobalIdx]) return prev;
+  /* =========================================
+     סימון אזור שהושלם
+  ========================================= */
 
-      return {
-        ...prev,
-        [wordGlobalIdx]: true,
-      };
-    });
+  const handleAreaComplete = (areaId) => {
+    setCompletedAreas((prev) => ({
+      ...prev,
+      [areaId]: true,
+    }));
   };
 
-  const writtenCount = Object.keys(writtenWords).length;
+  const totalAreas =
+    bulletPoints.length + (footerNote.trim() ? 1 : 0);
 
-  // חייבים לחשוף את כל המילים
-  const isFinished =
-    totalWordsCount > 0 && writtenCount === totalWordsCount;
+  const completedCount = Object.values(completedAreas).filter(
+    Boolean
+  ).length;
 
-  // עדכון System פעם אחת בלבד כשהמשתמש סיים
+  /* =========================================
+     השלמת השלב
+  ========================================= */
+
   useEffect(() => {
-    if (isFinished && !completionSent.current) {
+    if (
+      totalAreas > 0 &&
+      completedCount === totalAreas &&
+      !completionSent.current
+    ) {
       completionSent.current = true;
       onComplete?.();
     }
-  }, [isFinished, onComplete]);
-
-  const renderWords = (words, startIdx, fontClass) =>
-    words.map((word, wIdx) => {
-      const globalIdx = startIdx + wIdx;
-      const isWritten = !!writtenWords[globalIdx];
-
-      return (
-        <span
-          key={globalIdx}
-          className="word-hit-area"
-          onPointerEnter={() => handleWordHover(globalIdx)}
-        >
-          <span
-            className={`board-word ${fontClass} ${
-              isWritten ? 'written' : 'hidden'
-            }`}
-          >
-            {word}
-          </span>
-        </span>
-      );
-    });
+  }, [completedCount, totalAreas, onComplete]);
 
   return (
     <div
@@ -107,54 +317,69 @@ const WriteboardScreen = ({ whiteboardData, onComplete }) => {
         '--marker-cursor': `url("${blueMarker}") 0 32, crosshair`,
       }}
     >
-      <div
-        className="whiteboard-frame-bg"
-        style={{
-          backgroundImage: `url("${whiteboardFrames}")`,
-        }}
-      >
-        <div className="whiteboard-content">
+      <main className="whiteboard-content">
 
-          {/* כותרת ותת-כותרת */}
-          <div className="whiteboard-heading">
-            <h2>{title}</h2>
+        {/* =================================
+            כותרת ותת כותרת
+        ================================= */}
+
+        <header className="whiteboard-heading">
+          <h2>{title}</h2>
+
+          <div className="whiteboard-subtitle">
             <p>{subtitle}</p>
+            <img src={blueMarker} alt="" />
           </div>
+        </header>
 
-          {/* שלוש המסגרות */}
-          <div className="bullets-section">
-            {bulletsParsed.map((bullet, bIdx) => (
-              <div
-                key={bIdx}
-                className={`bullet-box-text box-${bIdx + 1}`}
-              >
-                <span className="bullet-number">{bIdx + 1}</span>
+        {/* =================================
+            שלוש הקוביות
+        ================================= */}
 
-                <div className="bullet-words" dir="auto">
-                  {renderWords(
-                    bullet.words,
-                    bullet.startIdx,
-                    'font-lorem'
-                  )}
-                </div>
+        <section className="bullets-section">
+          {bulletPoints.map((point, index) => {
+            const areaId = `bullet-${index}`;
+
+            return (
+              <div className="bullet-row" key={areaId}>
+                <RevealArea
+                  className="bullet-box"
+                  resetKey={whiteboardData}
+                  onComplete={() => handleAreaComplete(areaId)}
+                >
+                  <p className="bullet-text">
+                    {point}
+                  </p>
+                </RevealArea>
+
+                <span className="bullet-number">
+                  {index + 1}
+                </span>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </section>
 
-          {/* קו עליון והדגש בתחתית הלוח */}
-          {footerParsed.words.length > 0 && (
-            <div className="footer-section">
-              <div className="footer-words" dir="rtl">
-                {renderWords(
-                  footerParsed.words,
-                  footerParsed.startIdx,
-                  'font-hebrew'
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        {/* =================================
+            הערת סיום
+        ================================= */}
+
+        {footerNote.trim() && (
+          <RevealArea
+            className="footer-section"
+            resetKey={whiteboardData}
+            showGuideLine
+            onComplete={() => handleAreaComplete('footer')}
+          >
+            <p className="footer-text">
+              <span className="footer-text-content">
+                {footerNote}
+              </span>
+            </p>
+          </RevealArea>
+        )}
+
+      </main>
     </div>
   );
 };

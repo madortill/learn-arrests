@@ -2,10 +2,14 @@
 import React from 'react';
 import './DoorsScreen.css';
 
-import doorClosed from '../../assets/door_closed.png';
-import doorLocked from '../../assets/door_locked.png';
-import doorOpen from '../../assets/door_open.png';
-import hallBackground from '../../assets/doors_hall_bg.jpg';
+import doorClosed from '../../assets/DoorsScreen/door_closed.png';
+import doorLocked from '../../assets/DoorsScreen/door_locked.png';
+import doorOpen from '../../assets/DoorsScreen/door_open.png';
+import hallBackground from '../../assets/DoorsScreen/doors_hall_bg.jpg';
+
+// ==========================================
+// נתוני הדלתות
+// ==========================================
 
 const doorsData = [
   {
@@ -26,37 +30,43 @@ const doorsData = [
   {
     id: 28,
     title: 'תרגול\nאחרון',
-    lockReason: 'יש להשלים את שלבים 25, 26 ו-27 קודם.',
+    lockReason: 'יש להשלים את השלבים האחרים קודם.',
   },
 ];
+
+// ==========================================
+// בדיקת נעילת דלת
+// ==========================================
+
+const isDoorLocked = (id, completedStages) => {
+  // חדר שהושלם כבר אינו נעול.
+  if (completedStages[id]) return false;
+
+  // חדר 26 נפתח לאחר השלמת חדר 25.
+  if (id === 26) {
+    return !completedStages[25];
+  }
+
+  // חדר 28 נפתח לאחר השלמת שלושת החדרים הראשונים.
+  if (id === 28) {
+    return !(
+      completedStages[25] &&
+      completedStages[26] &&
+      completedStages[27]
+    );
+  }
+
+  return false;
+};
+
+// ==========================================
+// קומפוננטת מסדרון הדלתות
+// ==========================================
 
 export default function DoorsScreen({
   completedStages = {},
   onEnterStage,
-  onComplete,
 }) {
-  const allCompleted = [25, 26, 27, 28].every(
-    (id) => completedStages[id]
-  );
-
-  const isLocked = (id) => {
-    if (completedStages[id]) return false;
-
-    if (id === 26) {
-      return !completedStages[25];
-    }
-
-    if (id === 28) {
-      return !(
-        completedStages[25] &&
-        completedStages[26] &&
-        completedStages[27]
-      );
-    }
-
-    return false;
-  };
-
   return (
     <div className="doors-container">
 
@@ -70,9 +80,10 @@ export default function DoorsScreen({
 
       {/* ארבע הדלתות */}
       <div className="doors-row">
+
         {doorsData.map((door) => {
           const isDone = Boolean(completedStages[door.id]);
-          const locked = isLocked(door.id);
+          const locked = isDoorLocked(door.id, completedStages);
 
           const doorImage = isDone
             ? doorOpen
@@ -86,23 +97,31 @@ export default function DoorsScreen({
               ? 'סגור'
               : 'לא בוצע';
 
+          const statusClass = isDone
+            ? 'status-done'
+            : locked
+              ? 'status-locked'
+              : 'status-not-done';
+
           return (
             <div className="door-wrapper" key={door.id}>
 
-              {/* תווית מצב */}
-              <div
-                className={`door-status-label ${
-                  isDone
-                    ? 'status-done'
-                    : locked
-                      ? 'status-locked'
-                      : 'status-not-done'
-                }`}
-              >
-                {status}
+              {/* תווית מצב הדלת */}
+              <div className={`door-status-label ${statusClass}`}>
+                {isDone ? (
+                  'בוצע'
+                ) : locked ? (
+                  'סגור'
+                ) : (
+                  <>
+                    לא
+                    <br />
+                    בוצע
+                  </>
+                )}
               </div>
 
-              {/* הדלת */}
+              {/* הדלת עצמה */}
               <button
                 type="button"
                 className={`door-frame ${
@@ -123,14 +142,14 @@ export default function DoorsScreen({
                   draggable="false"
                 />
 
-                {/* שם החדר */}
+                {/* כותרת החדר */}
                 {!isDone && !locked && (
                   <div className="door-title">
                     {door.title}
                   </div>
                 )}
 
-                {/* הסבר נעילה */}
+                {/* הסבר על דלת נעולה */}
                 {locked && (
                   <div className="locked-tooltip">
                     {door.lockReason}
@@ -141,20 +160,8 @@ export default function DoorsScreen({
             </div>
           );
         })}
+
       </div>
-
-      {/* מעבר הלאה רק לאחר השלמת כל החדרים */}
-      {allCompleted && (
-        <button
-          type="button"
-          className="doors-continue-btn"
-          onClick={onComplete}
-        >
-          המשך
-          <span>❯</span>
-        </button>
-      )}
-
     </div>
   );
 }

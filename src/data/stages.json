@@ -960,28 +960,6 @@
       }
     },
     {
-      "step": 24,
-      "id": 24,
-      "background": "",
-      "primaryComponent": {
-        "type": "DoorsScreen",
-        "props": {}
-      },
-      "secondaryComponent": {
-        "type": "SpeechBubble",
-        "props": {
-          "typeAnimation": false,
-          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
-          "position": {
-            "bottom": "5%",
-            "right": "5%"
-          },
-          "tailPosition": "right-bottom",
-          "character": "commander"
-        }
-      }
-    },
-    {
       "step": 25,
       "background": "bg-1",
       "primaryComponent": {
@@ -1040,7 +1018,7 @@
     
     {
       "step": 26,
-      "background": "",
+      "background": "whiteboard_frames",
       "primaryComponent": {
         "type": "WriteboardScreen",
         "props": {
@@ -1048,25 +1026,12 @@
             "title": "דגשים לקבלה",
             "subtitle": "עברו על הקוביות והפס עם הטוש",
             "bulletPoints": [
-              "Lorem ipsum dolor sit amet consectetur. Fringilla massa.",
-              "Lorem ipsum dolor sit amet consectetur. Praesent nulla.",
-              "Lorem ipsum dolor sit amet consectetur. Praesent nulla."
+              "יש לזכור להוריד את כל הטפסים, הפיקדונות והציוד האישי  מרכב הליווי.",
+              "לאחר הכנסת העצורים לתא המעצר בקבלה יש לשחרר אותם מאזיקה.",
+              "על המלווים להפריד בין העצורות לעצורים בזמן ההמתנה בקבלה."
             ],
             "footerNote": "המתנה בקבלה לרוב ארוכה ותפקיד צוות הליווי לדאוג ולפקח על העצורים לאורך כל התהליך"
           }
-        }
-      },
-      "secondaryComponent": {
-        "type": "SpeechBubble",
-        "props": {
-          "typeAnimation": false,
-          "text": "הפכו את הכרטיסיות כדי להכיר את תחומי האחריות של המלווים בקבלה.",
-          "position": {
-            "bottom": "5%",
-            "right": "5%"
-          },
-          "tailPosition": "right-bottom",
-          "character": "commander"
         }
       }
     },
