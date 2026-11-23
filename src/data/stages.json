@@ -33,7 +33,7 @@
           },
           "tailTarget": {
             "x": "25%",
-            "y": "24%"
+            "y": "30%"
           }
         }
       }
@@ -141,17 +141,32 @@
         "type": "Tablet",
         "props": {
           "type": "LocationMap",
-          "speechBubbleText": "עברו על נקודות המיקום בשביל לראות איפה\nהמעצרים מתקיימים",
-          "generalImportantPoint": "Lorem ipsum dolor sit amet consectetur. Placerat facilisis dolor pharetra urna mauris ac eget suspendisse. Velit arcu id in nec molestie. Odio viverra euismod proin tempus libero.",
+          "generalImportantPoint": "כל מעצר נמצא בבסיס משטרה צבאית. ישנם מעצרים רבים נוספים ברחבי הארץ -מן המעצרים שצוינו בלבד מתבצעים איסופים על ידי פלוגת הליווים.",
           "locations": [
             { "id": 1, "mainName": "מעצר דן", "subName": "שנמצא באזור תל השומר", "x": 58, "y": 26 },
             { "id": 2, "mainName": "מעצר האשל", "subName": "שנמצא באזור באר שבע", "x": 48, "y": 78 },
             { "id": 3, "mainName": "מעצר יואב", "subName": "שנמצא במחנה ג'וליס", "x": 44, "y": 48 },
-            { "id": 4, "mainName": "מעצר ענתות", "subName": "שנמצא בירושלים", "x": 51, "y": 44, "importantPoint": "Lorem ipsum dolor sit amet consectetur. Viverra tellus volutpat bibendum massa in in orci in donec." },
+            { "id": 4, "mainName": "מעצר ענתות", "subName": "שנמצא בירושלים", "x": 51, "y": 44, "importantPoint": "במידה וישנו עצור במעצר אילת שבבסיס מ.צ. אילת, לא ניסע עד לאילת בכדי לקחת אותו, מפני שהמרחק הוא גדול וזמני הנסיעות הם ארוכים. במקום זאת, סגל המעצר ידאג להביא את הכלוא למעצר בבה״ד 1, משם סגל מהשלוחה הדרומית (שבשדה תימן) של פלוגת הליוויים תדאג לקחת אותו מבה״ד 1 עד לבסיס הכליאה. פעולה זאת נקראת ״פגש״." },
             { "id": 5, "mainName": "מעצר ג'למה", "subName": "נמצא בצומת ג'למה שליד יגור", "x": 46, "y": 41 },
             { "id": 6, "mainName": "מעצר פילון", "subName": "נמצא ליד ראש פינה", "x": 51, "y": 30 },
             { "id": 7, "mainName": "מעצר הנגב", "subName": "נמצא בעיר בה״דִים", "x": 47, "y": 53 }
           ]
+        }
+      },
+      "secondaryComponent": {
+        "type": "SpeechBubble",
+        "props": {
+          "text": "עברו על הנקודות במפה\n לצפייה במיקומי המעצרים",
+          "typeAnimation": false,
+          "zIndex": 600,
+          "position": {
+            "top": "5%",
+            "right": "55%"
+          },
+          "tailTarget": {
+            "x": "-5%",
+            "y": "20%"
+          }
         }
       }
     },
@@ -219,12 +234,12 @@
           "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח ",
           "typeAnimation": false,
           "position": {
-            "top": "15%",
+            "top": "12%",
             "right": "10%"
           },
           "tailTarget": {
             "x": "25%",
-            "y": "24%"
+            "y": "20%"
           }
         }
       }
@@ -248,15 +263,15 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "לפני שנמשיך חשוב שנבין מי הוא עצור מצ”ח, לחצו בשביל להבין את ההבדל. ",
+          "text": "חשוב שגם נכיר מי הם צוותי צח”ם",
           "typeAnimation": false,
           "position": {
             "top": "12%",
-            "right": "5%"
+            "right": "10%"
           },
           "tailTarget": {
             "x": "25%",
-            "y": "24%"
+            "y": "20%"
           }
         }
       }
@@ -322,8 +337,8 @@
               "id": 8,
               "mainName": "מיקום 8",
               "subName": "תיאור מיקום 8",
-              "x": 60,
-              "y": 60
+              "x": 48,
+              "y": 34
             }
           ]
         }
@@ -331,8 +346,16 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
+          "text": "עברו על הנקודות במפה\n לצפייה במיקומי מעצרי מצ״ח",
           "typeAnimation": false,
-          "text": "עברו על נקודות המיקום בשביל לראות איפה המעצרים של מצ״ח מתקיימים"
+          "position": {
+            "top": "5%",
+            "right": "55%"
+          },
+          "tailTarget": {
+            "x": "-5%",
+            "y": "20%"
+          }
         }
       }
     },
@@ -456,7 +479,7 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי",
+          "text": "לפני היציאה לליווי, עברו על סעיפי ההיערכות וסמנו ✓ לאחר קריאת כל סעיף.",
           "typeAnimation": false,
           "position": {
             "top": "12%",
@@ -493,7 +516,7 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "עכשיו עליכם לעבור הערכות לפני יציאה לליווי של מצ”ח",
+          "text": "לפני היציאה לליווי של מצ״ח, עברו על סעיפי ההיערכות וסמנו ✓ לאחר קריאת כל סעיף.",
           "typeAnimation": false,
           "position": {
             "top": "12%",
@@ -567,7 +590,7 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "חשוב שנבין מה האחריות של סגל המעצר בתהליך",
+          "text": "בואו נכיר את אחריות סגל המעצר בתהליך",
           "typeAnimation": false,
           "position": {
             "top": "10%",
@@ -582,43 +605,43 @@
     },
     {
       "id": 14,
-      "background": "bg-1",
+      "background": "bg-3",
       "primaryComponent": {
         "type": "DepositsBtn",
         "props": {
           "content": {
             "steps": [
               {
-                "text": "קבלת פיקדונות...",
+                "text": "כאשר חייל מתקבל למעצר הוא עובר חיפוש יסודי ומפקיד את כלל הציוד שלו בידי סגל המעצר.",
                 "image": "film_frame_1.png"
               },
               {
-                "text": "רישום מדויק...",
+                "text": "החייל נשאר אך ורק עם הציוד האישי ששלו המותר להיות עליו בעת השהייה במעצר על מנת שיכול להתקיים בצורה בסיסית כמו למשל מגבת, גופיות, גרביים.",
                 "image": "film_frame_2.png"
               },
               {
-                "text": "בדיקת תקינות...",
+                "text": "את שאר הציוד מפקידים, סופרים ורושמים כל פריט כולל פירוט נרחב בטופס פיקדון.",
                 "image": "film_frame_3.png"
               },
               {
-                "text": "אחסון מאובטח...",
+                "text": "הציוד מופקד בשקית אפורה וסגורה.",
                 "image": "film_frame_4.png"
               },
               {
-                "text": "חתימה על טפסים...",
+                "text": "לאחר הפקדת הכלוא חותם על טופס הפיקדון ובכך מאשר שכל הציוד שהועבר הופקד ונרשם כפי שקיים.",
                 "image": "film_frame_5.png"
               },
               {
-                "text": "נעילת כספת...",
+                "text": "אותו פיקדון לא יפתח וישמר בכספת במעצר עד לרגע שהכלוא ישוחרר או שפלוגת הליווים תגיע לאסוף את העצור וכמו כן תיקח אחריות על הפיקדונות עד להגעתה לבסיס כליאה.",
                 "image": "film_frame_6.png"
               },
               {
-                "text": "סיום תהליך והעברת אחריות.",
+                "text": "ישנה  תשובת לב רבה לתיאור הפריט, “שרשרת זהב” תקרא “שרשרת צהובה” - סגל המעצר אינם אנשי מקצוע ואין יודעים לזהות מה טיב המתכת.",
                 "image": "film_frame_7.png"
               }
             ],
             "finalFrame": {
-              "text": "סיום תהליך הפיקדונות.",
+              "text": "סיום תהליך הפיקדונות. לחץ על כפתור ההמשך",
               "image": "film_last_frame.png"
             }
           }
@@ -631,18 +654,18 @@
           "typeAnimation": false,
           "position": {
             "top": "15%",
-            "right": "10%"
+            "right": "5%"
           },
           "tailTarget": {
-            "x": "25%",
-            "y": "24%"
+            "x": "29%",
+            "y": "10%"
           }
         }
       }
     },
     {
       "step": 15,
-      "background": "bg-1",
+      "background": "bg-3",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
@@ -665,7 +688,7 @@
     },
     {
       "id": 16,
-      "background": "bg-10",
+      "background": "bg-4",
       "primaryComponent": {
         "type": "ChecklistScreen",
         "props": {
@@ -691,22 +714,22 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "השלב הרביעי בתהליך הוא לבצע חיפושים יסודיים",
+          "text": "השלב הרביעי הוא ביצוע חיפושים יסודיים.",
           "typeAnimation": false,
           "position": {
-            "top": "15%",
+            "top": "10%",
             "right": "10%"
           },
           "tailTarget": {
-            "x": "25%",
-            "y": "24%"
+            "x": "21%",
+            "y": "0%"
           }
         }
       }
     },
     {
       "step": 17,
-      "background": "bg-2",
+      "background": "bg-3",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
@@ -729,7 +752,7 @@
             "right": "10%"
           },
           "tailTarget": {
-            "x": "25%",
+            "x": "30%",
             "y": "24%"
           }
         }
@@ -772,7 +795,7 @@
     
     {
       "step": 19,
-      "background": "parking_gate_bg",
+      "background": "bg-5",
       "primaryComponent": {
         "type": "ParkingButton",
         "props": {
@@ -921,7 +944,7 @@
       "secondaryComponent": {
         "type": "SpeechBubble",
         "props": {
-          "text": "הגעתם למגרש החניה. בשלב הזה תלמדו על ארבעת רכבי הליווי",
+          "text": "ברוכים הבאים למגרש החניה! בשלב הזה תלמדו על ארבעת רכבי הליווי",
           "typeAnimation": false,
           "position": {
             "top": "15%",
@@ -959,7 +982,7 @@
     },
     {
       "id": 21,
-      "background": "bg-blur",
+      "background": "bg-3",
       "primaryComponent": {
         "type": "FlipCards",
         "props": {
@@ -979,8 +1002,8 @@
             "right": "10%"
           },
           "tailTarget": {
-            "x": "25%",
-            "y": "24%"
+            "x": "28%",
+            "y": "20%"
           }
         }
       }

@@ -1,4 +1,3 @@
-
 /* =========================================
    FONT
 ========================================= */
@@ -69,6 +68,7 @@
 
 /* =========================================
    CONTENT WRAPPER
+   ברירת מחדל — מותאמת במדויק ל-1440x1024
 ========================================= */
 
 .bookend-content-wrapper {
@@ -143,8 +143,6 @@
   flex-shrink: 0;
 }
 
-/* קווים משני צדי היהלום */
-
 .divider-line {
   flex: 1;
   min-width: 0;
@@ -164,14 +162,12 @@
   opacity: 0.9;
 }
 
-/* יהלום */
-
 .divider-diamond {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: clamp(35px, 5vw, 75px);
+  width: clamp(42px, 5.2vw, 78px);
   aspect-ratio: 4 / 3;
 
   flex-shrink: 0;
@@ -184,8 +180,6 @@
   overflow: visible;
 }
 
-/* מבנה היהלום */
-
 .diamond-facets {
   fill: none;
   stroke: #b9cde0;
@@ -193,8 +187,6 @@
   stroke-linejoin: round;
   stroke-linecap: round;
 }
-
-/* מסגרת חיצונית */
 
 .diamond-outline {
   stroke: #dce8f3;
@@ -207,8 +199,6 @@
   animation: diamondDraw 3s ease-in-out infinite alternate;
 }
 
-/* חלוקה פנימית */
-
 .diamond-facet {
   stroke: #88a4be;
   stroke-width: 1.5;
@@ -219,8 +209,6 @@
 
   animation: diamondDraw 2.5s ease-in-out infinite alternate;
 }
-
-/* קו מרכזי */
 
 .diamond-center {
   stroke: #88a4be;
@@ -252,7 +240,7 @@
 
 .bookend-text-box {
   width: 100%;
-  max-width: 605px;
+  max-width: 650px;
 
   margin: 0;
   padding: 0;
@@ -264,6 +252,17 @@
   box-shadow: none;
 }
 
+/* הצללה כחלחלה-רכה מאחורי טקסט הסיום לשיפור קריאות מול השמיים */
+.bookend-text-box.is-end-text {
+  padding: clamp(6px, 1vh, 14px) clamp(14px, 2vw, 28px);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(24, 52, 92, 0.42) 0%,
+    rgba(24, 52, 92, 0.16) 55%,
+    transparent 80%
+  );
+}
+
 .bookend-text-box p {
   margin: 0;
 
@@ -271,13 +270,13 @@
   font-weight: 600;
 
   font-size: clamp(18px, min(2.35vw, 4.2vh), 36px);
-  line-height: 1.15;
+  line-height: 1.25;
   letter-spacing: 0;
 
   text-align: center;
   color: #ffffff;
 
-  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.35);
 }
 
 
@@ -328,8 +327,6 @@
     filter 0.25s ease;
 }
 
-/* מסגרת זהובה */
-
 .bookend-btn::before {
   content: '';
   position: absolute;
@@ -345,8 +342,6 @@
 
   clip-path: inherit;
 }
-
-/* מילוי אדום */
 
 .bookend-btn::after {
   content: '';
@@ -396,46 +391,100 @@
 
 
 /* =========================================
-   ULTRAWIDE SCREENS
+   מסכים קטנים מעט מ-1440x1024 (כגון 1440x900)
 ========================================= */
 
-@media (min-width: 2000px) {
+@media (max-height: 980px) and (min-height: 821px) and (min-width: 769px) {
   .bookend-content-wrapper {
-    width: min(85%, 900px);
-  }
-
-  .bookend-main-title {
-    font-size: clamp(60px, 4.2vw, 84px);
-  }
-
-  .bookend-text-box {
-    max-width: 680px;
-  }
-
-  .bookend-divider {
-    max-width: 850px;
-  }
-
-  .divider-diamond {
-    width: clamp(65px, 3.5vw, 90px);
+    gap: clamp(10px, 2vh, 21px);
   }
 }
 
 
 /* =========================================
-   SHORT DESKTOP SCREENS
+   1920x1080 & 1920x911 (גדול מ-1440x1024)
 ========================================= */
 
-@media (max-height: 800px) and (min-width: 769px) {
+@media (min-width: 1650px) and (max-width: 2199px) {
+  .bookend-content-wrapper {
+    gap: clamp(18px, 2.8vh, 33px);
+    transform: translate(
+      clamp(320px, 21.5vw, 430px),
+      clamp(-250px, -15vh, -100px)
+    );
+  }
+
+  .bookend-text-box {
+    max-width: 750px;
+  }
+}
+
+/* התאמת גובה ספציפית ל-1920x911 */
+@media (min-width: 1650px) and (max-width: 2199px) and (max-height: 960px) {
+  .bookend-content-wrapper {
+    gap: clamp(16px, 3.5vh, 38px);
+  }
+
+  .bookend-text-box {
+    max-width: 750px;
+  }
+}
+
+
+/* =========================================
+   2K / 2560x1440 (גדול מ-1440x1024)
+========================================= */
+
+@media (min-width: 2200px) {
+  .bookend-content-wrapper {
+    width: min(85%, 1020px);
+    gap: clamp(26px, 2.9vh, 42px);
+
+    transform: translate(
+      clamp(460px, 22vw, 620px),
+      clamp(-280px, -14vh, -130px)
+    );
+  }
+
+  .bookend-main-title {
+    font-size: clamp(84px, 4.3vw, 112px);
+    -webkit-text-stroke: clamp(4px, 0.25vw, 6px) #ffffff;
+  }
+
+  .bookend-text-box {
+    max-width: 920px;
+  }
+
+  .bookend-text-box p {
+    font-size: clamp(36px, 1.85vw, 48px);
+  }
+
+  .bookend-divider {
+    max-width: 960px;
+    gap: 28px;
+  }
+
+  .divider-diamond {
+    width: clamp(75px, 3.6vw, 100px);
+  }
+
+  .bookend-btn {
+    width: min(100%, 460px);
+    height: clamp(92px, 7.8vh, 120px);
+    font-size: clamp(34px, 1.75vw, 46px);
+  }
+}
+
+
+/* =========================================
+   SHORT DESKTOP SCREENS (1366x768, 1280x720)
+   ללא transform — נשאר במיקום הטבעי
+========================================= */
+
+@media (max-height: 820px) and (min-width: 769px) {
   .bookend-content-wrapper {
     gap: clamp(8px, 1.8vh, 18px);
     max-height: 96%;
-
-    /* שומר על ההזזה האופקית גם במסכים נמוכים */
-    transform: translate(
-      clamp(100px, 20vw, 350px),
-      -1vh
-    );
   }
 
   .bookend-main-title {
@@ -456,7 +505,39 @@
   }
 
   .divider-diamond {
-    width: clamp(30px, 3vw, 48px);
+    width: clamp(36px, 3.4vw, 54px);
+  }
+}
+
+
+/* =========================================
+   מסכים צרים יותר מ-1240px (כולל 1024x768)
+   קווי הפרדה קצרים יותר, יהלום מוגדל מעט, וכפתור קצר יותר
+========================================= */
+
+@media (max-width: 1240px) and (min-width: 769px) {
+  .bookend-content-wrapper {
+    gap: clamp(8px, 1.8vh, 18px);
+    
+  }
+
+  .bookend-divider {
+    width: min(76%, 480px);
+    gap: clamp(10px, 1.5vw, 18px);
+  }
+
+  .divider-diamond {
+    width: clamp(46px, 5.2vw, 62px);
+  }
+
+  .bookend-text-box {
+    max-width: min(88%, 430px);
+  }
+
+  .bookend-btn {
+    width: min(85%, 270px);
+    height: clamp(50px, 7.2vh, 66px);
+    font-size: clamp(19px, 2.1vw, 24px);
   }
 }
 
@@ -469,7 +550,7 @@
   .bookend-content-wrapper {
     width: 90%;
     max-height: 94%;
-    gap: clamp(12px, 2.5vh, 22px);
+    gap: clamp(8px, 1.8vh, 16px);
     transform: none;
   }
 
@@ -480,22 +561,26 @@
     -webkit-text-stroke: 2px #ffffff;
   }
 
+  .bookend-divider {
+    width: min(82%, 400px);
+  }
+
+  .divider-diamond {
+    width: clamp(40px, 6.8vw, 58px);
+  }
+
+  .bookend-text-box {
+    max-width: min(92%, 420px);
+  }
+
   .bookend-text-box p {
     font-size: clamp(17px, 3.5vw, 27px);
   }
 
   .bookend-btn {
-    width: min(100%, 320px);
-    height: clamp(58px, 9vh, 82px);
-    font-size: clamp(21px, 4vw, 30px);
-  }
-
-  .bookend-divider {
-    width: 100%;
-  }
-
-  .divider-diamond {
-    width: clamp(32px, 6vw, 55px);
+    width: min(88%, 265px);
+    height: clamp(52px, 8vh, 72px);
+    font-size: clamp(19px, 3.6vw, 26px);
   }
 }
 
@@ -507,7 +592,7 @@
 @media (max-width: 380px) {
   .bookend-content-wrapper {
     width: 94%;
-    gap: 12px;
+    gap: 8px;
   }
 
   .bookend-main-title {
@@ -517,7 +602,16 @@
   }
 
   .bookend-divider {
+    width: 85%;
     gap: 8px;
+  }
+
+  .divider-diamond {
+    width: 38px;
+  }
+
+  .bookend-text-box {
+    max-width: 96%;
   }
 
   .bookend-text-box p {
@@ -525,8 +619,9 @@
   }
 
   .bookend-btn {
-    height: 58px;
-    font-size: 21px;
+    width: min(90%, 240px);
+    height: 52px;
+    font-size: 19px;
   }
 }
 

@@ -58,7 +58,7 @@
   -webkit-user-select: none;
 
   pointer-events: auto;
-  left: 10%;
+  left: 5%;
 }
 
 .film-area.is-dragging {

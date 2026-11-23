@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import quizBg from '../../assets/quiz-bg.png';
+import quizBg from '../../assets/quiz-bg.jpg';
 import './QuizScreen.css';
 
 export default function QuizScreen({
@@ -11,37 +10,70 @@ export default function QuizScreen({
   savedProgress = null,
 }) {
   const [currentIndex, setCurrentIndex] = useState(
-    savedProgress?.currentIndex || 0
+    savedProgress?.currentIndex ?? 0
   );
-
   const [selectedAnswers, setSelectedAnswers] = useState(
-    () => savedProgress?.selectedAnswers || {}
+    savedProgress?.selectedAnswers ?? {}
   );
-
   const [isReviewMode, setIsReviewMode] = useState(
-    () => isCompleted || savedProgress?.isReviewMode || false
+    Boolean(isCompleted || savedProgress?.isReviewMode)
   );
-
   const [expandedExplanations, setExpandedExplanations] = useState(
-    () => savedProgress?.expandedExplanations || {}
+    savedProgress?.expandedExplanations ?? {}
   );
+  const [viewedExplanations, setViewedExplanations] = useState(() => {
+    if (isCompleted) {
+      const allViewed = {};
+      questions.forEach((_, idx) => {
+        allViewed[idx] = true;
+      });
+      return allViewed;
+    }
+    return savedProgress?.viewedExplanations ?? savedProgress?.expandedExplanations ?? {};
+  });
+  const [flashingIndex, setFlashingIndex] = useState(null);
 
-  const [activeFlashingIdx, setActiveFlashingIdx] = useState(null);
-
+  const bodyRef = useRef(null);
   const cardRefs = useRef({});
+  const flashTimerRef = useRef(null);
 
-  const currentQ = questions[currentIndex];
+  useEffect(() => {
+    return () => {
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+    };
+  }, []);
+
+  if (!questions || questions.length === 0) return null;
+
   const totalQuestions = questions.length;
+  const safeIndex = Math.min(currentIndex, totalQuestions - 1);
+  const currentQuestion = questions[safeIndex];
   const answeredCount = Object.keys(selectedAnswers).length;
 
-  // שמירת ההתקדמות
-  const saveProgress = (updates = {}) => {
+  const syncProgress = (overrides = {}) => {
     onComplete?.({
-      currentIndex,
+      currentIndex: safeIndex,
       selectedAnswers,
       isReviewMode,
       expandedExplanations,
-      ...updates,
+      viewedExplanations,
+      ...overrides,
+    });
+  };
+
+  // גלילה פנימית חלקה לכרטיס שגוי בתוך אזור התוכן בלבד
+  const scrollCardIntoBody = (idx) => {
+    requestAnimationFrame(() => {
+      const container = bodyRef.current;
+      const card = cardRefs.current[idx];
+      if (!container || !card) return;
+
+      const targetTop =
+        card.offsetTop - container.offsetTop - container.clientHeight * 0.15;
+      container.scrollTo({
+        top: Math.max(0, targetTop),
+        behavior: 'smooth',
+      });
     });
   };
 
@@ -51,239 +83,229 @@ export default function QuizScreen({
 
     const updatedAnswers = {
       ...selectedAnswers,
-      [currentIndex]: optionIndex,
+      [safeIndex]: optionIndex,
     };
 
     setSelectedAnswers(updatedAnswers);
-
-    onComplete?.({
-      currentIndex,
+    syncProgress({
       selectedAnswers: updatedAnswers,
       isReviewMode: false,
-      expandedExplanations,
     });
   };
 
-  const handleNext = () => {
-    if (currentIndex < totalQuestions - 1) {
-      const nextIndex = currentIndex + 1;
-      setCurrentIndex(nextIndex);
-
-      onComplete?.({
-        currentIndex: nextIndex,
-        selectedAnswers,
-        isReviewMode: false,
-        expandedExplanations,
-      });
-    }
+  // ניווט בין השאלות
+  const handleNextQuestion = () => {
+    if (safeIndex >= totalQuestions - 1) return;
+    const nextIdx = safeIndex + 1;
+    setCurrentIndex(nextIdx);
+    syncProgress({ currentIndex: nextIdx, isReviewMode: false });
   };
 
-  const handleBack = () => {
-    if (currentIndex > 0) {
-      const previousIndex = currentIndex - 1;
-      setCurrentIndex(previousIndex);
-
-      onComplete?.({
-        currentIndex: previousIndex,
-        selectedAnswers,
-        isReviewMode: false,
-        expandedExplanations,
-      });
-    }
+  const handlePrevQuestion = () => {
+    if (safeIndex <= 0) return;
+    const prevIdx = safeIndex - 1;
+    setCurrentIndex(prevIdx);
+    syncProgress({ currentIndex: prevIdx, isReviewMode: false });
   };
 
-  // מעבר לדף התשובות
+  // מעבר למסך התשובות ("בדוק") — פותח אוטומטית את ההסבר של השגיאה הראשונה
   const handleCheckAll = () => {
     const firstWrongIndex = questions.findIndex(
       (q, idx) => selectedAnswers[idx] !== q.correctAnswer
     );
 
-    const updatedExplanations =
-      firstWrongIndex !== -1
-        ? { [firstWrongIndex]: true }
-        : {};
+    const nextExpanded = { ...expandedExplanations };
+    const nextViewed = { ...viewedExplanations };
+
+    if (firstWrongIndex !== -1) {
+      nextExpanded[firstWrongIndex] = true;
+      nextViewed[firstWrongIndex] = true;
+    }
 
     setIsReviewMode(true);
-    setExpandedExplanations(updatedExplanations);
+    setExpandedExplanations(nextExpanded);
+    setViewedExplanations(nextViewed);
 
-    onComplete?.({
-      currentIndex,
-      selectedAnswers,
+    syncProgress({
       isReviewMode: true,
-      expandedExplanations: updatedExplanations,
+      expandedExplanations: nextExpanded,
+      viewedExplanations: nextViewed,
     });
 
     if (firstWrongIndex !== -1) {
-      setTimeout(() => {
-        cardRefs.current[firstWrongIndex]?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }, 100);
+      scrollCardIntoBody(firstWrongIndex);
     }
   };
 
-  // פתיחה וסגירה של הסברים
-  const toggleExpand = (idx) => {
-    const updatedExplanations = {
+  // פתיחה/סגירה ידנית של הסבר לתשובה שגויה
+  const handleToggleExplanation = (idx) => {
+    const willOpen = !expandedExplanations[idx];
+
+    const nextExpanded = {
       ...expandedExplanations,
-      [idx]: !expandedExplanations[idx],
+      [idx]: willOpen,
     };
 
-    setExpandedExplanations(updatedExplanations);
+    const nextViewed = willOpen
+      ? { ...viewedExplanations, [idx]: true }
+      : viewedExplanations;
 
-    onComplete?.({
-      currentIndex,
-      selectedAnswers,
-      isReviewMode,
-      expandedExplanations: updatedExplanations,
-    });
+    setExpandedExplanations(nextExpanded);
+    setViewedExplanations(nextViewed);
 
-    if (activeFlashingIdx === idx) {
-      setActiveFlashingIdx(null);
+    if (flashingIndex === idx) {
+      setFlashingIndex(null);
     }
+
+    syncProgress({
+      expandedExplanations: nextExpanded,
+      viewedExplanations: nextViewed,
+    });
   };
 
-  // המשך בסוף דף התשובות
+  // כפתור "המשך" במסך התשובות — מוודא שכל ההסברים השגויים נפתחו לפחות פעם אחת
   const handleFinalContinue = () => {
     const unviewedWrongIndex = questions.findIndex((q, idx) => {
-      const isCorrect = selectedAnswers[idx] === q.correctAnswer;
-
-      return !isCorrect && !expandedExplanations[idx];
+      const isWrong = selectedAnswers[idx] !== q.correctAnswer;
+      return isWrong && !viewedExplanations[idx];
     });
 
     if (unviewedWrongIndex !== -1) {
-      setActiveFlashingIdx(unviewedWrongIndex);
-
-      const updatedExplanations = {
+      const nextExpanded = {
         ...expandedExplanations,
         [unviewedWrongIndex]: true,
       };
+      const nextViewed = {
+        ...viewedExplanations,
+        [unviewedWrongIndex]: true,
+      };
 
-      setExpandedExplanations(updatedExplanations);
+      setExpandedExplanations(nextExpanded);
+      setViewedExplanations(nextViewed);
+      setFlashingIndex(unviewedWrongIndex);
 
-      onComplete?.({
-        currentIndex,
-        selectedAnswers,
+      syncProgress({
         isReviewMode: true,
-        expandedExplanations: updatedExplanations,
+        expandedExplanations: nextExpanded,
+        viewedExplanations: nextViewed,
       });
 
-      cardRefs.current[unviewedWrongIndex]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
+      scrollCardIntoBody(unviewedWrongIndex);
 
-      setTimeout(() => {
-        setActiveFlashingIdx(null);
-      }, 2000);
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      flashTimerRef.current = setTimeout(() => {
+        setFlashingIndex(null);
+      }, 1800);
 
       return;
     }
 
-    saveProgress({
-      isReviewMode: true,
-    });
-
+    syncProgress({ isReviewMode: true });
     onNext?.();
   };
-
-  if (!questions || questions.length === 0) return null;
 
   return (
     <div
       className="quiz-screen-container"
       style={{ backgroundImage: `url(${quizBg})` }}
     >
+      {/* שורת כותרת עליונה מיושרת */}
+      <header className="quiz-header-bar">
+        <div className="quiz-top-right-header">
+          <span>{isReviewMode ? 'תשובות' : 'זמן לשאלה'}</span>
+        </div>
 
-      <div className="quiz-top-right-header">
-        <span>{isReviewMode ? 'תשובות' : 'זמן לשאלה'}</span>
-      </div>
+        <div className="quiz-counter-circle">
+          <svg viewBox="0 0 100 100" className="circle-svg" aria-hidden="true">
+            <circle
+              cx="50"
+              cy="50"
+              r="44"
+              stroke="#000000"
+              strokeWidth="4"
+              fill="none"
+            />
+            <circle
+              cx="50"
+              cy="50"
+              r="38"
+              stroke="#000000"
+              strokeWidth="1.5"
+              fill="none"
+            />
+          </svg>
+          <span className="circle-text">
+            {isReviewMode
+              ? `${totalQuestions}/${totalQuestions}`
+              : `${safeIndex + 1}/${totalQuestions}`}
+          </span>
+        </div>
+      </header>
 
-      <div className="quiz-counter-circle">
-        <svg viewBox="0 0 100 100" className="circle-svg">
-          <circle cx="50" cy="50" r="44" stroke="#000000" strokeWidth="4" fill="none" />
-          <circle cx="50" cy="50" r="38" stroke="#000000" strokeWidth="1.5" fill="none" />
-        </svg>
-
-        <span className="circle-text">
-          {isReviewMode
-            ? `${totalQuestions}/${totalQuestions}`
-            : `${currentIndex + 1}/${totalQuestions}`}
-        </span>
-      </div>
-
-      <div className="quiz-content-body">
-
+      {/* גוף השאלה או סיכום התשובות */}
+      <main ref={bodyRef} className="quiz-content-body">
         {!isReviewMode ? (
           <div className="quiz-active-mode">
-
-            <h2 className="quiz-question-title">
-              {currentQ.question}
-            </h2>
+            <h2 className="quiz-question-title">{currentQuestion.question}</h2>
 
             <div className="quiz-options-grid">
-              {currentQ.options.map((optionText, optIdx) => (
-                <div
-                  key={optIdx}
-                  className={`quiz-option-card ${
-                    selectedAnswers[currentIndex] === optIdx
-                      ? 'selected'
-                      : ''
-                  }`}
-                  onClick={() => handleSelectOption(optIdx)}
-                >
-                  <span className="option-text">
-                    {optionText}
-                  </span>
-                </div>
-              ))}
-            </div>
+              {currentQuestion.options.map((optionText, optIdx) => {
+                const isSelected = selectedAnswers[safeIndex] === optIdx;
 
+                return (
+                  <button
+                    key={optIdx}
+                    type="button"
+                    className={`quiz-option-card ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleSelectOption(optIdx)}
+                  >
+                    <span className="option-text">{optionText}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className="quiz-summary-list">
-
             {questions.map((q, idx) => {
-              const isCorrect =
-                selectedAnswers[idx] === q.correctAnswer;
-
-              const isExpanded =
-                !!expandedExplanations[idx];
-
-              const isFlashing =
-                activeFlashingIdx === idx;
-
+              const isCorrect = selectedAnswers[idx] === q.correctAnswer;
+              const isExpanded = Boolean(expandedExplanations[idx]);
+              const isFlashing = flashingIndex === idx;
               const correctText = q.options[q.correctAnswer];
 
               return (
                 <div
                   key={idx}
-                  ref={el => cardRefs.current[idx] = el}
-                  className={`summary-card ${
-                    isCorrect ? 'correct' : 'wrong'
-                  } ${isFlashing ? 'flashing-animation' : ''}`}
+                  ref={(el) => {
+                    cardRefs.current[idx] = el;
+                  }}
+                  className={`summary-card ${isCorrect ? 'correct' : 'wrong'} ${
+                    isFlashing ? 'flashing-animation' : ''
+                  }`}
                 >
-
                   <div
                     className="summary-card-header"
-                    onClick={() => !isCorrect && toggleExpand(idx)}
+                    role={!isCorrect ? 'button' : undefined}
+                    tabIndex={!isCorrect ? 0 : undefined}
+                    onClick={() => !isCorrect && handleToggleExplanation(idx)}
+                    onKeyDown={(e) => {
+                      if (!isCorrect && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault();
+                        handleToggleExplanation(idx);
+                      }
+                    }}
                   >
-
                     <div className="summary-icons-right">
-                      {isCorrect
-                        ? <span className="icon-check">✓</span>
-                        : <span className="icon-x">✗</span>}
+                      {isCorrect ? (
+                        <span className="icon-check">✓</span>
+                      ) : (
+                        <span className="icon-x">✗</span>
+                      )}
                     </div>
 
                     <div className="summary-text-content">
-                      <div className="summary-q-text">
-                        {q.question}
-                      </div>
-
-                      <div className="summary-a-text">
-                        {correctText}
-                      </div>
+                      <div className="summary-q-text">{q.question}</div>
+                      <div className="summary-a-text">{correctText}</div>
                     </div>
 
                     {!isCorrect && (
@@ -295,41 +317,37 @@ export default function QuizScreen({
                         ▼
                       </div>
                     )}
-
                   </div>
 
                   {!isCorrect && isExpanded && q.explanation && (
-                    <div className="summary-explanation">
-                      {q.explanation}
-                    </div>
+                    <div className="summary-explanation">{q.explanation}</div>
                   )}
-
                 </div>
               );
             })}
-
           </div>
         )}
+      </main>
 
-      </div>
-
-      <div className="quiz-footer-actions">
-
+      {/* כפתורי ניווט תחתונים */}
+      <footer className="quiz-footer-actions">
         {!isReviewMode ? (
           <>
-            {currentIndex > 0 ? (
+            {safeIndex > 0 ? (
               <button
+                type="button"
                 className="quiz-nav-btn back-btn"
-                onClick={handleBack}
+                onClick={handlePrevQuestion}
               >
                 חזור
               </button>
             ) : (
-              <div className="spacer"></div>
+              <div className="spacer" />
             )}
 
-            {currentIndex === totalQuestions - 1 ? (
+            {safeIndex === totalQuestions - 1 ? (
               <button
+                type="button"
                 className="quiz-nav-btn check-btn"
                 onClick={handleCheckAll}
                 disabled={answeredCount < totalQuestions}
@@ -338,9 +356,10 @@ export default function QuizScreen({
               </button>
             ) : (
               <button
+                type="button"
                 className="quiz-nav-btn next-btn"
-                onClick={handleNext}
-                disabled={selectedAnswers[currentIndex] === undefined}
+                onClick={handleNextQuestion}
+                disabled={selectedAnswers[safeIndex] === undefined}
               >
                 הבא
               </button>
@@ -349,6 +368,7 @@ export default function QuizScreen({
         ) : (
           <>
             <button
+              type="button"
               className="quiz-nav-btn back-btn"
               onClick={() => setIsReviewMode(false)}
             >
@@ -356,6 +376,7 @@ export default function QuizScreen({
             </button>
 
             <button
+              type="button"
               className="quiz-nav-btn next-btn"
               onClick={handleFinalContinue}
             >
@@ -363,9 +384,7 @@ export default function QuizScreen({
             </button>
           </>
         )}
-
-      </div>
-
+      </footer>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
@@ -24,7 +23,10 @@ import Levels, { LevelsBtn } from '../Levels/Levels';
 import ReturnBtn from '../ReturnBtn/ReturnBtn';
 
 import bg1 from '../../assets/backgrounds/bg-1.png';
-import parkingGateBg from '../../assets/backgrounds/parking_gate_bg.png';
+import bg2 from '../../assets/backgrounds/bg-2.png';
+import bg3 from '../../assets/backgrounds/bg-3.png';
+import bg4 from '../../assets/backgrounds/bg-4.png';
+import bg5 from '../../assets/backgrounds/bg-5.png';
 import whiteboardFrames from '../../assets/backgrounds/whiteboard_frames.png';
 
 // ==========================================
@@ -50,8 +52,11 @@ const componentMap = {
 
 const backgroundMap = {
   'bg-1': bg1,
-  parking_gate_bg: parkingGateBg,
-  whiteboard_frames: whiteboardFrames
+  'bg-2': bg2,
+  'bg-3': bg3,
+  'bg-4': bg4,
+  'bg-5': bg5,
+  whiteboard_frames: whiteboardFrames,
 };
 
 // ==========================================
@@ -71,8 +76,6 @@ const DOORS_HUB_CONFIG = {
     y: '5%',
   },
 };
-
-
 
 // מספר שלב לפי JSON
 const getStageNumber = (page, index) =>
@@ -100,20 +103,13 @@ export default function System() {
   // מסדרון הדלתות
   // ==========================================
 
-  // המסדרון אינו שלב ואינו נמצא ב-stages.json.
-  // הוא מוצג כשכבת ניווט עצמאית.
-
   const [isDoorsScreenOpen, setIsDoorsScreenOpen] = useState(false);
-
-  // השלב שאליו נכנסנו מתוך מסדרון הדלתות.
   const [activeDoorStage, setActiveDoorStage] = useState(null);
 
-  // מציאת האינדקס של שלב 23.
   const stage23Index = pages.findIndex(
     (page, index) => getStageNumber(page, index) === 23
   );
 
-  // מציאת האינדקס של שלב 29.
   const stage29Index = pages.findIndex(
     (page, index) => getStageNumber(page, index) === 29
   );
@@ -157,12 +153,10 @@ export default function System() {
         return;
       }
 
-      // שלב 26 דורש השלמת שלב 25.
       if (stageNumber === 26 && !completedDoorStages[25]) {
         return;
       }
 
-      // שלב 28 דורש השלמת שלבים 25, 26 ו-27.
       if (
         stageNumber === 28 &&
         !(
@@ -189,6 +183,7 @@ export default function System() {
   // ==========================================
 
   const stepData = pages[currentStep];
+  const activeStageNumber = getStageNumber(stepData, currentStep);
 
   const primaryData = stepData?.primaryComponent;
   const secondaryData = stepData?.secondaryComponent;
@@ -199,7 +194,7 @@ export default function System() {
 
   const isDrivingStep =
     primaryData?.type === 'DrivingScreen' &&
-    getStageNumber(stepData, currentStep) === 22;
+    activeStageNumber === 22;
 
   const isDoorRoomStep = activeDoorStage !== null;
 
@@ -372,7 +367,6 @@ export default function System() {
     setActiveDoorStage(null);
     setIsDoorsScreenOpen(true);
 
-    // המסדרון חוזר להיות מוצג מעל שלב 23.
     setCurrentStep(stage23Index);
 
     setContinueSignal(0);
@@ -408,18 +402,13 @@ export default function System() {
   // ==========================================
 
   const handleNextStep = useCallback(() => {
-    // השלמת השלב הנוכחי.
     markStepCompleted(currentStep);
 
-    // אם אנחנו בתוך אחד מארבעת החדרים:
-    // חוזרים למסדרון ולא לשלב הבא ב-JSON.
     if (activeDoorStage !== null) {
       handleReturnToDoors();
       return;
     }
 
-    // אם המסדרון פתוח:
-    // ממשיכים לשלב 29 רק לאחר השלמת כל החדרים.
     if (isDoorsScreenOpen) {
       handleLeaveDoors();
       return;
@@ -427,11 +416,9 @@ export default function System() {
 
     const stageNumber = getStageNumber(stepData, currentStep);
 
-    // סיום שלב 23 מפעיל אוטומטית את מסדרון הדלתות.
     if (stageNumber === 23) {
       setIsDoorsScreenOpen(true);
 
-      // לא פותחים את השלבים 25-28 דרך רשימת השלבים.
       setMaxUnlockedStep((prev) =>
         Math.max(prev, currentStep)
       );
@@ -448,7 +435,6 @@ export default function System() {
       return;
     }
 
-    // מסכי טעינה בין שלבים 12 ו-21.
     if (stageNumber === 12 || stageNumber === 21) {
       setPendingStep(nextStep);
       setLoadingType('transition');
@@ -513,13 +499,11 @@ export default function System() {
   // ==========================================
 
   const handlePreviousStep = useCallback(() => {
-    // מתוך חדר חוזרים למסדרון.
     if (activeDoorStage !== null) {
       handleReturnToDoors();
       return;
     }
 
-    // מתוך המסדרון חוזרים לשלב 23.
     if (isDoorsScreenOpen) {
       setIsDoorsScreenOpen(false);
       setCurrentStep(stage23Index);
@@ -527,7 +511,6 @@ export default function System() {
       return;
     }
 
-    // ניווט רגיל בין השלבים.
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
       setContinueSignal(0);
@@ -590,12 +573,11 @@ export default function System() {
   // ==========================================
 
   const handleGlobalContinue = () => {
-    // במסדרון, המשך מעביר לשלב 29.
     if (isDoorsScreenOpen) {
       handleLeaveDoors();
       return;
     }
-  
+
     if (
       isLocationMapStep &&
       primaryData?.props?.generalImportantPoint
@@ -603,59 +585,83 @@ export default function System() {
       setContinueSignal((prev) => prev + 1);
       return;
     }
-  
+
     handleNextStep();
   };
 
- // ==========================================
-// מצבי תצוגה
-// ==========================================
+  // ==========================================
+  // מצבי תצוגה
+  // ==========================================
 
-if (loadingType) {
-  return <LoadingScreen type={loadingType} />;
-}
+  if (loadingType) {
+    return <LoadingScreen type={loadingType} />;
+  }
 
-if (!stepData) {
-  return (
-    <div className="system-container">
-      <BookendScreen
-        isStart={false}
-        onRestart={handleRestart}
-      />
-    </div>
-  );
-}
+  // מסך סיום כאשר currentStep >= pages.length
+  if (!stepData) {
+    return (
+      <div className="system-container">
+        <div className="system-top-right-controls">
+          <About
+            currentStep={pages.length}
+            totalSteps={pages.length}
+          />
+          <LevelsBtn
+            isOpen={isLevelsOpen}
+            onClick={() => setIsLevelsOpen((prev) => !prev)}
+          />
+        </div>
 
-const isParkingModalOpen =
-  isParkingStep &&
-  (
-    Boolean(currentParkingState.isLockModalOpen) ||
-    Boolean(currentParkingState.activeVehicleId)
-  );
+        <Levels
+          steps={pages}
+          currentStep={currentStep}
+          maxUnlockedStep={maxUnlockedStep}
+          onSelectStep={handleSelectStep}
+          isOpen={isLevelsOpen}
+          onClose={() => setIsLevelsOpen(false)}
+        />
 
-// כפתור המשך גלובלי.
-const showGlobalContinue =
-  isDoorsScreenOpen
-    ? allDoorStagesCompleted
-    : (
-        (
-          isCompleted ||
-          (isPrimarySpeechBubble && !primarySpeechHasTyping)
-        ) &&
-        (!isWhatsAppStep || isPrisonerWhatsAppStep) &&
-        !isQuizStep &&
-        !isBookend &&
-        !isParkingModalOpen
-      );
+        <BookendScreen
+          isStart={false}
+          onRestart={handleRestart}
+        />
+      </div>
+    );
+  }
 
-// בועת דיבור משנית.
-const showSecondarySpeechBubble =
-  !isDoorsScreenOpen &&
-  !isDrivingStep &&
-  secondaryData?.type === 'SpeechBubble' &&
-  !(isChecklistStep && checklistHasInteracted) &&
-  (!isDepositsScreenOpen || primaryData?.type !== 'DepositsBtn') &&
-  !(isParkingStep && Boolean(currentParkingState.isGateOpened));
+  const isParkingModalOpen =
+    isParkingStep &&
+    (
+      Boolean(currentParkingState.isLockModalOpen) ||
+      Boolean(currentParkingState.activeVehicleId)
+    );
+
+  // כפתור המשך גלובלי
+  const showGlobalContinue =
+    isDoorsScreenOpen
+      ? allDoorStagesCompleted
+      : (
+          (
+            isCompleted ||
+            (isPrimarySpeechBubble && !primarySpeechHasTyping)
+          ) &&
+          (!isWhatsAppStep || isPrisonerWhatsAppStep) &&
+          !isQuizStep &&
+          !isBookend &&
+          !isParkingModalOpen
+        );
+
+  // בועת דיבור משנית
+  const showSecondarySpeechBubble =
+    !isDoorsScreenOpen &&
+    !isDrivingStep &&
+    secondaryData?.type === 'SpeechBubble' &&
+    !(isChecklistStep && checklistHasInteracted) &&
+    (!isDepositsScreenOpen || primaryData?.type !== 'DepositsBtn') &&
+    !(isParkingStep && Boolean(currentParkingState.isGateOpened));
+
+  // הצגת כפתור השלבים בכל העמודים חוץ מהעמוד הראשון (0)
+  const showLevelsBtn = currentStep > 0;
 
   // ==========================================
   // תצוגה
@@ -670,15 +676,20 @@ const showSecondarySpeechBubble =
           : 'none',
       }}
     >
-      <About />
-
-      {/* כפתור רשימת השלבים */}
-      {!isBookend && (
-        <LevelsBtn
-          isOpen={isLevelsOpen}
-          onClick={() => setIsLevelsOpen((prev) => !prev)}
+      {/* סרגל כפתורים ימני עליון: About ראשון מימין ו-LevelsBtn משמאלו */}
+      <div className="system-top-right-controls">
+        <About
+          currentStep={currentStep}
+          totalSteps={pages.length}
         />
-      )}
+
+        {showLevelsBtn && (
+          <LevelsBtn
+            isOpen={isLevelsOpen}
+            onClick={() => setIsLevelsOpen((prev) => !prev)}
+          />
+        )}
+      </div>
 
       {/* כפתור חזור */}
       {!isBookend &&
@@ -687,7 +698,7 @@ const showSecondarySpeechBubble =
         )}
 
       {/* רשימת השלבים */}
-      {!isBookend && (
+      {showLevelsBtn && (
         <Levels
           steps={pages}
           currentStep={currentStep}
@@ -711,6 +722,7 @@ const showSecondarySpeechBubble =
           />
 
           <SpeechBubble
+            step={24}
             text={DOORS_HUB_CONFIG.text}
             typeAnimation={false}
             position={DOORS_HUB_CONFIG.position}
@@ -733,6 +745,7 @@ const showSecondarySpeechBubble =
               : undefined
           }
           {...(primaryData.props || {})}
+          step={activeStageNumber}
           currentStep={currentStep}
           isCompleted={isCompleted}
           onComplete={
@@ -786,6 +799,8 @@ const showSecondarySpeechBubble =
         showSecondarySpeechBubble && (
           <SpeechBubble
             {...(secondaryData.props || {})}
+            step={activeStageNumber}
+            zIndex={secondaryData.props?.zIndex ?? 600}
             text={
               isDrivingStep
                 ? isDrivingDestinationReached

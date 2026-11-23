@@ -32,12 +32,10 @@ export default function LocationMap({
 
   const [pulsingId, setPulsingId] = useState(initialArrowId);
 
-  // בדיקה האם כל הנקודות הושלמו
   const isAllVisited =
     locations.length > 0 &&
     locations.every((loc) => visitedIds.includes(loc.id));
 
-  // שחזור הנקודות כאשר חוזרים לשלב שהושלם
   useEffect(() => {
     if (isCompleted && locations.length > 0) {
       setVisitedIds(locations.map((loc) => loc.id));
@@ -46,7 +44,6 @@ export default function LocationMap({
     }
   }, [isCompleted, locations]);
 
-  // פתיחת ההערה הכללית רק בעקבות לחיצה על כפתור ההמשך הגלובלי
   useEffect(() => {
     if (
       continueSignal > 0 &&
@@ -65,17 +62,14 @@ export default function LocationMap({
     isGeneralPopupOpen,
   ]);
 
-  // עדכון מערכת הניווט לאחר השלמת כל הנקודות
   useEffect(() => {
     if (isAllVisited && onComplete) {
       onComplete();
     }
   }, [isAllVisited, onComplete]);
 
-  // לחיצה על נקודה במפה או על כרטיס ברשימה
   const handleLocationClick = (loc) => {
     const isNew = !visitedIds.includes(loc.id);
-
     const newVisited = isNew ? [...visitedIds, loc.id] : visitedIds;
 
     if (isNew) {
@@ -101,7 +95,6 @@ export default function LocationMap({
     }
   };
 
-  // סגירת פופאפ הדגשים
   const handleClosePopup = () => {
     const wasGeneralPopup = isGeneralPopupOpen;
 
@@ -173,7 +166,7 @@ export default function LocationMap({
         </div>
       </div>
 
-      {/* סרגל המיקומים הצף בצד ימין מעל המפה */}
+      {/* סרגל המיקומים הצף בצד ימין מעל המפה בלבד */}
       <aside className="map-sidebar-side">
         <div className="sidebar-header">
           <h3>מיקום מעצרים</h3>
@@ -205,27 +198,18 @@ export default function LocationMap({
                   }
                 }}
               >
-                {/* טקסט מיושר לימין + אייקון אזהרה ליד הכותרת אם יש importantPoint */}
                 <div className="item-text">
                   <div className="item-title-row">
                     <strong>{loc.mainName}</strong>
-                    {hasImportantPoint && (
-                      <img
-                        src={warningEmojiIcon}
-                        alt="דגש חשוב"
-                        className="item-warning-icon"
-                        draggable="false"
-                      />
-                    )}
                   </div>
                   <small>{loc.subName}</small>
                 </div>
 
-                {/* אייקון sidebar-pin בצד שמאל */}
+                {/* אייקון בצד שמאל: warning-emoji אם יש דגש חשוב, אחרת sidebar-pin באותו גודל */}
                 <div className="item-icon-left">
                   <img
-                    src={sidebarPinIcon}
-                    alt=""
+                    src={hasImportantPoint ? warningEmojiIcon : sidebarPinIcon}
+                    alt={hasImportantPoint ? 'דגש חשוב' : ''}
                     className="sidebar-pin-img"
                     draggable="false"
                   />
@@ -236,11 +220,12 @@ export default function LocationMap({
         </div>
       </aside>
 
-      {/* פופאפ דגשים */}
+      {/* התראת Apple עם האייקון שיצרת */}
       {activePopupText && (
         <ImportantPoints
           title={popupTitle}
           text={activePopupText}
+          icon={warningEmojiIcon}
           onClose={handleClosePopup}
         />
       )}

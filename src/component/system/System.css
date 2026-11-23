@@ -1,24 +1,56 @@
-
 /* =========================================
    SYSTEM CONTAINER
 ========================================= */
 
 .system-container {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100dvh;
-  
-    overflow: hidden;
-  
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  
-  /* =========================================
-     BACKGROUNDS
-  ========================================= */
-  
-
-  
+   position: relative;
+   width: 100%;
+   min-height: 100vh;
+   min-height: 100dvh;
+ 
+   overflow: hidden;
+ 
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+ }
+ 
+ /* =========================================
+    TOP-RIGHT CONTROLS (ABOUT + LEVELS BTN)
+    תמיד בצד ימין אחת ליד השנייה
+ ========================================= */
+ 
+ .system-top-right-controls {
+   --top-control-size: clamp(42px, min(3.4vw, 6.2vh), 76px);
+ 
+   position: fixed;
+   top: clamp(14px, 2.4vh, 32px);
+   right: clamp(16px, 2.2vw, 38px);
+   z-index: 9999;
+ 
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   gap: clamp(10px, 1.1vw, 20px);
+ 
+   direction: rtl;
+   pointer-events: none;
+ }
+ 
+ .system-top-right-controls > * {
+   pointer-events: auto;
+   flex-shrink: 0;
+ }
+ 
+ /* יישור של LevelsBtn בתוך הסרגל העליון כך שיישב לצד About באותו גובה */
+ .system-top-right-controls .levels-btn {
+   position: relative !important;
+   top: auto !important;
+   right: auto !important;
+   left: auto !important;
+   bottom: auto !important;
+ 
+   height: var(--top-control-size);
+   min-width: var(--top-control-size);
+   box-sizing: border-box;
+ }

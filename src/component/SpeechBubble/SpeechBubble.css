@@ -3,14 +3,14 @@
 ========================================= */
 
 .speech-bubble-layer {
-  position: absolute;
+  position: fixed;
   inset: 0;
 
   width: 100%;
   height: 100%;
 
-  /* מתחת לבלר ולחלוניות של Lock ו-VehicleInfo, מעל החניה והרכבים */
-  z-index: 40;
+  /* מעל .tablet-stage-wrapper (z-index: 500) */
+  z-index: 600;
 
   direction: rtl;
   font-family: 'Rubik', sans-serif;
@@ -37,22 +37,21 @@
 }
 
 /* =========================================
-   BUBBLE
+   BUBBLE BASE (ALL STEPS DEFAULT)
 ========================================= */
 
 .speech-bubble {
   position: absolute;
 
   width: fit-content;
-
-  max-width: min(48vw, 1050px);
+  max-width: min(60vw, 1480px);
   min-width: 0;
 
   box-sizing: border-box;
 
   padding:
-    clamp(12px, 1.1vw, 24px)
-    clamp(24px, 2.1vw, 48px);
+    clamp(18px, 2.22vw, 56px)
+    clamp(28px, 3.61vw, 92px);
 
   background: transparent;
   border: none;
@@ -82,7 +81,8 @@
 }
 
 /* =========================================
-   TEXT
+   TEXT BASE (ALL STEPS EXCEPT STEP 1)
+   מבוסס רספונסיבית על 1440x1024 (40px / 75px)
 ========================================= */
 
 .speech-content p {
@@ -92,8 +92,8 @@
   font-family: 'Rubik', sans-serif;
   font-weight: 600;
 
-  font-size: clamp(22px, 1.7vw, 40px);
-  line-height: 1.45;
+  font-size: clamp(22px, 2.78vw, 72px);
+  line-height: 1.875;
 
   color: #FFFFFF;
 
@@ -105,18 +105,18 @@
   word-break: normal;
 }
 
+.speech-checkmark {
+  color: #F8B533;
+}
+
 /* =========================================
-   HIDDEN MEASUREMENT TEXT
+   HIDDEN & VISIBLE TEXT LAYERS
 ========================================= */
 
 .speech-measure-text {
   visibility: hidden;
   pointer-events: none;
 }
-
-/* =========================================
-   VISIBLE TYPEWRITER TEXT
-========================================= */
 
 .speech-visible-text {
   position: absolute;
@@ -127,97 +127,171 @@
 }
 
 /* =========================================
-   1280x720
+   DESKTOP FLUID TUNING - DEFAULT STEPS
+   (שומר על הפרופורציה של 1440x1024 בכל מסך)
 ========================================= */
 
-@media (min-width: 1200px) and (max-width: 1300px) {
-  .speech-bubble {
-    max-width: 55vw;
-    padding: 24px 39px;
+/* מסכים צרים / ניידים קטנים (מתחת ל-1366) */
+@media (max-width: 1365px) {
+  .speech-bubble-layer.is-default-step .speech-bubble {
+    max-width: 56vw;
+    padding: clamp(18px, 2vw, 28px) clamp(28px, 3.2vw, 44px);
   }
 
-  .speech-content p {
-    font-size: 30px;
-    line-height: 1.4;
+  .speech-bubble-layer.is-default-step .speech-content p {
+    font-size: clamp(22px, 2.4vw, 34px);
+    line-height: 1.75;
   }
 }
 
-/* =========================================
-   1366x768
-========================================= */
-
-@media (min-width: 1301px) and (max-width: 1399px) {
-  .speech-bubble {
-    max-width: 57vw;
-    padding: 28px 45px;
+/* 1366x768 */
+@media (min-width: 1366px) and (max-width: 1439px) {
+  .speech-bubble-layer.is-default-step .speech-bubble {
+    max-width: 58vw;
+    padding: 28px 46px;
   }
 
-  .speech-content p {
-    font-size: 34px;
-    line-height: 1.4;
+  .speech-bubble-layer.is-default-step .speech-content p {
+    font-size: 36px;
+    line-height: 1.8;
   }
 }
 
-/* =========================================
-   1440x900 - 1440x1025
-   REFERENCE SIZE
-========================================= */
-
-@media (min-width: 1400px) and (max-width: 1599px) {
-  .speech-bubble {
+/* 1440x900 - 1440x1025 (REFERENCE) */
+@media (min-width: 1440px) and (max-width: 1599px) {
+  .speech-bubble-layer.is-default-step .speech-bubble {
     max-width: 60vw;
     padding: 32px 52px;
   }
 
-  .speech-content p {
+  .speech-bubble-layer.is-default-step .speech-content p {
     font-size: 40px;
     line-height: 75px;
   }
 }
 
+/* מסכים רחבים נמוכים (כמו 1920x911) - הקטנה פרופורציונלית בכל השלבים */
+@media (min-width: 1600px) and (max-height: 950px) {
+  .speech-bubble-layer.is-default-step .speech-bubble {
+    max-width: 53vw;
+    padding: 26px 44px;
+  }
+
+  .speech-bubble-layer.is-default-step .speech-content p {
+    font-size: clamp(32px, 2.05vw, 40px);
+    line-height: 1.65;
+  }
+}
+
 /* =========================================
-   1920x1080
+   STEP 1 ONLY - EXACT RESPONSIVE CALIBRATION
 ========================================= */
 
-@media (min-width: 1600px) and (max-width: 2199px) {
-  .speech-bubble {
+.speech-bubble-layer.is-step-1 .speech-bubble {
+  max-width: min(58vw, 1480px);
+  padding:
+    clamp(20px, 2.1vw, 52px)
+    clamp(32px, 3.4vw, 84px);
+}
+
+.speech-bubble-layer.is-step-1 .speech-content p {
+  font-size: clamp(24px, 2.5vw, 64px);
+  line-height: 1.8;
+}
+
+/* 1280x720 (וכל רוחב עד 1300px) */
+@media (max-width: 1300px) {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
+    max-width: 55vw;
+    padding: 24px 39px;
+  }
+
+  .speech-bubble-layer.is-step-1 .speech-content p {
+    font-size: clamp(24px, 2.35vw, 30px);
+    line-height: 2;
+  }
+}
+
+/* 1366x768 */
+@media (min-width: 1301px) and (max-width: 1399px) {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
+    max-width: 57vw;
+    padding: 28px 45px;
+  }
+
+  .speech-bubble-layer.is-step-1 .speech-content p {
+    font-size: 34px;
+    line-height: 1.8;
+  }
+}
+
+/* 1440x900 - 1440x1025 (REFERENCE - מעולה) */
+@media (min-width: 1400px) and (max-width: 1599px) {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
+    max-width: 60vw;
+    padding: 32px 52px;
+  }
+
+  .speech-bubble-layer.is-step-1 .speech-content p {
+    font-size: 40px;
+    line-height: 75px;
+  }
+}
+
+/* 1920x911 (מסך רחב עם גובה מוגבל - הקטנה פרופורציונלית) */
+@media (min-width: 1600px) and (max-width: 2199px) and (max-height: 950px) {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
+    max-width: 53vw;
+    padding: 28px 48px;
+  }
+
+  .speech-bubble-layer.is-step-1 .speech-content p {
+    font-size: 41px;
+    line-height: 1.65;
+  }
+}
+
+/* 1920x1080 */
+@media (min-width: 1600px) and (max-width: 2199px) and (min-height: 951px) {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
     max-width: 58vw;
     padding: 40px 65px;
   }
 
-  .speech-content p {
+  .speech-bubble-layer.is-step-1 .speech-content p {
     font-size: 48px;
-    line-height: 1.4;
+    line-height: 1.8;
   }
 }
 
-/* =========================================
-   2560x1440
-========================================= */
-
+/* 2560x1440 ומעלה */
 @media (min-width: 2200px) {
-  .speech-bubble {
+  .speech-bubble-layer.is-step-1 .speech-bubble {
     max-width: 58vw;
     padding: 52px 84px;
   }
 
-  .speech-content p {
-    font-size: 64px;
-    line-height: 1.4;
+  .speech-bubble-layer.is-step-1 .speech-content p {
+    font-size: clamp(64px, 2.5vw, 80px);
+    line-height: 1.8;
   }
 }
 
 /* =========================================
-   TABLET
+   SMALL VIEWPORTS / TABLET
 ========================================= */
 
 @media (max-width: 768px) {
-  .speech-bubble {
+  .speech-bubble,
+  .speech-bubble-layer.is-step-1 .speech-bubble,
+  .speech-bubble-layer.is-default-step .speech-bubble {
     max-width: 80vw;
     padding: 14px 20px;
   }
 
-  .speech-content p {
+  .speech-content p,
+  .speech-bubble-layer.is-step-1 .speech-content p,
+  .speech-bubble-layer.is-default-step .speech-content p {
     font-size: clamp(18px, 3.5vw, 27px);
     line-height: 1.45;
   }

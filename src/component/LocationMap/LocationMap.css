@@ -1,5 +1,5 @@
 /* =========================================
-   LOCATION MAP CONTAINER (המפה משמשת כרקע מלא)
+   LOCATION MAP CONTAINER
 ========================================= */
 
 .location-map-container {
@@ -14,14 +14,19 @@
   background-color: #a1caec;
 }
 
+.location-map-container * {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
 /* =========================================
-   MAP BACKGROUND LAYER (100% רוחב וגובה)
+   MAP BACKGROUND LAYER
 ========================================= */
 
 .map-viewport-side {
   position: relative;
   width: 100%;
   height: 100%;
+  z-index: 1;
 }
 
 .map-image-container {
@@ -64,23 +69,21 @@
   transition: transform 0.2s ease;
 }
 
-/* הגדלה במעבר עכבר רק על סיכה שטרם נלחצה */
 .map-pin-marker.unvisited:hover .pin-icon {
   transform: scale(1.22);
 }
 
-/* פעימה על הסיכה הבאה בתור */
 .pin-icon.pulsing {
   animation: pulsePoint 1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
 }
 
-/* חץ הכוונה לנקודה הראשונה */
+/* חץ הכוונה */
 .arrow-hint-wrapper {
   position: absolute;
-  top: calc(-1 * min(3.2vw, 4.3vh));
-  right: calc(-1 * min(6.6vw, 8.8vh));
+  top: calc(-1 * min(2.2vw, 2.9vh));
+  right: calc(-1 * min(5.1vw, 6.8vh));
   pointer-events: none;
-  z-index: 25;
+  z-index: 12;
 }
 
 .arrow-hint-img {
@@ -92,7 +95,7 @@
 }
 
 /* =========================================
-   SIDEBAR (צד ימין מעל המפה - רוחב 383.83px מתוך 1440px)
+   SIDEBAR (עולה רק על המפה, מתחת לפופאפים וכפתורים חיצוניים)
 ========================================= */
 
 .map-sidebar-side {
@@ -105,22 +108,21 @@
   background-color: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  border-left: 1px solid rgba(227, 227, 227, 1);
+  border-left: 1px solid rgb(196, 196, 196);
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: min(2.4vw, 3.2vh) min(2.6vw, 3.5vh) min(1.5vw, 2vh);
   box-sizing: border-box;
   overflow: hidden;
-  z-index: 20;
+  z-index: 15;
 }
 
-/* כותרת הסרגל - תואמת ל-39px ב-1440x1080 */
 .sidebar-header {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   flex-shrink: 0;
   margin-bottom: min(1.3vw, 1.75vh);
 }
@@ -128,25 +130,23 @@
 .sidebar-header h3 {
   margin: 0;
   width: 100%;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 700;
   font-size: max(22px, min(2.71vw, 3.61vh));
   line-height: 1;
   letter-spacing: 0;
-  text-align: right;
+  text-align: center;
   color: rgba(0, 0, 0, 1);
 }
 
-/* קו דק מתחת לכותרת - תואם 299.74px ב-1440x1080 */
 .sidebar-header-divider {
   width: 100%;
   max-width: min(20.82vw, 27.75vh);
   height: 0;
-  border-bottom: 1px solid rgba(227, 227, 227, 1);
+  border-bottom: 1px solid rgb(196, 196, 196);
   margin-top: min(1.05vw, 1.4vh);
 }
 
-/* רשימת הפריטים */
 .sidebar-list {
   flex: 1;
   width: 100%;
@@ -165,12 +165,12 @@
 }
 
 .sidebar-list::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.16);
+  background-color: rgb(196, 196, 196);
   border-radius: 999px;
 }
 
 /* =========================================
-   SIDEBAR ITEM VISITED (302.98px x 68.98px ב-1440x1080)
+   SIDEBAR ITEM VISITED
 ========================================= */
 
 .sidebar-item.visited {
@@ -179,7 +179,7 @@
   min-height: max(54px, min(4.79vw, 6.39vh));
   padding: min(0.65vw, 0.85vh) min(1.1vw, 1.45vh);
   background: rgba(255, 255, 255, 1);
-  border: 1px solid rgba(227, 227, 227, 1);
+  border: 1px solid rgb(196, 196, 196);
   border-radius: min(1.11vw, 1.48vh);
   display: flex;
   align-items: center;
@@ -198,7 +198,6 @@
   transform: translateY(-1px);
 }
 
-/* אזור הטקסט מימין */
 .item-text {
   display: flex;
   flex-direction: column;
@@ -213,14 +212,12 @@
 .item-title-row {
   display: flex;
   align-items: center;
-  gap: min(0.42vw, 0.56vh);
   max-width: 100%;
 }
 
-/* כותרת ראשית - תואמת 24px, משקל 500, Inter */
 .item-title-row strong {
-  font-family: 'Inter', sans-serif;
-  font-weight: 500;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
   font-size: max(15px, min(1.67vw, 2.22vh));
   line-height: 1;
   letter-spacing: 0;
@@ -231,18 +228,8 @@
   text-overflow: ellipsis;
 }
 
-/* אייקון אזהרה ליד הכותרת כשיש importantPoint */
-.item-warning-icon {
-  width: max(15px, min(1.45vw, 1.95vh));
-  height: max(15px, min(1.45vw, 1.95vh));
-  object-fit: contain;
-  flex-shrink: 0;
-  display: block;
-}
-
-/* כותרת משנית - תואמת 16px, משקל 300, Inter */
 .item-text small {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 300;
   font-size: max(11px, min(1.11vw, 1.48vh));
   line-height: 1.15;
@@ -253,7 +240,7 @@
   width: 100%;
 }
 
-/* אייקון sidebar-pin בצד שמאל */
+/* אייקון מוגדל בצד שמאל (sidebar-pin או תמרור אזהרה) */
 .item-icon-left {
   display: flex;
   align-items: center;
@@ -263,8 +250,8 @@
 }
 
 .sidebar-pin-img {
-  width: max(18px, min(1.8vw, 2.4vh));
-  height: max(18px, min(1.8vw, 2.4vh));
+  width: max(26px, min(2.45vw, 3.25vh));
+  height: max(26px, min(2.45vw, 3.25vh));
   object-fit: contain;
   display: block;
 }

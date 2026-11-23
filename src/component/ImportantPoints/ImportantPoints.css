@@ -1,81 +1,135 @@
-.important-points-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(3px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    animation: fadeInModal 0.25s ease;
+/* =========================================
+   APPLE SYSTEM ALERT (iOS / iPadOS Style)
+========================================= */
+
+.apple-alert-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  direction: rtl;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  padding: 4%;
+  box-sizing: border-box;
+  animation: appleOverlayFadeIn 0.18s ease-out forwards;
+}
+
+.apple-alert-dialog {
+  width: min(25vw, 33.5vh);
+  min-width: 270px;
+  max-width: 90%;
+  background: rgba(242, 242, 247, 0.94);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgb(196, 196, 196);
+  border-radius: min(1.05vw, 1.4vh);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  box-sizing: border-box;
+  animation: appleAlertPopIn 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.05) forwards;
+}
+
+.apple-alert-body {
+  padding: min(1.5vw, 2vh) min(1.3vw, 1.75vh) min(1.35vw, 1.8vh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.apple-alert-icon-wrapper {
+  margin-bottom: min(0.75vw, 1vh);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.apple-alert-icon {
+  width: max(48px, min(4.2vw, 5.6vh));
+  height: max(48px, min(4.2vw, 5.6vh));
+  object-fit: contain;
+  display: block;
+}
+
+.apple-alert-title {
+  margin: 0 0 min(0.45vw, 0.6vh);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  font-size: max(17px, min(1.35vw, 1.8vh));
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #000000;
+}
+
+.apple-alert-message {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  font-size: max(13px, min(1.02vw, 1.36vh));
+  line-height: 1.42;
+  color: rgba(28, 28, 30, 0.92);
+  white-space: pre-line;
+}
+
+.apple-alert-actions {
+  width: 100%;
+  border-top: 1px solid rgb(196, 196, 196);
+  display: flex;
+}
+
+.apple-alert-action-btn {
+  width: 100%;
+  min-height: max(44px, min(3.3vw, 4.4vh));
+  padding: min(0.65vw, 0.85vh) 12px;
+  background: transparent;
+  border: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  font-size: max(16px, min(1.25vw, 1.68vh));
+  line-height: 1;
+  color: #007aff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.12s ease;
+}
+
+.apple-alert-action-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.apple-alert-action-btn:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   APPLE ALERT ANIMATIONS
+========================================= */
+
+@keyframes appleOverlayFadeIn {
+  from {
+    opacity: 0;
   }
-  
-  .important-points-card {
-    background-color: #ffffff;
-    border-radius: 16px;
-    width: 85%;
-    max-width: 340px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-    box-sizing: border-box;
-    animation: scaleUpModal 0.25s ease;
+  to {
+    opacity: 1;
   }
-  
-  .warning-icon-wrapper {
-    font-size: 32px;
-    margin-bottom: 8px;
+}
+
+@keyframes appleAlertPopIn {
+  from {
+    opacity: 0;
+    transform: scale(1.12);
   }
-  
-  .modal-title {
-    margin: 0 0 10px 0;
-    font-size: 15px;
-    font-weight: 700;
-    color: #1e293b;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
-  
-  .modal-text-content {
-    max-height: 140px;
-    overflow-y: auto;
-    margin-bottom: 16px;
-    padding: 0 5px;
-  }
-  
-  .modal-text-content p {
-    margin: 0;
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: #475569;
-  }
-  
-  .modal-ok-btn {
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 20px;
-    padding: 8px 30px;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .modal-ok-btn:hover {
-    background-color: #0056b3;
-  }
-  
-  @keyframes fadeInModal {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes scaleUpModal {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-  }
+}

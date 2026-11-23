@@ -19,17 +19,29 @@ const BORDER_WIDTH = 1;
 const TAIL_BASE = 93;
 const TAIL_TIP_RADIUS = 4;
 
-// ==========================================
-// RESPONSIVE TAIL CALIBRATION
-// ==========================================
+// יחס גובה-רוחב של מסך הייחוס (1440x1024)
+const REFERENCE_ASPECT_RATIO = 1440 / 1024; // 1.40625
 
-function getResponsiveTailY(width, height) {
-  const value =
-    24.030896 -
-    0.0133882595 * width +
-    0.0237727429 * height;
+// ==========================================
+// RESPONSIVE TAIL Y CALIBRATION
+// ==========================================
+// מתאים את אחוז הגובה (y) שהוגדר ב-JSON עבור 1440x1024
+// לכל יחס מסך אחר (1440x900, 16:9, 1920x911 וכו') בהתאם לחיתוך הרקע.
+function getCalibratedTailYPercent(basePercent, width, height) {
+  if (!width || !height) return basePercent;
 
-  return Math.max(0, Math.min(100, value));
+  const aspectRatio = width / height;
+  const deltaRatio = aspectRatio - REFERENCE_ASPECT_RATIO;
+
+  // התאמה חלקה:
+  // AR 1.406 (1440x1024) -> 0% היסט (נשאר 30%)
+  // AR 1.600 (1440x900)  -> -2.5% (27.5% ~ 28%)
+  // AR 1.778 (16:9)      -> -5.0% (25%)
+  // AR 2.108 (1920x911)  -> -9.7% (20.3% ~ 20%)
+  const offset = deltaRatio * 13.8;
+  const calibrated = basePercent - offset;
+
+  return Math.max(0, Math.min(100, calibrated));
 }
 
 // ==========================================
@@ -40,15 +52,61 @@ function parseCoordinate(value, total) {
   if (typeof value === 'number') return value;
   if (typeof value !== 'string') return 0;
 
-  if (value.endsWith('%')) {
-    return (parseFloat(value) / 100) * total;
+  const trimmed = value.trim();
+
+  if (trimmed.endsWith('%')) {
+    return (parseFloat(trimmed) / 100) * total;
   }
 
-  if (value.endsWith('px')) {
-    return parseFloat(value);
+  if (trimmed.endsWith('px')) {
+    return parseFloat(trimmed);
   }
 
-  return parseFloat(value) || 0;
+  return parseFloat(trimmed) || 0;
+}
+
+function resolveTailTargetY(rawY, width, height) {
+  if (rawY === undefined || rawY === null || rawY === '') {
+    const defaultCalibrated = getCalibratedTailYPercent(30, width, height);
+    return (defaultCalibrated / 100) * height;
+  }
+
+  if (typeof rawY === 'string' && rawY.trim().endsWith('%')) {
+    const basePercent = parseFloat(rawY);
+    const calibratedPercent = getCalibratedTailYPercent(
+      basePercent,
+      width,
+      height
+    );
+    return (calibratedPercent / 100) * height;
+  }
+
+  if (typeof rawY === 'number') {
+    const calibratedPercent = getCalibratedTailYPercent(rawY, width, height);
+    return (calibratedPercent / 100) * height;
+  }
+
+  return parseCoordinate(rawY, height);
+}
+
+// ==========================================
+// TEXT FORMATTING (HIGHLIGHT ✓ IN #F8B533)
+// ==========================================
+
+function renderFormattedText(content) {
+  if (!content) return null;
+
+  const parts = String(content).split(/(✓)/g);
+
+  return parts.map((part, index) =>
+    part === '✓' ? (
+      <span key={index} className="speech-checkmark">
+        ✓
+      </span>
+    ) : (
+      <React.Fragment key={index}>{part}</React.Fragment>
+    )
+  );
 }
 
 // ==========================================
@@ -141,15 +199,19 @@ const DEFAULT_POSITION = {
 
 export default function SpeechBubble({
   text = '',
+  step = null,
+  currentStep = null,
   typeAnimation = true,
   position = DEFAULT_POSITION,
   tailTarget = null,
-  responsiveTailTarget = true,
   centered = false,
   zIndex,
   isCompleted = false,
   onComplete,
 }) {
+  const resolvedStep = step ?? currentStep;
+  const isStepOne = Number(resolvedStep) === 1;
+
   const [displayedText, setDisplayedText] = useState(
     isCompleted || !typeAnimation ? text : ''
   );
@@ -245,16 +307,9 @@ export default function SpeechBubble({
     let target = null;
 
     if (tailTarget) {
-      const responsiveY = responsiveTailTarget
-        ? `${getResponsiveTailY(
-            window.innerWidth,
-            window.innerHeight
-          )}%`
-        : tailTarget.y;
-
       target = {
         x: parseCoordinate(tailTarget.x, layer.width),
-        y: parseCoordinate(responsiveY, layer.height),
+        y: resolveTailTargetY(tailTarget.y, layer.width, layer.height),
       };
     }
 
@@ -275,7 +330,7 @@ export default function SpeechBubble({
 
       return nextGeometry;
     });
-  }, [tailTarget, responsiveTailTarget]);
+  }, [tailTarget]);
 
   // ==========================================
   // OBSERVE SIZE CHANGES
@@ -296,7 +351,7 @@ export default function SpeechBubble({
       observer.disconnect();
       window.removeEventListener('resize', updateGeometry);
     };
-  }, [updateGeometry, position, text, centered]);
+  }, [updateGeometry, position, text, centered, isStepOne]);
 
   const resolvedBubbleStyle = centered
     ? {
@@ -307,9 +362,17 @@ export default function SpeechBubble({
       }
     : position;
 
+  const layerClasses = [
+    'speech-bubble-layer',
+    centered ? 'is-centered' : '',
+    isStepOne ? 'is-step-1' : 'is-default-step',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
     <div
-      className={`speech-bubble-layer ${centered ? 'is-centered' : ''}`}
+      className={layerClasses}
       style={zIndex !== undefined ? { zIndex } : undefined}
       ref={layerRef}
     >
@@ -340,12 +403,12 @@ export default function SpeechBubble({
         <div className="speech-content">
           {/* טקסט למדידת גובה ורוחב הבועה */}
           <p className="speech-measure-text">
-            {text || ' '}
+            {text ? renderFormattedText(text) : ' '}
           </p>
 
           {/* טקסט מוצג */}
           <p className="speech-visible-text">
-            {displayedText}
+            {renderFormattedText(displayedText)}
           </p>
         </div>
       </div>
