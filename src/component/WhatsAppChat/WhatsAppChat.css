@@ -1,296 +1,568 @@
+/* =========================================
+   WHATSAPP CONTAINER (נעול למסגרת, מונע דחיפת Header/Footer)
+========================================= */
+
 .wa-chat-flow-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background-color: #efeae2;
-    direction: rtl;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  
-  /* סרגל עליון (Header) - מורחב */
-  .wa-header {
-    background-color: #005c4b;
-    color: #ffffff;
-    height: 14%;
-    min-height: 42px;
-    padding: 0 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-    z-index: 5;
-    box-sizing: border-box;
-  }
-  
-  .wa-header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .wa-back-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 15px;
-    padding: 0;
-    cursor: pointer;
-  }
-  
-  .wa-avatar {
-    width: 30px;
-    height: 30px;
-    background-color: #6b7c85;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-  }
-  
-  .wa-title-container {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .wa-group-title {
-    margin: 0;
-    font-size: 14.5px;
-    font-weight: 700;
-    line-height: 1.1;
-  }
-  
-  .wa-group-sub {
-    font-size: 10.5px;
-    opacity: 0.85;
-  }
-  
-  .wa-header-actions {
-    display: flex;
-    gap: 12px;
-  }
-  
-  .wa-icon-btn {
-    background: none;
-    border: none;
-    color: #ffffff;
-    font-size: 14px;
-    padding: 0;
-    cursor: pointer;
-  }
-  
-  /* גוף השיחה - ניצול שטח מקסימלי */
-  .wa-body {
-    flex: 1;
-    padding: 5px 50px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size: 14px 14px;
-    box-sizing: border-box;
-  }
-  
-  /* בועות הודעה - מורחבות ל-92% והגדלת פונט ל-14.5px */
-  .wa-message {
-    position: relative;
-    max-width: 92%;
-    padding: 8px 12px;
-    border-radius: 9px;
-    font-size: 14.5px;
-    line-height: 1.4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    box-sizing: border-box;
-  }
-  
-  /* דיווח נכנס (לבן) */
-  .wa-message.incoming-report {
-    align-self: flex-start;
-    background-color: #ffffff;
-    border-top-right-radius: 2px;
-  }
-  
-  .wa-sender-name {
-    color: #e542a3;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
-  
-  .wa-report-text {
-    margin: 0;
-    font-family: inherit;
-    font-size: 13px;
-    line-height: 1.4;
-    white-space: pre-wrap;
-    word-break: break-word;
-    color: #111b21;
-  }
-  
-  /* הודעה יוצאת (ירוקה) */
-  .wa-message.outgoing {
-    align-self: flex-end;
-    background-color: #d9fdd3;
-    border-top-left-radius: 2px;
-  }
-  
-  .wa-message.outgoing p {
-    margin: 0;
-    color: #111b21;
-    font-size: 14.5px;
-    font-weight: 500;
-  }
-  
-  .wa-time {
-    display: block;
-    font-size: 10px;
-    color: #667781;
-    text-align: left;
-    margin-top: 4px;
-  }
-  
-  .wa-ticks.blue {
-    color: #53bdeb;
-  }
-  
-  /* כרטיסיית אישור / פופאפ מוגדלת */
-  .wa-highlight-card-wrapper {
-    display: flex;
-    justify-content: center;
-    margin: 6px 0;
-  }
-  
-  .wa-highlight-card {
-    background-color: #d8f5d0;
-    border: 2px solid #72d65e;
-    border-radius: 12px;
-    padding: 10px 14px;
-    max-width: 96%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-sizing: border-box;
-  }
-  
-  .wa-highlight-text {
-    margin: 0;
-    font-size: 13px;
-    color: #1a4314;
-    line-height: 1.35;
-    font-weight: 600;
-  }
-  
-  .wa-confirm-btn {
-    background-color: #ffffff;
-    border: 2px solid #72d65e;
-    border-radius: 50%;
-    width: 36px;
-    height: 36px;
-    font-size: 17px;
-    cursor: pointer;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* כרטיסיית מפה מוגדלת */
-  .wa-map-preview-card {
-    align-self: flex-end;
-    width: 200px;
-    background-color: #ffffff;
-    border: 2px solid #00a884;
-    border-radius: 10px;
-    padding: 8px 12px;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-  
-  .map-icon {
-    font-size: 22px;
-  }
-  
-  .map-text-group strong {
-    font-size: 13px;
-    color: #075e54;
-  }
-  
-  .map-text-group small {
-    font-size: 10.5px;
-    color: #667781;
-  }
-  
-  /* סרגל תחתון (Footer) - מורחב */
-  .wa-footer {
-    background-color: #f0f2f5;
-    height: 12%;
-    min-height: 36px;
-    padding: 0 -20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-top: 1px solid #d1d7db;
-    flex-shrink: 0;
-    box-sizing: border-box;
-  }
-  
-  .wa-footer-btn {
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: #54656f;
-    padding: 0;
-  }
-  
-  .wa-input-placeholder {
-    flex: 1;
-    background-color: #ffffff;
-    height: 25px;
-    border-radius: 14px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    color: #8696a0;
-    font-size: 12px;
-  }
-  
-  .wa-mic-btn {
-    width: 28px;
-    height: 28px;
-    background-color: #00a884;
-    border: none;
-    border-radius: 50%;
-    color: #ffffff;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  /* שליטה על הגלילה */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  background-color: #efeae2;
+  direction: rtl;
+  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  position: relative;
+}
+
+/* =========================================
+   SVG ICONS (סקייל פרופורציונלי לכל מסך)
+========================================= */
+
+.wa-svg-icon {
+  width: min(1.5vw, 2.1vh);
+  height: min(1.5vw, 2.1vh);
+  min-width: 16px;
+  min-height: 16px;
+}
+
+.wa-svg-icon-sm {
+  width: min(1.35vw, 1.9vh);
+  height: min(1.35vw, 1.9vh);
+  min-width: 15px;
+  min-height: 15px;
+}
+
+.wa-tick-svg {
+  width: min(1.1vw, 1.5vh);
+  height: min(0.75vw, 1.05vh);
+  min-width: 13px;
+  min-height: 9px;
+}
+
+.wa-pin-svg {
+  width: min(1.7vw, 2.4vh);
+  height: min(1.7vw, 2.4vh);
+  min-width: 20px;
+  min-height: 20px;
+}
+
+/* =========================================
+   WHATSAPP HEADER (קבוע ולעולם לא נעלם)
+========================================= */
+
+.wa-header {
+  position: sticky;
+  top: 0;
+  background-color: #008069;
+  color: #ffffff;
+  height: 9.2%;
+  min-height: 44px;
+  padding: 0 2.2%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  z-index: 30;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+  box-sizing: border-box;
+}
+
+.wa-header-right {
+  display: flex;
+  align-items: center;
+  gap: min(0.8vw, 1.1vh);
+  min-width: 0;
+}
+
+.wa-back-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  padding: 0.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.wa-avatar {
+  width: min(2.9vw, 4.1vh);
+  height: min(2.9vw, 4.1vh);
+  min-width: 30px;
+  min-height: 30px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wa-title-container {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.wa-group-title {
+  margin: 0;
+  font-size: max(13px, min(1.25vw, 1.75vh));
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wa-group-sub {
+  font-size: max(10.5px, min(0.95vw, 1.35vh));
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.2;
+}
+
+.wa-header-actions {
+  display: flex;
+  align-items: center;
+  gap: min(1.4vw, 2vh);
+}
+
+.wa-icon-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  padding: 0.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+/* =========================================
+   CHAT BODY & WALLPAPER (אזור הגלילה הפנימי היחיד)
+========================================= */
+
+.wa-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: min(1.5vw, 2.1vh) 4%;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: min(0.95vw, 1.35vh);
+  background-color: #efeae2;
+  background-image:
+    radial-gradient(rgba(134, 150, 160, 0.16) 1px, transparent 1px),
+    radial-gradient(rgba(134, 150, 160, 0.12) 1px, transparent 1px);
+  background-size: 22px 22px;
+  background-position: 0 0, 11px 11px;
+  box-sizing: border-box;
+}
+
 .wa-body.lock-scroll {
-    overflow-y: hidden; /* חוסם גלילה ידנית */
+  overflow-y: hidden;
+  padding-bottom: 85%;
+}
+
+.wa-body.allow-scroll {
+  overflow-y: auto;
+  padding-bottom: min(1.8vw, 2.5vh);
+}
+
+.wa-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wa-body::-webkit-scrollbar-thumb {
+  background-color: rgba(11, 20, 26, 0.2);
+  border-radius: 3px;
+}
+
+/* עטיפת קבוצת הודעות שמופיעות יחד (כמו 8 ו-9) */
+.wa-message-batch {
+  display: flex;
+  flex-direction: column;
+  gap: min(0.95vw, 1.35vh);
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes waMessagePopIn {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
   }
-  
-  .wa-body.allow-scroll {
-    overflow-y: auto; /* מאפשר גלילה ברגע שמגיעים להודעה האחרונה */
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
-  
-  /* התאמת גוף השיחה */
-  .wa-body {
-    flex: 1;
-    padding: 8px 10px;
-    overflow-x: hidden;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-    background-size: 14px 14px;
-    box-sizing: border-box;
-  }
+}
+
+.wa-animate-in {
+  animation: waMessagePopIn 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.wa-animate-in-slow {
+  animation: waMessagePopIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* =========================================
+   MESSAGE BUBBLES
+========================================= */
+
+.wa-message {
+  position: relative;
+  max-width: 86%;
+  padding: min(0.9vw, 1.25vh) min(1.3vw, 1.8vh);
+  border-radius: min(0.65vw, 0.9vh);
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  box-sizing: border-box;
+}
+
+/* הודעה נכנסת (לבן + זנב ימני) */
+.wa-message.incoming-report {
+  align-self: flex-start;
+  background-color: #ffffff;
+  border-top-right-radius: 0;
+  font-size: max(12.5px, min(1.15vw, 1.6vh));
+  line-height: 1.42;
+  color: #111b21;
+}
+
+.wa-message.incoming-report::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #ffffff;
+  border-right: 8px solid transparent;
+}
+
+.wa-sender-name {
+  color: #06cf9c;
+  font-size: max(11px, min(1vw, 1.4vh));
+  font-weight: 600;
+  margin-bottom: 0.25em;
+}
+
+/* הודעה יוצאת ירוקה - עובי 500 וסקייל מלא לכל מסך */
+.wa-message.outgoing {
+  align-self: flex-end;
+  background-color: #d9fdd3;
+  border-top-left-radius: 0;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 500;
+  font-size: max(15px, min(1.66vw, 2.35vh));
+  line-height: 1.6667;
+  letter-spacing: 0%;
+  text-align: right;
+  color: rgba(0, 0, 0, 1);
+}
+
+.wa-message.outgoing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid #d9fdd3;
+  border-left: 8px solid transparent;
+}
+
+.wa-formatted-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12em;
+}
+
+.wa-text-line {
+  min-height: 1em;
+}
+
+.wa-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  float: left;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 400;
+  font-size: max(9.5px, min(0.8vw, 1.15vh));
+  color: #667781;
+  margin-top: 0.4em;
+  margin-right: 0.7em;
+  line-height: 1;
+}
+
+.wa-ticks.blue {
+  color: #53bdeb;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* =========================================
+   HIGHLIGHT CARD (מותאם אוטומטית לגובה המסך ולאורך הטקסט)
+========================================= */
+
+.wa-highlight-card-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  flex-shrink: 0;
+  margin: min(0.4vw, 0.6vh) 0;
+}
+
+.wa-highlight-card {
+  --icon-scale: 1;
+  background-color: #d8f5d0;
+  border: 2px solid #5ec24b;
+  border-radius: min(1vw, 1.4vh);
+  width: 95%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(26, 67, 20, 0.14);
+  box-sizing: border-box;
+}
+
+/* טקסט קצר / רגיל (כמו חלק 1) */
+.wa-highlight-card.density-normal {
+  padding: min(1.25vw, 1.8vh) min(1.7vw, 2.4vh);
+  gap: min(1.2vw, 1.7vh);
+}
+
+.wa-highlight-card.density-normal .wa-highlight-text {
+  font-size: max(14.5px, min(1.55vw, 2.2vh));
+  line-height: 1.52;
+}
+
+/* טקסט בינוני */
+.wa-highlight-card.density-medium {
+  padding: min(1vw, 1.4vh) min(1.5vw, 2.1vh);
+  gap: min(1.1vw, 1.5vh);
+}
+
+.wa-highlight-card.density-medium .wa-highlight-text {
+  font-size: max(13px, min(1.3vw, 1.85vh));
+  line-height: 1.4;
+}
+
+/* טקסט ארוך ומרובה שורות (כמו דיווח עצור בחלק 2 — נכנס כולו למסך אחד בכל מחשב!) */
+.wa-highlight-card.density-compact {
+  padding: min(0.75vw, 1.05vh) min(1.3vw, 1.8vh);
+  gap: min(1.1vw, 1.5vh);
+}
+
+.wa-highlight-card.density-compact .wa-highlight-text {
+  font-size: max(11px, min(0.98vw, 1.38vh));
+  line-height: 1.28;
+}
+
+.wa-highlight-card.density-compact .wa-formatted-text {
+  gap: 0.04em;
+}
+
+.wa-highlight-text {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0%;
+  text-align: right;
+  color: rgba(0, 0, 0, 1);
+  flex: 1;
+}
+
+.wa-highlight-text strong {
+  font-weight: 700;
+  color: rgba(0, 0, 0, 1);
+}
+
+.wa-confirm-btn {
+  background-color: #ffffff;
+  border: 2px solid #5ec24b;
+  border-radius: 50%;
+  width: calc(max(36px, min(3.2vw, 4.5vh)) * var(--icon-scale));
+  height: calc(max(36px, min(3.2vw, 4.5vh)) * var(--icon-scale));
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.wa-confirm-btn-icon {
+  width: 66%;
+  height: 66%;
+  object-fit: contain;
+  display: block;
+}
+
+.wa-confirm-btn:hover:not(:disabled) {
+  transform: scale(1.07);
+}
+
+.wa-confirm-btn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+/* =========================================
+   LOCATION PREVIEW CARD (כרטיסיית מיקום)
+========================================= */
+
+.wa-map-preview-card {
+  align-self: flex-end;
+  width: 30%;
+  min-width: 200px;
+  background-color: #d9fdd3;
+  border-radius: min(0.65vw, 0.9vh);
+  border-top-left-radius: 0;
+  padding: min(0.45vw, 0.65vh);
+  cursor: pointer;
+  box-shadow: 0 1px 1.5px rgba(11, 20, 26, 0.16);
+  box-sizing: border-box;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.wa-map-preview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 128, 105, 0.22);
+}
+
+.wa-map-visual {
+  height: min(6.2vw, 8.8vh);
+  min-height: 64px;
+  border-radius: min(0.45vw, 0.65vh);
+  background:
+    linear-gradient(135deg, #e5f4ea 25%, #d4eadc 25%, #d4eadc 50%, #e5f4ea 50%, #e5f4ea 75%, #d4eadc 75%),
+    #e5f4ea;
+  background-size: 28px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(0, 128, 105, 0.18);
+}
+
+.wa-map-pin-badge {
+  width: min(2.6vw, 3.7vh);
+  height: min(2.6vw, 3.7vh);
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.wa-map-preview-content {
+  padding: 0.4em 0.3em 0.15em;
+}
+
+.map-text-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.map-text-group strong {
+  font-size: max(12.5px, min(1.1vw, 1.55vh));
+  color: #111b21;
+}
+
+.map-text-group small {
+  font-size: max(10.5px, min(0.95vw, 1.35vh));
+  color: #008069;
+  font-weight: 500;
+}
+
+/* =========================================
+   WHATSAPP FOOTER (קבוע ולעולם לא נעלם)
+========================================= */
+
+.wa-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: #f0f2f5;
+  height: 8.5%;
+  min-height: 44px;
+  padding: 0 2%;
+  display: flex;
+  align-items: center;
+  gap: min(0.9vw, 1.3vh);
+  flex: 0 0 auto;
+  z-index: 30;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+}
+
+.wa-footer-btn {
+  background: none;
+  border: none;
+  color: #54656f;
+  padding: 0.3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.wa-input-box {
+  flex: 1;
+  background-color: #ffffff;
+  height: 68%;
+  min-height: 32px;
+  border-radius: 999px;
+  padding: 0 2.2%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.06);
+}
+
+.wa-input-placeholder {
+  color: #8696a0;
+  font-size: max(12px, min(1.1vw, 1.55vh));
+}
+
+.wa-input-icons {
+  display: flex;
+  align-items: center;
+  gap: min(0.8vw, 1.1vh);
+  color: #54656f;
+}
+
+.wa-mic-btn {
+  width: min(2.9vw, 4.1vh);
+  height: min(2.9vw, 4.1vh);
+  min-width: 34px;
+  min-height: 34px;
+  background-color: #00a884;
+  border: none;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+  cursor: default;
+}

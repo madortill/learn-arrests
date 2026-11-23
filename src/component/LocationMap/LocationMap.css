@@ -1,174 +1,294 @@
+/* =========================================
+   LOCATION MAP CONTAINER (המפה משמשת כרקע מלא)
+========================================= */
+
 .location-map-container {
-    display: flex;
-    width: 100% !important;
-    height: 100% !important;
-    background-color: transparent;
-    direction: rtl;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  
-  
-  .map-viewport-side {
-    flex: 1.45;
-    position: relative;
-    background-color: transparent;
-    height: 100%;
-  }
-  
-  .map-image-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
-  
-  /* סיכות המיקום */
-  .map-pin-marker {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    z-index: 10;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  /* הגדלה בעבר עכבר רק לסיכות שטרם נלחצו (אדומות) */
-  .map-pin-marker.unvisited:hover {
-    transform: translate(-50%, -50%); /* נשאר בגודל 1 */
-  }
-  /* ההגדלה מופעלת אך ורק על הסיכה האדומה עצמה! */
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-color: #a1caec;
+}
+
+/* =========================================
+   MAP BACKGROUND LAYER (100% רוחב וגובה)
+========================================= */
+
+.map-viewport-side {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-image-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.map-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* =========================================
+   MAP PIN MARKERS
+========================================= */
+
+.map-pin-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pin-icon {
+  width: min(2.3vw, 3.1vh);
+  height: min(2.3vw, 3.1vh);
+  min-width: 24px;
+  min-height: 24px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+/* הגדלה במעבר עכבר רק על סיכה שטרם נלחצה */
 .map-pin-marker.unvisited:hover .pin-icon {
-    transform: scale(1.25);
+  transform: scale(1.22);
+}
+
+/* פעימה על הסיכה הבאה בתור */
+.pin-icon.pulsing {
+  animation: pulsePoint 1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+}
+
+/* חץ הכוונה לנקודה הראשונה */
+.arrow-hint-wrapper {
+  position: absolute;
+  top: calc(-1 * min(3.2vw, 4.3vh));
+  right: calc(-1 * min(6.6vw, 8.8vh));
+  pointer-events: none;
+  z-index: 25;
+}
+
+.arrow-hint-img {
+  width: min(6.25vw, 8.35vh);
+  min-width: 65px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+/* =========================================
+   SIDEBAR (צד ימין מעל המפה - רוחב 383.83px מתוך 1440px)
+========================================= */
+
+.map-sidebar-side {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: min(26.65vw, 35.54vh);
+  min-width: 260px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-left: 1px solid rgba(227, 227, 227, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: min(2.4vw, 3.2vh) min(2.6vw, 3.5vh) min(1.5vw, 2vh);
+  box-sizing: border-box;
+  overflow: hidden;
+  z-index: 20;
+}
+
+/* כותרת הסרגל - תואמת ל-39px ב-1440x1080 */
+.sidebar-header {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  margin-bottom: min(1.3vw, 1.75vh);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: max(22px, min(2.71vw, 3.61vh));
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: right;
+  color: rgba(0, 0, 0, 1);
+}
+
+/* קו דק מתחת לכותרת - תואם 299.74px ב-1440x1080 */
+.sidebar-header-divider {
+  width: 100%;
+  max-width: min(20.82vw, 27.75vh);
+  height: 0;
+  border-bottom: 1px solid rgba(227, 227, 227, 1);
+  margin-top: min(1.05vw, 1.4vh);
+}
+
+/* רשימת הפריטים */
+.sidebar-list {
+  flex: 1;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: min(0.85vw, 1.15vh);
+  padding: 2px 0 min(1vw, 1.3vh);
+  box-sizing: border-box;
+}
+
+.sidebar-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebar-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+}
+
+/* =========================================
+   SIDEBAR ITEM VISITED (302.98px x 68.98px ב-1440x1080)
+========================================= */
+
+.sidebar-item.visited {
+  width: 100%;
+  max-width: min(21.04vw, 28.05vh);
+  min-height: max(54px, min(4.79vw, 6.39vh));
+  padding: min(0.65vw, 0.85vh) min(1.1vw, 1.45vh);
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid rgba(227, 227, 227, 1);
+  border-radius: min(1.11vw, 1.48vh);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: min(0.7vw, 0.95vh);
+  cursor: pointer;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+  animation: fadeInCard 0.3s ease forwards;
+}
+
+.sidebar-item.visited:hover {
+  background-color: rgba(249, 250, 251, 1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+/* אזור הטקסט מימין */
+.item-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: min(0.28vw, 0.38vh);
+  min-width: 0;
+  flex: 1;
+  text-align: right;
+}
+
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: min(0.42vw, 0.56vh);
+  max-width: 100%;
+}
+
+/* כותרת ראשית - תואמת 24px, משקל 500, Inter */
+.item-title-row strong {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: max(15px, min(1.67vw, 2.22vh));
+  line-height: 1;
+  letter-spacing: 0;
+  text-align: right;
+  color: rgba(0, 0, 0, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* אייקון אזהרה ליד הכותרת כשיש importantPoint */
+.item-warning-icon {
+  width: max(15px, min(1.45vw, 1.95vh));
+  height: max(15px, min(1.45vw, 1.95vh));
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+/* כותרת משנית - תואמת 16px, משקל 300, Inter */
+.item-text small {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: max(11px, min(1.11vw, 1.48vh));
+  line-height: 1.15;
+  letter-spacing: 0;
+  text-align: right;
+  color: rgba(94, 94, 94, 1);
+  display: block;
+  width: 100%;
+}
+
+/* אייקון sidebar-pin בצד שמאל */
+.item-icon-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
+.sidebar-pin-img {
+  width: max(18px, min(1.8vw, 2.4vh));
+  height: max(18px, min(1.8vw, 2.4vh));
+  object-fit: contain;
+  display: block;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes pulsePoint {
+  from {
+    transform: scale(1);
   }
-  
-  /* לסיכות שנלחצו (ירוקות) אין אפקט הגדלה בעבר עכבר למניעת בלבול */
-  .map-pin-marker.visited {
-    cursor: pointer;
+  to {
+    transform: scale(1.32);
   }
-  
-  .pin-icon {
-    font-size: 20px;
-    display: inline-block;
-    transition: transform 0.2s ease;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  
-  /* אפקט פעימה קבוע המופעל על האייקון בלבד */
-  .pin-icon.pulsing {
-    animation: pulsePoint 1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  /* תמונת החץ - נשארת קבועה לחלוטין ואינה מושפעת מהפעימה */
-  .arrow-hint-wrapper {
-    position: absolute;
-    top: -45px;
-    right: -95px;
-    pointer-events: none;
-    z-index: 25;
-  }
-  
-  .arrow-hint-img {
-    width: 90px;
-    height: auto;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-  }
-  
-  /* רשימת המיקומים מימין */
-  .map-sidebar-side {
-    flex: 1;
-    background-color: #ffffff;
-    border-right: 1.5px solid #e2e8f0;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    overflow: hidden;
-    z-index: 5;
-  }
-  
-  .sidebar-header {
-    padding: 10px 14px;
-    border-bottom: 1px solid #e2e8f0;
-    background-color: #f1f5f9;
-  }
-  
-  .sidebar-header h3 {
-    margin: 0;
-    font-size: 13px;
-    color: #0f172a;
-    font-weight: 700;
-  }
-  
-  .sidebar-list {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 7px 10px;
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    animation: fadeInCard 0.3s ease forwards;
-  }
-  
-  .sidebar-item:hover {
-    background-color: #f8fafc;
-  }
-  
-  .item-icon .yellow-icon {
-    font-size: 14px;
-  }
-  
-  .item-text strong {
-    font-size: 11px;
-    color: #0f172a;
-    display: block;
-  }
-  
-  .item-text small {
-    font-size: 8.5px;
-    color: #64748b;
-  }
-  
-  /* כפתור המשך בתחתית */
-  .map-continue-bottom-bar {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    animation: popInBtn 0.4s ease;
-  }
-  
-  @keyframes pulsePoint {
-    from {
-      transform: scale(1);
-    }
-    to {
-      transform: scale(1.4);
-    }
-  }
-  
-  @keyframes fadeInCard {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  
-  @keyframes popInBtn {
-    from { opacity: 0; transform: translateX(-50%) scale(0.8); }
-    to { opacity: 1; transform: translateX(-50%) scale(1); }
-  }
+}

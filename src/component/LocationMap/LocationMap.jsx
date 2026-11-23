@@ -1,8 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
 
 import ImportantPoints from '../ImportantPoints/ImportantPoints';
-import arrowHintImg from '../../assets/click-arrow.png';
+
+import mapBgImg from '../../assets/LocationMap/map.jpg';
+import pinUnvisitedIcon from '../../assets/LocationMap/pin-unvisited.svg';
+import pinVisitedIcon from '../../assets/LocationMap/pin-visited.svg';
+import sidebarPinIcon from '../../assets/LocationMap/sidebar-pin.svg';
+import warningEmojiIcon from '../../assets/LocationMap/warning-emoji.svg';
+import arrowHintImg from '../../assets/LocationMap/click-arrow.png';
 
 import './LocationMap.css';
 
@@ -19,12 +24,10 @@ export default function LocationMap({
 
   const [activePopupText, setActivePopupText] = useState(null);
   const [popupTitle, setPopupTitle] = useState('דגשים חשובים');
-
   const [isGeneralPopupOpen, setIsGeneralPopupOpen] = useState(false);
 
   const initialArrowLoc =
     locations.find((loc) => !loc.importantPoint) || locations[0];
-
   const initialArrowId = initialArrowLoc?.id;
 
   const [pulsingId, setPulsingId] = useState(initialArrowId);
@@ -43,7 +46,7 @@ export default function LocationMap({
     }
   }, [isCompleted, locations]);
 
-  // פתיחת ההערה הכללית רק בעקבות לחיצה על ההמשך הגלובלי
+  // פתיחת ההערה הכללית רק בעקבות לחיצה על כפתור ההמשך הגלובלי
   useEffect(() => {
     if (
       continueSignal > 0 &&
@@ -62,20 +65,18 @@ export default function LocationMap({
     isGeneralPopupOpen,
   ]);
 
-  // עדכון System לאחר השלמת כל הנקודות
+  // עדכון מערכת הניווט לאחר השלמת כל הנקודות
   useEffect(() => {
     if (isAllVisited && onComplete) {
       onComplete();
     }
   }, [isAllVisited, onComplete]);
 
-  // פתיחת הערה אישית או סימון נקודה
+  // לחיצה על נקודה במפה או על כרטיס ברשימה
   const handleLocationClick = (loc) => {
     const isNew = !visitedIds.includes(loc.id);
 
-    const newVisited = isNew
-      ? [...visitedIds, loc.id]
-      : visitedIds;
+    const newVisited = isNew ? [...visitedIds, loc.id] : visitedIds;
 
     if (isNew) {
       setVisitedIds(newVisited);
@@ -83,7 +84,6 @@ export default function LocationMap({
 
     setHasClickedAny(true);
 
-    // מציאת הנקודה הבאה שעדיין לא ביקרו בה
     const remaining = locations.filter(
       (location) => !newVisited.includes(location.id)
     );
@@ -94,7 +94,6 @@ export default function LocationMap({
       setPulsingId(null);
     }
 
-    // אם יש דגש אישי, פותחים אותו
     if (loc.importantPoint) {
       setPopupTitle('דגשים חשובים');
       setActivePopupText(loc.importantPoint);
@@ -102,14 +101,13 @@ export default function LocationMap({
     }
   };
 
-  // סגירת פופאפ
+  // סגירת פופאפ הדגשים
   const handleClosePopup = () => {
     const wasGeneralPopup = isGeneralPopupOpen;
 
     setActivePopupText(null);
     setIsGeneralPopupOpen(false);
 
-    // רק אישור ההערה הכללית מעביר לשלב הבא
     if (wasGeneralPopup) {
       onNext?.();
     }
@@ -117,10 +115,15 @@ export default function LocationMap({
 
   return (
     <div className="location-map-container">
-
-      {/* אזור המפה */}
+      {/* שכבת המפה על כל שטח הקומפוננטה */}
       <div className="map-viewport-side">
         <div className="map-image-container">
+          <img
+            src={mapBgImg}
+            alt="מפת מיקומי מעצרים"
+            className="map-background-image"
+            draggable="false"
+          />
 
           {locations.map((loc) => {
             const isVisited = visitedIds.includes(loc.id);
@@ -138,14 +141,21 @@ export default function LocationMap({
                   left: `${loc.x}%`,
                 }}
                 onClick={() => handleLocationClick(loc)}
+                role="button"
+                tabIndex={0}
+                aria-label={loc.mainName}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleLocationClick(loc);
+                  }
+                }}
               >
-                <span
-                  className={`pin-icon ${
-                    isPulsing ? 'pulsing' : ''
-                  }`}
-                >
-                  {isVisited ? '🟢' : '🔴'}
-                </span>
+                <img
+                  src={isVisited ? pinVisitedIcon : pinUnvisitedIcon}
+                  alt={loc.mainName}
+                  className={`pin-icon ${isPulsing ? 'pulsing' : ''}`}
+                  draggable="false"
+                />
 
                 {!hasClickedAny && isInitialArrowLoc && (
                   <div className="arrow-hint-wrapper">
@@ -153,25 +163,24 @@ export default function LocationMap({
                       src={arrowHintImg}
                       alt="לחצו על נקודת המיקום"
                       className="arrow-hint-img"
+                      draggable="false"
                     />
                   </div>
                 )}
               </div>
             );
           })}
-
         </div>
       </div>
 
-      {/* רשימת המיקומים */}
-      <div className="map-sidebar-side">
-
+      {/* סרגל המיקומים הצף בצד ימין מעל המפה */}
+      <aside className="map-sidebar-side">
         <div className="sidebar-header">
           <h3>מיקום מעצרים</h3>
+          <div className="sidebar-header-divider" />
         </div>
 
         <div className="sidebar-list">
-
           {visitedIds.map((visitedId) => {
             const loc = locations.find(
               (location) => location.id === visitedId
@@ -179,26 +188,53 @@ export default function LocationMap({
 
             if (!loc) return null;
 
+            const hasImportantPoint = Boolean(loc.importantPoint);
+
             return (
               <div
                 key={loc.id}
-                className="sidebar-item visited"
+                className={`sidebar-item visited ${
+                  hasImportantPoint ? 'has-warning' : ''
+                }`}
                 onClick={() => handleLocationClick(loc)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleLocationClick(loc);
+                  }
+                }}
               >
-                <div className="item-icon">
-                  <span className="yellow-icon">🟡</span>
+                {/* טקסט מיושר לימין + אייקון אזהרה ליד הכותרת אם יש importantPoint */}
+                <div className="item-text">
+                  <div className="item-title-row">
+                    <strong>{loc.mainName}</strong>
+                    {hasImportantPoint && (
+                      <img
+                        src={warningEmojiIcon}
+                        alt="דגש חשוב"
+                        className="item-warning-icon"
+                        draggable="false"
+                      />
+                    )}
+                  </div>
+                  <small>{loc.subName}</small>
                 </div>
 
-                <div className="item-text">
-                  <strong>{loc.mainName}</strong>
-                  <small>{loc.subName}</small>
+                {/* אייקון sidebar-pin בצד שמאל */}
+                <div className="item-icon-left">
+                  <img
+                    src={sidebarPinIcon}
+                    alt=""
+                    className="sidebar-pin-img"
+                    draggable="false"
+                  />
                 </div>
               </div>
             );
           })}
-
         </div>
-      </div>
+      </aside>
 
       {/* פופאפ דגשים */}
       {activePopupText && (
@@ -208,7 +244,6 @@ export default function LocationMap({
           onClose={handleClosePopup}
         />
       )}
-
     </div>
   );
 }

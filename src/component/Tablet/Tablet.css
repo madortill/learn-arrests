@@ -1,76 +1,70 @@
+/* =========================================
+   TABLET STAGE (מרכוז מלא + רקע כהה ומטושטש)
+========================================= */
 
 .tablet-stage-wrapper {
   position: fixed;
   inset: 0;
+
   width: 100%;
   height: 100%;
-  overflow: hidden;
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  z-index: 500;
-  direction: rtl;
-}
-
-/* רקע מטושטש */
-.tablet-blur-backdrop {
-  position: absolute;
-  inset: 0;
-
-  background-color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 
-  z-index: 1;
+  overflow: hidden;
+  z-index: 500;
+  direction: rtl;
+
+  pointer-events: auto;
+  user-select: none;
 }
 
-/* תמונת החייל */
-.tablet-character-container {
-  position: absolute;
-  z-index: 2;
+/* =========================================
+   TABLET DEVICE FRAME (שמירה על פרופורציות 1156x831)
+========================================= */
 
-  /* התאמה לפי רוחב וגובה המסך */
-  width: min(
-    100vw,
-    133.333vh,
-    1600px
-  );
+.tablet-device-frame {
+  position: relative;
 
-  aspect-ratio: 4 / 3;
-  height: auto;
+  /* מתאים את עצמו אוטומטית לגובה ולרוחב של כל מסך מחשב תוך שמירה על מרווחי נשימה */
+  width: min(82vw, calc(84vh * (1156 / 831)));
+  aspect-ratio: 1156 / 831;
 
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-
-  user-select: none;
+  flex-shrink: 0;
   pointer-events: none;
 }
 
-/* תמונת הרקע */
-.soldier-base-img {
-  display: block;
+/* תמונת מסגרת הטאבלט */
+.tablet-base-img {
+  position: absolute;
+  inset: 0;
 
+  display: block;
   width: 100%;
   height: 100%;
 
-  object-fit: contain;
-
+  object-fit: fill;
   pointer-events: none;
   user-select: none;
 }
 
-/* שכבת המסכה */
+/* =========================================
+   TABLET MASK (קואורדינטות מדויקות מתוך 1156x831)
+========================================= */
+
 .tablet-mask-layer {
   position: absolute;
 
-  left: 23.9%;
-  top: 15.4%;
-
-  width: 74.5%;
-  height: 78.8%;
+  left: 3.287197%;
+  top: 4.813478%;
+  width: 93.425606%;
+  height: 90.373045%;
 
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
@@ -81,37 +75,42 @@
   -webkit-mask-position: center;
   mask-position: center;
 
-  overflow: visible;
-  box-sizing: border-box;
+  -webkit-mask-mode: alpha;
+  mask-mode: alpha;
 
   pointer-events: none;
-}
-
-/* המסך הפנימי */
-.tablet-inner-screen {
-  position: absolute;
-
-  left: 4.43%;
-  top: 7.84%;
-
-  width: 91.34%;
-  height: 84.14%;
-
-  transform: rotate(5.15deg);
-  transform-origin: center center;
-
-  border-radius: 3.4% / 4.5%;
-  overflow: hidden;
-
   box-sizing: border-box;
-  pointer-events: auto;
 }
 
-/* תוכן React */
+/* =========================================
+   REACT SCREEN CONTENT
+========================================= */
+
 .tablet-screen-content {
+  position: relative;
+
   width: 100%;
   height: 100%;
 
   overflow: hidden;
   box-sizing: border-box;
+
+  pointer-events: auto;
+}
+
+/* =========================================
+   PLACEHOLDER
+========================================= */
+
+.tablet-placeholder-screen {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #000;
+  color: #fff;
+  text-align: center;
 }
