@@ -157,6 +157,8 @@ export default function WhatsAppChat({
   onNext,
   onComplete,
   isCompleted = false,
+  savedStepState,
+  onSaveStepState,
 }) {
   const activeData = useMemo(() => {
     const fallback = DEFAULT_CHAT_DATA[Number(part)] || DEFAULT_CHAT_DATA[1];
@@ -171,19 +173,34 @@ export default function WhatsAppChat({
     };
   }, [part, chatData]);
 
+  // בודק אם השלב כבר הושלם מראש (מרענון או חזרה אחורה) — ולא כתוצאה מלחיצה חיה כעת
+  const [isRestoredFromSaved, setIsRestoredFromSaved] = useState(() =>
+    Boolean(isCompleted || savedStepState?.isConfirmed)
+  );
+
   const [messageBatches, setMessageBatches] = useState([]);
   const [showHighlightCard, setShowHighlightCard] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const [canScroll, setCanScroll] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(isRestoredFromSaved);
+  const [canScroll, setCanScroll] = useState(isRestoredFromSaved);
 
   const chatBodyRef = useRef(null);
   const firstIntroRef = useRef(null);
   const lastBatchRef = useRef(null);
   const hasAnchoredFirstIntroRef = useRef(false);
-  const isPartFinishedRef = useRef(false);
-  const completionNotifiedRef = useRef(false);
+  const isPartFinishedRef = useRef(isRestoredFromSaved);
+  const isLiveSessionRef = useRef(!isRestoredFromSaved);
+  const isConfirmingRef = useRef(false);
+  const completionNotifiedRef = useRef(Boolean(isCompleted));
 
   const firstIntroId = activeData.introMessages?.[0]?.id;
+
+  // אם המשתמש עובר בין חלקים שונים בתוך אותו מופע קומפוננטה
+  useEffect(() => {
+    const alreadyDone = Boolean(isCompleted || savedStepState?.isConfirmed);
+    if (!isLiveSessionRef.current) {
+      setIsRestoredFromSaved(alreadyDone);
+    }
+  }, [part, isCompleted, savedStepState?.isConfirmed]);
 
   const highlightLayout = useMemo(() => {
     const text = activeData.highlightMessage?.text || '';
@@ -215,6 +232,8 @@ export default function WhatsAppChat({
     isPartFinishedRef.current = true;
     setCanScroll(true);
 
+    onSaveStepState?.({ isConfirmed: true });
+
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const container = chatBodyRef.current;
@@ -234,7 +253,7 @@ export default function WhatsAppChat({
 
   // גלילה פנימית מדויקת במהלך ההזרמה
   useEffect(() => {
-    if (isCompleted || isPartFinishedRef.current) return;
+    if (isRestoredFromSaved || isPartFinishedRef.current) return;
 
     const timer = setTimeout(() => {
       const container = chatBodyRef.current;
@@ -295,11 +314,11 @@ export default function WhatsAppChat({
     }, 30);
 
     return () => clearTimeout(timer);
-  }, [messageBatches, showHighlightCard, firstIntroId, isCompleted]);
+  }, [messageBatches, showHighlightCard, firstIntroId, isRestoredFromSaved]);
 
-  // שחזור שלב שהושלם
+  // שחזור מיידי רק כאשר נכנסים לשלב שכבר הושלם בעבר (רענון / חזרה אחורה)
   useEffect(() => {
-    if (!isCompleted) return;
+    if (!isRestoredFromSaved) return;
 
     const allFinalItems = [
       ...activeData.reportSamples.map((r) => ({ ...r, isReportSample: true })),
@@ -312,13 +331,15 @@ export default function WhatsAppChat({
     setShowHighlightCard(false);
     setIsConfirmed(true);
     finishPartAndScrollToBottom();
-  }, [isCompleted, activeData]);
+  }, [isRestoredFromSaved, activeData]);
 
   // הזרמת הודעות מתוך ה-JSON
   useEffect(() => {
-    if (isCompleted) return;
+    if (isRestoredFromSaved) return;
 
     let isMounted = true;
+    isLiveSessionRef.current = true;
+    isConfirmingRef.current = false;
     setMessageBatches([]);
     setShowHighlightCard(false);
     setIsConfirmed(false);
@@ -372,11 +393,12 @@ export default function WhatsAppChat({
     return () => {
       isMounted = false;
     };
-  }, [activeData, isCompleted]);
+  }, [activeData, isRestoredFromSaved]);
 
-  // אישור הכרטיס המודגש, הצגת הודעות ההמשך, וסיום החלק עם גלילה אוטומטית להודעה האחרונה ופתיחת גלילה חופשית
+  // אישור הכרטיס המודגש, הצגת הודעות ההמשך, וסיום החלק
   const handleConfirmHighlight = async () => {
-    if (isConfirmed) return;
+    if (isConfirmed || isConfirmingRef.current) return;
+    isConfirmingRef.current = true;
 
     setIsConfirmed(true);
     setShowHighlightCard(false);
@@ -400,7 +422,7 @@ export default function WhatsAppChat({
       setMessageBatches((prev) => [...prev, batch]);
     }
 
-    // בסיום החלק: גלילה אוטומטית למטה להודעה הכי אחרונה ופתיחת אפשרות לגלילה חופשית
+    // בסיום החלק: שמירת המצב, גלילה אוטומטית למטה ופתיחת אפשרות לגלילה חופשית
     finishPartAndScrollToBottom();
   };
 

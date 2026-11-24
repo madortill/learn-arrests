@@ -55,7 +55,7 @@ const backgroundMap = {
 };
 
 // ==========================================
-// הגדרות מסדרון הדלתות ומסכי מעבר
+// הגדרות מסדרון הדלתות, מעברים ושמירת התקדמות
 // ==========================================
 
 const DOORS_ENTRY_STAGE = 23;
@@ -63,21 +63,60 @@ const DOORS_EXIT_STAGE = 28;
 const DOOR_STAGES = [24, 25, 26, 27];
 const TRANSITION_STAGES = [12, 21];
 const LOADING_DURATION_MS = 3000;
-
-const DOORS_HUB_CONFIG = {
-  text: 'מעולה הגעתם כמעט לסוף נשארו לכם רק עוד 4 כיתות לעבור בהם',
-  position: {
-    top: '10%',
-    right: '30%',
-  },
-  tailTarget: {
-    x: '-5%',
-    y: '5%',
-  },
-};
+const PROGRESS_STORAGE_KEY = 'lomda-progress';
 
 const getStageNumber = (page, index) =>
   Number(page?.step ?? page?.id ?? index + 1);
+
+const loadSavedProgress = (totalPages) => {
+  try {
+    const raw = sessionStorage.getItem(PROGRESS_STORAGE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+
+    const safeCurrentStep =
+      typeof parsed.currentStep === 'number' &&
+      parsed.currentStep >= 0 &&
+      parsed.currentStep <= totalPages
+        ? parsed.currentStep
+        : 0;
+
+    return {
+      currentStep: safeCurrentStep,
+      visitedSteps: Array.isArray(parsed.visitedSteps)
+        ? parsed.visitedSteps
+        : [safeCurrentStep],
+      completedSteps: Array.isArray(parsed.completedSteps)
+        ? parsed.completedSteps
+        : [],
+      maxUnlockedStep:
+        typeof parsed.maxUnlockedStep === 'number'
+          ? parsed.maxUnlockedStep
+          : safeCurrentStep,
+      isDoorsScreenOpen: Boolean(parsed.isDoorsScreenOpen),
+      activeDoorStage: parsed.activeDoorStage ?? null,
+      checklistProgress:
+        parsed.checklistProgress && typeof parsed.checklistProgress === 'object'
+          ? parsed.checklistProgress
+          : {},
+      checklistStartedSteps: Array.isArray(parsed.checklistStartedSteps)
+        ? parsed.checklistStartedSteps
+        : [],
+      parkingProgress:
+        parsed.parkingProgress && typeof parsed.parkingProgress === 'object'
+          ? parsed.parkingProgress
+          : {},
+      stepProgress:
+        parsed.stepProgress && typeof parsed.stepProgress === 'object'
+          ? parsed.stepProgress
+          : {},
+    };
+  } catch {
+    return null;
+  }
+};
 
 // ==========================================
 // קומפוננטת מערכת ראשית
@@ -85,32 +124,99 @@ const getStageNumber = (page, index) =>
 
 export default function System() {
   const pages = Array.isArray(stages.pages) ? stages.pages : [];
+  const initialSaved = useMemo(
+    () => loadSavedProgress(pages.length),
+    [pages.length]
+  );
 
   // ניווט והתקדמות
-  const [currentStep, setCurrentStep] = useState(0);
-  const [visitedSteps, setVisitedSteps] = useState([0]);
-  const [completedSteps, setCompletedSteps] = useState([]);
-  const [maxUnlockedStep, setMaxUnlockedStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(
+    () => initialSaved?.currentStep ?? 0
+  );
+  const [visitedSteps, setVisitedSteps] = useState(
+    () => initialSaved?.visitedSteps ?? [0]
+  );
+  const [completedSteps, setCompletedSteps] = useState(
+    () => initialSaved?.completedSteps ?? []
+  );
+  const [maxUnlockedStep, setMaxUnlockedStep] = useState(
+    () => initialSaved?.maxUnlockedStep ?? 0
+  );
   const [continueSignal, setContinueSignal] = useState(0);
 
   // חלוניות צפות (לא יכולות להיות פתוחות בו-זמנית)
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
 
-  // מסכי טעינה ומעבר
-  const [loadingType, setLoadingType] = useState('initial');
+  // מסכי טעינה ומעבר (מדלג על טעינה ראשונית כשחוזרים מהתקדמות שמורה)
+  const [loadingType, setLoadingType] = useState(() =>
+    initialSaved ? null : 'initial'
+  );
   const [pendingStep, setPendingStep] = useState(null);
 
   // מסדרון הדלתות (מופיע בין שלב 23 לשלב 24, וכולל את שלבים 24-27)
-  const [isDoorsScreenOpen, setIsDoorsScreenOpen] = useState(false);
-  const [activeDoorStage, setActiveDoorStage] = useState(null);
+  const [isDoorsScreenOpen, setIsDoorsScreenOpen] = useState(
+    () => initialSaved?.isDoorsScreenOpen ?? false
+  );
+  const [activeDoorStage, setActiveDoorStage] = useState(
+    () => initialSaved?.activeDoorStage ?? null
+  );
 
   // מצבים פנימיים של שלבים ספציפיים
-  const [isDrivingDestinationReached, setIsDrivingDestinationReached] = useState(false);
-  const [checklistProgress, setChecklistProgress] = useState({});
-  const [checklistStartedSteps, setChecklistStartedSteps] = useState([]);
-  const [parkingProgress, setParkingProgress] = useState({});
+  const [checklistProgress, setChecklistProgress] = useState(
+    () => initialSaved?.checklistProgress ?? {}
+  );
+  const [checklistStartedSteps, setChecklistStartedSteps] = useState(
+    () => initialSaved?.checklistStartedSteps ?? []
+  );
+  const [parkingProgress, setParkingProgress] = useState(
+    () => initialSaved?.parkingProgress ?? {}
+  );
+  const [stepProgress, setStepProgress] = useState(
+    () => initialSaved?.stepProgress ?? {}
+  );
   const [isDepositsScreenOpen, setIsDepositsScreenOpen] = useState(false);
+
+  // שמירת כל התקדמות המשתמש ב-sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        PROGRESS_STORAGE_KEY,
+        JSON.stringify({
+          currentStep,
+          visitedSteps,
+          completedSteps,
+          maxUnlockedStep,
+          isDoorsScreenOpen,
+          activeDoorStage,
+          checklistProgress,
+          checklistStartedSteps,
+          parkingProgress,
+          stepProgress,
+        })
+      );
+    } catch (error) {
+      console.warn('Could not save lomda progress', error);
+    }
+  }, [
+    currentStep,
+    visitedSteps,
+    completedSteps,
+    maxUnlockedStep,
+    isDoorsScreenOpen,
+    activeDoorStage,
+    checklistProgress,
+    checklistStartedSteps,
+    parkingProgress,
+    stepProgress,
+  ]);
+
+  // איפוס מצב מסך הפיקדונות רק בעזיבה לשלב שאינו מסך פיקדונות
+  useEffect(() => {
+    if (pages[currentStep]?.primaryComponent?.type !== 'DepositsBtn') {
+      setIsDepositsScreenOpen(false);
+    }
+  }, [currentStep, pages]);
 
   // רישום אוטומטי של כל שלב שהמשתמש נכנס אליו
   useEffect(() => {
@@ -193,6 +299,9 @@ export default function System() {
 
   const isDrivingStep =
     primaryData?.type === 'DrivingScreen' && activeStageNumber === 22;
+  const isDrivingDestinationReached =
+    isDrivingStep &&
+    (isCompleted || Boolean(stepProgress[currentStep]?.isDestinationReached));
 
   const isPrimarySpeechBubble = primaryData?.type === 'SpeechBubble';
   const primarySpeechHasTyping = primaryData?.props?.typeAnimation !== false;
@@ -214,12 +323,6 @@ export default function System() {
   const isParkingModalOpen =
     isParkingStep &&
     (Boolean(currentParkingState.isLockModalOpen) || Boolean(currentParkingState.activeVehicleId));
-
-  // איפוס מצבים מקומיים במעבר שלב
-  useEffect(() => {
-    setIsDrivingDestinationReached(false);
-    setIsDepositsScreenOpen(false);
-  }, [currentStep]);
 
   // טיימר טעינה ראשונית
   useEffect(() => {
@@ -257,10 +360,28 @@ export default function System() {
     markStepCompleted(currentStep);
   }, [currentStep, markStepCompleted]);
 
+  const handleSaveStepState = useCallback(
+    (updater) => {
+      setStepProgress((prev) => {
+        const current = prev[currentStep] || {};
+        const nextState =
+          typeof updater === 'function' ? updater(current) : updater;
+        return {
+          ...prev,
+          [currentStep]: nextState,
+        };
+      });
+    },
+    [currentStep]
+  );
+
   const handleDrivingComplete = useCallback(() => {
-    setIsDrivingDestinationReached(true);
+    handleSaveStepState((prev) => ({
+      ...prev,
+      isDestinationReached: true,
+    }));
     markStepCompleted(currentStep);
-  }, [currentStep, markStepCompleted]);
+  }, [currentStep, handleSaveStepState, markStepCompleted]);
 
   const handleChecklistProgress = useCallback(
     (newState) => {
@@ -460,6 +581,18 @@ export default function System() {
     setChecklistProgress({});
     setChecklistStartedSteps([]);
     setParkingProgress({});
+    setStepProgress({});
+
+    try {
+      sessionStorage.removeItem(PROGRESS_STORAGE_KEY);
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith('deposits-')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    } catch {
+      // התעלמות משגיאת אחסון במידה ואינו זמין
+    }
 
     setIsDepositsScreenOpen(false);
     closeFloatingPanels();
@@ -565,23 +698,13 @@ export default function System() {
         <BookendScreen isStart={false} onRestart={handleRestart} />
       )}
 
-      {/* מסדרון הדלתות (מופיע בין שלב 23 לשלב 24) */}
+      {/* מסדרון הדלתות (מופיע בין שלב 23 לשלב 24, וכולל בתוכו את בועת הדיבור) */}
       {!isEndScreen && isDoorsScreenOpen && (
-        <>
-          <DoorsScreen
-            completedStages={completedDoorStages}
-            onEnterStage={handleEnterDoorStage}
-            onComplete={handleLeaveDoors}
-          />
-
-          <SpeechBubble
-            step={24}
-            text={DOORS_HUB_CONFIG.text}
-            typeAnimation={false}
-            position={DOORS_HUB_CONFIG.position}
-            tailTarget={DOORS_HUB_CONFIG.tailTarget}
-          />
-        </>
+        <DoorsScreen
+          completedStages={completedDoorStages}
+          onEnterStage={handleEnterDoorStage}
+          onComplete={handleLeaveDoors}
+        />
       )}
 
       {/* קומפוננטה ראשית של שלב רגיל */}
@@ -598,6 +721,8 @@ export default function System() {
           step={activeStageNumber}
           currentStep={currentStep}
           isCompleted={isCompleted}
+          savedStepState={stepProgress[currentStep]}
+          onSaveStepState={handleSaveStepState}
           onComplete={isDrivingStep ? handleDrivingComplete : handleComplete}
           onNext={handleNextStep}
           onRestart={handleRestart}

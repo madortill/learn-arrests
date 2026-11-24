@@ -7,21 +7,32 @@ export default function QuizScreen({
   onNext,
   onComplete,
   isCompleted = false,
-  savedProgress = null,
+  savedStepState,
+  onSaveStepState,
 }) {
   const [currentIndex, setCurrentIndex] = useState(
-    savedProgress?.currentIndex ?? 0
+    () => savedStepState?.currentIndex ?? 0
   );
+
   const [selectedAnswers, setSelectedAnswers] = useState(
-    savedProgress?.selectedAnswers ?? {}
+    () => savedStepState?.selectedAnswers ?? {}
   );
-  const [isReviewMode, setIsReviewMode] = useState(
-    Boolean(isCompleted || savedProgress?.isReviewMode)
-  );
+
+  const [isReviewMode, setIsReviewMode] = useState(() => {
+    if (savedStepState) {
+      return Boolean(savedStepState.isReviewMode || isCompleted);
+    }
+    return Boolean(isCompleted);
+  });
+
   const [expandedExplanations, setExpandedExplanations] = useState(
-    savedProgress?.expandedExplanations ?? {}
+    () => savedStepState?.expandedExplanations ?? {}
   );
+
   const [viewedExplanations, setViewedExplanations] = useState(() => {
+    if (savedStepState?.viewedExplanations) {
+      return savedStepState.viewedExplanations;
+    }
     if (isCompleted) {
       const allViewed = {};
       questions.forEach((_, idx) => {
@@ -29,13 +40,32 @@ export default function QuizScreen({
       });
       return allViewed;
     }
-    return savedProgress?.viewedExplanations ?? savedProgress?.expandedExplanations ?? {};
+    return {};
   });
+
   const [flashingIndex, setFlashingIndex] = useState(null);
 
   const bodyRef = useRef(null);
   const cardRefs = useRef({});
   const flashTimerRef = useRef(null);
+
+  // סנכרון מלא בזמן אמת ל-System בכל שינוי
+  useEffect(() => {
+    onSaveStepState?.({
+      currentIndex,
+      selectedAnswers,
+      isReviewMode,
+      expandedExplanations,
+      viewedExplanations,
+    });
+  }, [
+    currentIndex,
+    selectedAnswers,
+    isReviewMode,
+    expandedExplanations,
+    viewedExplanations,
+    onSaveStepState,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -50,18 +80,7 @@ export default function QuizScreen({
   const currentQuestion = questions[safeIndex];
   const answeredCount = Object.keys(selectedAnswers).length;
 
-  const syncProgress = (overrides = {}) => {
-    onComplete?.({
-      currentIndex: safeIndex,
-      selectedAnswers,
-      isReviewMode,
-      expandedExplanations,
-      viewedExplanations,
-      ...overrides,
-    });
-  };
-
-  // גלילה פנימית חלקה לכרטיס שגוי בתוך אזור התוכן בלבד
+  // גלילה פנימית חלקה לכרטיס שגוי בתוך אזור התוכן
   const scrollCardIntoBody = (idx) => {
     requestAnimationFrame(() => {
       const container = bodyRef.current;
@@ -81,34 +100,26 @@ export default function QuizScreen({
   const handleSelectOption = (optionIndex) => {
     if (isReviewMode) return;
 
-    const updatedAnswers = {
-      ...selectedAnswers,
+    setSelectedAnswers((prev) => ({
+      ...prev,
       [safeIndex]: optionIndex,
-    };
-
-    setSelectedAnswers(updatedAnswers);
-    syncProgress({
-      selectedAnswers: updatedAnswers,
-      isReviewMode: false,
-    });
+    }));
   };
 
   // ניווט בין השאלות
   const handleNextQuestion = () => {
-    if (safeIndex >= totalQuestions - 1) return;
-    const nextIdx = safeIndex + 1;
-    setCurrentIndex(nextIdx);
-    syncProgress({ currentIndex: nextIdx, isReviewMode: false });
+    if (safeIndex < totalQuestions - 1) {
+      setCurrentIndex(safeIndex + 1);
+    }
   };
 
   const handlePrevQuestion = () => {
-    if (safeIndex <= 0) return;
-    const prevIdx = safeIndex - 1;
-    setCurrentIndex(prevIdx);
-    syncProgress({ currentIndex: prevIdx, isReviewMode: false });
+    if (safeIndex > 0) {
+      setCurrentIndex(safeIndex - 1);
+    }
   };
 
-  // מעבר למסך התשובות ("בדוק") — פותח אוטומטית את ההסבר של השגיאה הראשונה
+  // מעבר לדף התשובות ("בדוק") — פותח אוטומטית את ההסבר של השגיאה הראשונה
   const handleCheckAll = () => {
     const firstWrongIndex = questions.findIndex(
       (q, idx) => selectedAnswers[idx] !== q.correctAnswer
@@ -126,44 +137,33 @@ export default function QuizScreen({
     setExpandedExplanations(nextExpanded);
     setViewedExplanations(nextViewed);
 
-    syncProgress({
-      isReviewMode: true,
-      expandedExplanations: nextExpanded,
-      viewedExplanations: nextViewed,
-    });
-
     if (firstWrongIndex !== -1) {
       scrollCardIntoBody(firstWrongIndex);
     }
   };
 
-  // פתיחה/סגירה ידנית של הסבר לתשובה שגויה
+  // פתיחה וסגירה של הסבר לתשובה שגויה
   const handleToggleExplanation = (idx) => {
     const willOpen = !expandedExplanations[idx];
 
-    const nextExpanded = {
-      ...expandedExplanations,
+    setExpandedExplanations((prev) => ({
+      ...prev,
       [idx]: willOpen,
-    };
+    }));
 
-    const nextViewed = willOpen
-      ? { ...viewedExplanations, [idx]: true }
-      : viewedExplanations;
-
-    setExpandedExplanations(nextExpanded);
-    setViewedExplanations(nextViewed);
+    if (willOpen) {
+      setViewedExplanations((prev) => ({
+        ...prev,
+        [idx]: true,
+      }));
+    }
 
     if (flashingIndex === idx) {
       setFlashingIndex(null);
     }
-
-    syncProgress({
-      expandedExplanations: nextExpanded,
-      viewedExplanations: nextViewed,
-    });
   };
 
-  // כפתור "המשך" במסך התשובות — מוודא שכל ההסברים השגויים נפתחו לפחות פעם אחת
+  // לחיצה על "המשך" בדף התשובות — מוודא שכל ההסברים השגויים נפתחו לפחות פעם אחת
   const handleFinalContinue = () => {
     const unviewedWrongIndex = questions.findIndex((q, idx) => {
       const isWrong = selectedAnswers[idx] !== q.correctAnswer;
@@ -171,24 +171,15 @@ export default function QuizScreen({
     });
 
     if (unviewedWrongIndex !== -1) {
-      const nextExpanded = {
-        ...expandedExplanations,
+      setExpandedExplanations((prev) => ({
+        ...prev,
         [unviewedWrongIndex]: true,
-      };
-      const nextViewed = {
-        ...viewedExplanations,
+      }));
+      setViewedExplanations((prev) => ({
+        ...prev,
         [unviewedWrongIndex]: true,
-      };
-
-      setExpandedExplanations(nextExpanded);
-      setViewedExplanations(nextViewed);
+      }));
       setFlashingIndex(unviewedWrongIndex);
-
-      syncProgress({
-        isReviewMode: true,
-        expandedExplanations: nextExpanded,
-        viewedExplanations: nextViewed,
-      });
 
       scrollCardIntoBody(unviewedWrongIndex);
 
@@ -200,7 +191,7 @@ export default function QuizScreen({
       return;
     }
 
-    syncProgress({ isReviewMode: true });
+    onComplete?.();
     onNext?.();
   };
 
@@ -209,7 +200,7 @@ export default function QuizScreen({
       className="quiz-screen-container"
       style={{ backgroundImage: `url(${quizBg})` }}
     >
-      {/* שורת כותרת עליונה מיושרת */}
+      {/* שורת כותרת עליונה */}
       <header className="quiz-header-bar">
         <div className="quiz-top-right-header">
           <span>{isReviewMode ? 'תשובות' : 'זמן לשאלה'}</span>

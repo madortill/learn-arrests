@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import './WriteboardScreen.css';
 
@@ -15,16 +14,29 @@ const RevealArea = ({
   onComplete,
   resetKey,
   showGuideLine = false,
+  initialCompleted = false,
 }) => {
   const areaRef = useRef(null);
   const canvasRef = useRef(null);
   const previousPoint = useRef(null);
-  const completedRef = useRef(false);
+  const completedRef = useRef(Boolean(initialCompleted));
 
   const [maskUrl, setMaskUrl] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [isComplete, setIsComplete] = useState(Boolean(initialCompleted));
+  const [hasStarted, setHasStarted] = useState(Boolean(initialCompleted));
   const [guideStyle, setGuideStyle] = useState({});
+
+  /* =========================================
+     סנכרון מצב שמור מהמערכת
+  ========================================= */
+
+  useEffect(() => {
+    if (initialCompleted) {
+      completedRef.current = true;
+      setIsComplete(true);
+      setHasStarted(true);
+    }
+  }, [initialCompleted]);
 
   /* =========================================
      מדידת הטקסט ומיקום הקו המקדים
@@ -74,6 +86,8 @@ const RevealArea = ({
   ========================================= */
 
   useEffect(() => {
+    if (initialCompleted) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -100,20 +114,20 @@ const RevealArea = ({
     observer.observe(canvas);
 
     return () => observer.disconnect();
-  }, [resetKey]);
+  }, [resetKey, initialCompleted]);
 
   /* =========================================
      איפוס בעת החלפת נתוני השלב
   ========================================= */
 
   useEffect(() => {
-    completedRef.current = false;
+    completedRef.current = Boolean(initialCompleted);
     previousPoint.current = null;
 
-    setIsComplete(false);
-    setHasStarted(false);
+    setIsComplete(Boolean(initialCompleted));
+    setHasStarted(Boolean(initialCompleted));
     setMaskUrl('');
-  }, [resetKey]);
+  }, [resetKey, initialCompleted]);
 
   /* =========================================
      חשיפה באמצעות הטוש
@@ -218,7 +232,7 @@ const RevealArea = ({
 
       <div
         className={`reveal-content ${
-          maskUrl ? 'reveal-ready' : ''
+          maskUrl || isComplete ? 'reveal-ready' : ''
         }`}
         style={{
           '--reveal-mask': maskUrl
@@ -256,7 +270,13 @@ const RevealArea = ({
    WRITEBOARD SCREEN
 ========================================= */
 
-const WriteboardScreen = ({ whiteboardData, onComplete }) => {
+const WriteboardScreen = ({
+  whiteboardData,
+  onComplete,
+  isCompleted = false,
+  savedStepState,
+  onSaveStepState,
+}) => {
   const {
     title = '',
     subtitle = '',
@@ -264,27 +284,24 @@ const WriteboardScreen = ({ whiteboardData, onComplete }) => {
     footerNote = '',
   } = whiteboardData || {};
 
-  const [completedAreas, setCompletedAreas] = useState({});
-  const completionSent = useRef(false);
+  const [completedAreas, setCompletedAreas] = useState(
+    () => savedStepState?.completedAreas || {}
+  );
+  const completionSent = useRef(Boolean(isCompleted));
 
   /* =========================================
-     איפוס בעת החלפת נתוני השלב
-  ========================================= */
-
-  useEffect(() => {
-    setCompletedAreas({});
-    completionSent.current = false;
-  }, [whiteboardData]);
-
-  /* =========================================
-     סימון אזור שהושלם
+     סימון אזור שהושלם ושמירה ב-System
   ========================================= */
 
   const handleAreaComplete = (areaId) => {
-    setCompletedAreas((prev) => ({
-      ...prev,
-      [areaId]: true,
-    }));
+    setCompletedAreas((prev) => {
+      const next = {
+        ...prev,
+        [areaId]: true,
+      };
+      onSaveStepState?.({ completedAreas: next });
+      return next;
+    });
   };
 
   const totalAreas =
@@ -345,6 +362,9 @@ const WriteboardScreen = ({ whiteboardData, onComplete }) => {
                 <RevealArea
                   className="bullet-box"
                   resetKey={whiteboardData}
+                  initialCompleted={Boolean(
+                    isCompleted || completedAreas[areaId]
+                  )}
                   onComplete={() => handleAreaComplete(areaId)}
                 >
                   <p className="bullet-text">
@@ -369,6 +389,9 @@ const WriteboardScreen = ({ whiteboardData, onComplete }) => {
             className="footer-section"
             resetKey={whiteboardData}
             showGuideLine
+            initialCompleted={Boolean(
+              isCompleted || completedAreas.footer
+            )}
             onComplete={() => handleAreaComplete('footer')}
           >
             <p className="footer-text">

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import './DrivingScreen.css';
 
@@ -13,23 +12,10 @@ export default function DrivingScreen({
   onComplete,
   weakPoints = { title: '', items: [] },
   emphasisPoints = { title: '', items: [] },
+  isCompleted = false,
+  savedStepState,
+  onSaveStepState,
 }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [wheelRotation, setWheelRotation] = useState(0);
-
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const rotationRef = useRef(0);
-  const completedRef = useRef(false);
-  const videoRef = useRef(null);
-
-  // האטת סרטון הכביש
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 0.5;
-    }
-  }, []);
-
   // ==========================================
   // בניית רצף השלטים
   // ==========================================
@@ -77,8 +63,35 @@ export default function DrivingScreen({
     },
   ];
 
+  const destinationIndex = Math.max(0, drivingSequence.length - 1);
+
+  const initialIndex = Math.max(
+    0,
+    Math.min(
+      savedStepState?.currentIndex ?? (isCompleted ? destinationIndex : 0),
+      destinationIndex
+    )
+  );
+
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [wheelRotation, setWheelRotation] = useState(0);
+
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const rotationRef = useRef(0);
+  const completedRef = useRef(
+    Boolean(isCompleted || initialIndex >= destinationIndex)
+  );
+  const videoRef = useRef(null);
+
+  // האטת סרטון הכביש
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.playbackRate = 0.5;
+    }
+  }, []);
+
   const currentSign = drivingSequence[currentIndex];
-  const destinationIndex = drivingSequence.length - 1;
 
   // ==========================================
   // מצבי נהיגה
@@ -94,7 +107,7 @@ export default function DrivingScreen({
       : 'משוך את ההגה ימינה בשביל\nלהמשיך ושמאלה בשביל לחזור';
 
   // ==========================================
-  // מעבר בין שלטים
+  // מעבר בין שלטים ושמירת התקדמות ב-System
   // ==========================================
 
   const handleNext = () => {
@@ -103,6 +116,10 @@ export default function DrivingScreen({
     const nextIndex = currentIndex + 1;
 
     setCurrentIndex(nextIndex);
+    onSaveStepState?.((prev) => ({
+      ...prev,
+      currentIndex: nextIndex,
+    }));
 
     if (nextIndex === destinationIndex && !completedRef.current) {
       completedRef.current = true;
@@ -113,7 +130,12 @@ export default function DrivingScreen({
   const handlePrev = () => {
     if (isFirstSign) return;
 
-    setCurrentIndex((prev) => prev - 1);
+    const prevIndex = currentIndex - 1;
+    setCurrentIndex(prevIndex);
+    onSaveStepState?.((prev) => ({
+      ...prev,
+      currentIndex: prevIndex,
+    }));
   };
 
   // ==========================================
@@ -289,7 +311,7 @@ export default function DrivingScreen({
         }}
         tailTarget={{
           x: '-5%',
-          y: '2%',
+          y: '20%',
         }}
         zIndex={7}
       />

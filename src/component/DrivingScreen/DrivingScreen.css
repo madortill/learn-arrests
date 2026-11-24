@@ -232,8 +232,8 @@
 ========================================= */
 
 .emphasis-sign-container {
-  top: 25%;
-  right: 8%;
+  top: 35%;
+  right: 9%;
 
   width: min(42vw, 600px);
 }
@@ -553,10 +553,12 @@
 @media (min-width: 1920px) {
   .sign-container {
     right: 9%;
+    top: 38%;
   }
 
   .weak-sign-container {
     width: min(45vw, 850px);
+    top: 40%
   }
 
   .emphasis-sign-container {
@@ -650,7 +652,7 @@
 
 @media (min-width: 1800px) and (max-width: 2199px) {
   .emphasis-sign-container {
-    top: 35%;
+    top: 32%;
   }
 }
 

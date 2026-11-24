@@ -1,39 +1,51 @@
 /* =====================================================
+   LOCAL FONT
+===================================================== */
+
+@font-face {
+  font-family: 'OH Dorin Atias';
+  src: url('../../assets/fonts/OHDorinAtias-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =====================================================
    CHECKLIST SCREEN
 ===================================================== */
 
 :root {
   /* FONT */
-  --checklist-font-family: 'Dana Yad AlefAlefAlef', sans-serif;
+  --checklist-font-family: 'OH Dorin Atias', sans-serif;
   --checklist-font-weight: 400;
 
-  --checklist-font-size: clamp(22px, 3.9vh, 40px);
-  --checklist-line-height: 1;
-  --checklist-letter-spacing: 2px;
+  --checklist-font-size: clamp(21px, min(2.7vw, 4.1vh), 62px);
+  --checklist-line-height: 1.18;
+  --checklist-letter-spacing: clamp(0.3px, 0.04vw, 1px);
 
   --checklist-text-color: #000;
 
-  --checklist-text-border-width: 1px;
+  --checklist-text-border-width: clamp(0.45px, 0.045vw, 0.85px);
   --checklist-text-border-color: #000;
 
   /* ITEM DIMENSIONS */
-  --checklist-item-width: 655px;
-  --checklist-item-gap: clamp(20px, 3.54vw, 51px);
-  --checklist-items-gap: clamp(18px, 2.74vh, 28px);
+  --checklist-item-width: 100%;
+  --checklist-item-gap: clamp(14px, min(2.4vw, 3.6vh), 58px);
+  --checklist-items-gap: clamp(12px, min(1.75vw, 2.5vh), 38px);
 
   /* CHECKBOX */
-  --checklist-checkbox-size: clamp(44px, 4.72vw, 68px);
+  --checklist-checkbox-size: clamp(32px, min(3.6vw, 5.4vh), 86px);
 
   --checklist-checkmark-size: 85%;
   --checklist-checkmark-offset-top: -12%;
   --checklist-checkmark-offset-right: -8%;
 
   /* IMAGES */
-  --checklist-image-size: clamp(100px, 13.58vw, 195.5px);
-  --checklist-image-gap: clamp(20px, 3.47vw, 50px);
+  --checklist-image-size: clamp(72px, min(9.8vw, 14.5vh), 240px);
+  --checklist-image-gap: clamp(12px, min(2.2vw, 3.4vh), 54px);
 
   /* STRIKETHROUGH */
-  --checklist-strike-width: 4px;
+  --checklist-strike-width: clamp(2px, 0.22vw, 4.5px);
   --checklist-strike-color: rgba(0, 0, 0, 0.9);
 
   /* FIRST ITEM GLOW */
@@ -45,18 +57,23 @@
   --checklist-box-glow:
     0px 0px 7.4px 2px var(--checklist-glow-color);
 
-  /* POSITION */
-  --checklist-side-padding: 8.6%;
+  /* POSITION & SCROLL OFFSETS */
+  --checklist-side-padding: clamp(34px, calc(10.5vw - 72px), 215px);
+  --checklist-scroll-padding-top: clamp(190px, 31vh, 450px);
+  --checklist-scroll-padding-bottom: clamp(60px, 10vh, 150px);
 
   /* BOARD */
-  --checklist-board-width: min(790px, 85vw);
+  --checklist-board-width: clamp(460px, min(51vw, 90vh), 1260px);
+  --checklist-board-min-height: 82vh;
 
   --checklist-board-padding-top: 12%;
   --checklist-board-padding-horizontal: 5%;
   --checklist-board-padding-bottom: 8%;
 
-  /* CLICK BOUNDARY */
-  --checklist-click-boundary-top: 50vh;
+  /* BOTTOM BOUNDARY LINE (רספונסיבי מתחתית המסך לכל גדלי המחשב) */
+  --checklist-boundary-bottom: clamp(60px, min(calc(26vh - 9vw), calc(19vh - 76px)), 190px);
+  --checklist-boundary-height: 3px;
+  --checklist-boundary-color: #ff1e5600;
 
   /* ANIMATIONS */
   --checklist-move-duration: 0.65s;
@@ -103,20 +120,20 @@
 }
 
 /* =====================================================
-   CLICK BOUNDARY
+   BOTTOM BOUNDARY LINE
 ===================================================== */
 
 .checklist-click-boundary {
   position: fixed;
 
-  top: var(--checklist-click-boundary-top);
+  bottom: var(--checklist-boundary-bottom);
 
   left: 0;
   right: 0;
 
-  height: 1px;
+  height: var(--checklist-boundary-height);
+  background-color: var(--checklist-boundary-color);
 
-  opacity: 0;
   pointer-events: none;
 
   z-index: 20;
@@ -134,8 +151,8 @@
 
   min-height: 0;
 
-  padding-top: 20vh;
-  padding-bottom: 8vh;
+  padding-top: var(--checklist-scroll-padding-top);
+  padding-bottom: var(--checklist-scroll-padding-bottom);
 
   box-sizing: border-box;
 
@@ -166,7 +183,7 @@
   width: var(--checklist-board-width);
 
   height: max-content;
-  min-height: 90vh;
+  min-height: var(--checklist-board-min-height);
 
   max-height: none;
 
@@ -379,8 +396,8 @@
 /* TEXT WITH IMAGE */
 
 .checklist-item.has-image .item-text {
-  flex: 0 1 294px;
-  width: 294px;
+  flex: 1 1 auto;
+  width: auto;
 }
 
 /* =====================================================
@@ -419,30 +436,38 @@
 ===================================================== */
 
 .mini-checklist .checklist-scroll-area {
-  padding-top: 20vh;
+  padding-top: 34.5vh;
   padding-bottom: 5vh;
   overflow: hidden;
 }
 
 .mini-checklist .clipboard-wrapper {
-  width: min(700px, 80vw);
+  width: min(clamp(650px, min(46vw, 90vh), 1200px), 80vw);
   height: auto;
   min-height: min(20vh, 95px);
-  padding: 15% 3% 10%;
+  padding: 10% 5% 8%;
 }
 
 .mini-checklist .checklist-items {
-  gap: 3vh;
+  gap: clamp(20px, min(1.8vw, 3.1vh), 46px);
 }
 
 .mini-checklist .checklist-item {
-  gap: 20px;
+  gap: clamp(20px, min(1.4vw, 2.5vh), 38px);
+}
+
+.mini-checklist .item-text {
+  font-size: clamp(20px, min(1.65vw, 3vh), 44px);
+  line-height: 1.18;
+  -webkit-text-stroke:
+    clamp(0.45px, 0.035vw, 0.85px)
+    var(--checklist-text-border-color);
 }
 
 .mini-checklist .checkbox-box {
-  width: 28px;
-  height: 28px;
-  flex-basis: 28px;
+  width: clamp(28px, min(2vw, 3.6vh), 52px);
+  height: clamp(28px, min(2vw, 3.6vh), 52px);
+  flex-basis: clamp(28px, min(2vw, 3.6vh), 52px);
 }
 
 .mini-checklist .checkmark-img {
@@ -450,95 +475,7 @@
 }
 
 .mini-checklist .item-image {
-  width: clamp(70px, 10vw, 130px);
-  height: clamp(70px, 10vw, 130px);
-  flex-basis: clamp(70px, 10vw, 130px);
-}
-
-/* =====================================================
-   RESPONSIVE - LAPTOPS
-===================================================== */
-
-@media (max-width: 1200px) {
-  :root {
-    --checklist-font-size: clamp(26px, 3.7vh, 36px);
-    --checklist-item-gap: clamp(20px, 3vw, 40px);
-    --checklist-image-size: clamp(110px, 13.5vw, 180px);
-    --checklist-image-gap: clamp(18px, 3vw, 40px);
-    --checklist-checkbox-size: clamp(44px, 5vw, 60px);
-    --checklist-click-boundary-top: 81vh;
-  }
-
-  .clipboard-wrapper {
-    width: min(760px, 88vw);
-  }
-}
-
-/* =====================================================
-   RESPONSIVE - SMALL LAPTOPS
-===================================================== */
-
-@media (max-width: 900px) {
-  :root {
-    --checklist-font-size: clamp(22px, 3.5vh, 30px);
-    --checklist-item-gap: 18px;
-    --checklist-image-size: clamp(85px, 12vw, 130px);
-    --checklist-image-gap: 16px;
-    --checklist-checkbox-size: 42px;
-    --checklist-items-gap: 20px;
-    --checklist-side-padding: 4%;
-    --checklist-click-boundary-top: 80vh;
-  }
-
-  .clipboard-wrapper {
-    width: 90vw;
-  }
-
-  .checklist-item.has-image .item-text {
-    flex-basis: 0;
-    width: auto;
-  }
-}
-
-/* =====================================================
-   RESPONSIVE - LOW HEIGHT
-===================================================== */
-
-@media (max-height: 750px) {
-  :root {
-    --checklist-font-size: clamp(21px, 3.8vh, 30px);
-    --checklist-items-gap: 2vh;
-    --checklist-click-boundary-top: 78vh;
-  }
-
-  .checklist-scroll-area {
-    padding-top: 20vh;
-  }
-
-  .clipboard-wrapper {
-    min-height: 80vh;
-  }
-}
-
-/* =====================================================
-   RESPONSIVE - VERY LOW HEIGHT
-===================================================== */
-
-@media (max-height: 600px) {
-  :root {
-    --checklist-font-size: clamp(18px, 3.4vh, 24px);
-    --checklist-items-gap: 12px;
-    --checklist-image-size: clamp(65px, 12vh, 100px);
-    --checklist-checkbox-size: 36px;
-    --checklist-click-boundary-top: 76vh;
-  }
-
-  .clipboard-wrapper {
-    min-height: 80vh;
-  }
-
-  .checklist-container .checklist-item {
-    pointer-events: auto;
-    cursor: pointer;
-  }
+  width: clamp(70px, min(9vw, 14vh), 220px);
+  height: clamp(70px, min(9vw, 14vh), 220px);
+  flex-basis: clamp(70px, min(9vw, 14vh), 220px);
 }

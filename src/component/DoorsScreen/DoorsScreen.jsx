@@ -1,5 +1,5 @@
-
 import React from 'react';
+import SpeechBubble from '../SpeechBubble/SpeechBubble';
 import './DoorsScreen.css';
 
 import doorClosed from '../../assets/DoorsScreen/door_closed.png';
@@ -8,51 +8,84 @@ import doorOpen from '../../assets/DoorsScreen/door_open.png';
 import hallBackground from '../../assets/DoorsScreen/doors_hall_bg.jpg';
 
 // ==========================================
-// נתוני הדלתות
+// נתוני הדלתות (שלבים 24-27)
 // ==========================================
 
 const doorsData = [
   {
-    id: 25,
+    id: 24,
     title: 'אחריות\nהמלווים\nבקבלה',
     lockReason: '',
   },
   {
-    id: 26,
+    id: 25,
     title: 'קליטת\nעצור\nבמצ"ח',
     lockReason: 'יש לסיים קודם את שלב אחריות המלווים בקבלה.',
   },
   {
-    id: 27,
+    id: 26,
     title: 'דגשים\nלקבלה',
     lockReason: '',
   },
   {
-    id: 28,
+    id: 27,
     title: 'תרגול\nאחרון',
     lockReason: 'יש להשלים את השלבים האחרים קודם.',
   },
 ];
 
 // ==========================================
+// הגדרות מיקום בועת הדיבור
+// ==========================================
+
+const DOORS_SPEECH_POSITION = {
+  top: '10%',
+  right: '30%',
+};
+
+const DOORS_SPEECH_TAIL_TARGET = {
+  x: '-5%',
+  y: '15%',
+};
+
+// ==========================================
+// טקסט דינמי לבועת הדיבור לפי כמות הדלתות שנותרו
+// ==========================================
+
+const getSpeechBubbleText = (remainingCount) => {
+  switch (remainingCount) {
+    case 4:
+      return 'מעולה הגעתם כמעט לסוף נשארו לכם רק עוד 4 כיתות לעבור בהם';
+    case 3:
+      return 'מעולה! נשארו לכם רק עוד 3 כיתות לעבור בהן';
+    case 2:
+      return 'כל הכבוד! נשארו לכם רק עוד 2 כיתות לעבור בהן';
+    case 1:
+      return 'אלופים! נשארה לכם רק עוד כיתה אחת לעבור בה';
+    default:
+      return 'כל הכבוד! סיימתם את כל הכיתות, לחצו על כפתור ההמשך כדי לסיים';
+  }
+};
+
+// ==========================================
 // בדיקת נעילת דלת
 // ==========================================
 
 const isDoorLocked = (id, completedStages) => {
-  // חדר שהושלם כבר אינו נעול.
+  // חדר שהושלם כבר אינו נעול
   if (completedStages[id]) return false;
 
-  // חדר 26 נפתח לאחר השלמת חדר 25.
-  if (id === 26) {
-    return !completedStages[25];
+  // חדר 25 נפתח לאחר השלמת חדר 24
+  if (id === 25) {
+    return !completedStages[24];
   }
 
-  // חדר 28 נפתח לאחר השלמת שלושת החדרים הראשונים.
-  if (id === 28) {
+  // חדר 27 נפתח לאחר השלמת שלושת החדרים הראשונים
+  if (id === 27) {
     return !(
+      completedStages[24] &&
       completedStages[25] &&
-      completedStages[26] &&
-      completedStages[27]
+      completedStages[26]
     );
   }
 
@@ -67,9 +100,15 @@ export default function DoorsScreen({
   completedStages = {},
   onEnterStage,
 }) {
+  const completedCount = doorsData.filter((door) =>
+    Boolean(completedStages[door.id])
+  ).length;
+
+  const remainingDoorsCount = doorsData.length - completedCount;
+  const speechBubbleText = getSpeechBubbleText(remainingDoorsCount);
+
   return (
     <div className="doors-container">
-
       {/* רקע המסדרון */}
       <img
         src={hallBackground}
@@ -78,9 +117,17 @@ export default function DoorsScreen({
         draggable="false"
       />
 
+      {/* בועת דיבור דינמית */}
+      <SpeechBubble
+        step={24}
+        text={speechBubbleText}
+        typeAnimation={false}
+        position={DOORS_SPEECH_POSITION}
+        tailTarget={DOORS_SPEECH_TAIL_TARGET}
+      />
+
       {/* ארבע הדלתות */}
       <div className="doors-row">
-
         {doorsData.map((door) => {
           const isDone = Boolean(completedStages[door.id]);
           const locked = isDoorLocked(door.id, completedStages);
@@ -105,7 +152,6 @@ export default function DoorsScreen({
 
           return (
             <div className="door-wrapper" key={door.id}>
-
               {/* תווית מצב הדלת */}
               <div className={`door-status-label ${statusClass}`}>
                 {isDone ? (
@@ -156,11 +202,9 @@ export default function DoorsScreen({
                   </div>
                 )}
               </button>
-
             </div>
           );
         })}
-
       </div>
     </div>
   );

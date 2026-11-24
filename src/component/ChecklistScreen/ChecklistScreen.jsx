@@ -1,4 +1,3 @@
-
 import React, {
   useState,
   useEffect,
@@ -77,9 +76,6 @@ export default function ChecklistScreen({
   const itemRefs = useRef([]);
   const textRefs = useRef([]);
 
-  // מונע הרצה מיותרת בתחילת טעינת הקומפוננטה
-  const previousCheckedRef = useRef(null);
-
   // =====================================================
   // CHECKED ITEMS
   // =====================================================
@@ -110,7 +106,6 @@ export default function ChecklistScreen({
     setHasStarted(hasInteracted || isCompleted);
 
     completionCalled.current = false;
-    previousCheckedRef.current = null;
 
     itemRefs.current = [];
     textRefs.current = [];
@@ -131,20 +126,16 @@ export default function ChecklistScreen({
       return boundaryRef.current.getBoundingClientRect().top;
     }
 
-    return window.innerHeight * 0.82;
+    return window.innerHeight * 0.87;
   }, []);
 
   // =====================================================
-  // GET FIRST FULLY VISIBLE ITEM
+  // GET ITEMS NOT FULLY ABOVE BOUNDARY (IN JSON ORDER)
   // =====================================================
 
-  const getFirstFullyVisibleItem = useCallback(() => {
-    const scrollArea = scrollAreaRef.current;
-
-    if (!scrollArea) return null;
-
-    const areaRect = scrollArea.getBoundingClientRect();
+  const getItemsNotFullyAboveBoundary = useCallback(() => {
     const boundaryTop = getBoundaryTop();
+    const notAboveItems = [];
 
     for (let index = 0; index < items.length; index++) {
       const element = itemRefs.current[index];
@@ -153,153 +144,86 @@ export default function ChecklistScreen({
 
       const rect = element.getBoundingClientRect();
 
-      const isFullyVisible =
-        rect.height > 0 &&
-        rect.top >= areaRect.top &&
-        rect.bottom <= boundaryTop;
+      if (rect.height <= 0) continue;
 
-      if (isFullyVisible) {
-        return {
+      const isFullyAboveLine = rect.bottom <= boundaryTop - 2;
+
+      if (!isFullyAboveLine) {
+        notAboveItems.push({
           index,
           item: items[index],
           element,
           rect,
-        };
+        });
       }
     }
 
-    return null;
+    return notAboveItems;
   }, [items, getBoundaryTop]);
 
   // =====================================================
-  // CHECK LAST VISIBLE ITEM
+  // SCROLL FIRST OVERFLOWING ITEM ABOVE LINE (ON CLICK)
   // =====================================================
 
-  const isLastVisibleItemCrossingBoundary = useCallback(() => {
+  const scrollFirstItemAboveBoundary = useCallback(() => {
+    if (isMini) return;
+
     const scrollArea = scrollAreaRef.current;
 
-    if (!scrollArea) return false;
+    if (!scrollArea) return;
 
-    const areaRect = scrollArea.getBoundingClientRect();
+    const itemsNotAbove = getItemsNotFullyAboveBoundary();
+
+    // אם כל הנקודות כבר נמצאות מעל הקו - אין צורך בגלילה
+    if (itemsNotAbove.length === 0) return;
+
+    const firstOverflowItem = itemsNotAbove[0];
     const boundaryTop = getBoundaryTop();
 
-    let lastVisible = null;
+    // מרווח ביטחון קטן מעל הקו כדי שהנקודה תהיה כל כולה מעליו
+    const clearance = 8;
+    const neededScrollDelta =
+      firstOverflowItem.rect.bottom - boundaryTop + clearance;
 
-    for (let index = 0; index < items.length; index++) {
-      const element = itemRefs.current[index];
+    if (neededScrollDelta <= 1) return;
 
-      if (!element) continue;
+    const maxScroll =
+      scrollArea.scrollHeight - scrollArea.clientHeight;
 
-      const rect = element.getBoundingClientRect();
-
-      const intersectsVisibleArea =
-        rect.top < boundaryTop &&
-        rect.bottom > areaRect.top;
-
-      if (intersectsVisibleArea) {
-        lastVisible = rect;
-      }
-    }
-
-    return Boolean(
-      lastVisible &&
-      lastVisible.bottom > boundaryTop
+    const nextScrollTop = Math.min(
+      scrollArea.scrollTop + neededScrollDelta,
+      maxScroll
     );
-  }, [items, getBoundaryTop]);
 
-  // =====================================================
-  // AUTOMATIC CLIPBOARD MOVEMENT
-  // =====================================================
-
-  useEffect(() => {
-    if (isMini || isCompleted) return;
-
-    const currentChecked = JSON.stringify(checkedItems);
-
-    if (previousCheckedRef.current === null) {
-      previousCheckedRef.current = currentChecked;
+    if (nextScrollTop <= scrollArea.scrollTop + 1) {
       return;
     }
 
-    if (previousCheckedRef.current === currentChecked) {
-      return;
-    }
-
-    previousCheckedRef.current = currentChecked;
-
-    // ממתינים עד שהעדכון של הסימון הסתיים
-    requestAnimationFrame(() => {
-      const scrollArea = scrollAreaRef.current;
-
-      if (!scrollArea) return;
-
-      // תנאי ראשון:
-      // הנקודה הראשונה שמוצגת במלואה כבר סומנה
-
-      const firstItem = getFirstFullyVisibleItem();
-
-      if (!firstItem) return;
-
-      const firstItemChecked =
-        Boolean(checkedItems[firstItem.item.id]);
-
-      if (!firstItemChecked) return;
-
-      // תנאי שני:
-      // הנקודה האחרונה באזור התצוגה חוצה את הקו השקוף
-
-      const lastItemCrosses =
-        isLastVisibleItemCrossingBoundary();
-
-      if (!lastItemCrosses) return;
-
-      // =================================================
-      // BOTH CONDITIONS MET
-      // =================================================
-
-      const itemHeight = firstItem.rect.height;
-
-      // מרימים מספיק כדי שהנקודה הראשונה
-      // כבר לא תהיה מוצגת במלואה.
-      // לא מרימים את כל גובה הנקודה.
-
-      const movement = itemHeight * 0.7;
-
-      const maxScroll =
-        scrollArea.scrollHeight - scrollArea.clientHeight;
-
-      const nextScroll = Math.min(
-        scrollArea.scrollTop + movement,
-        maxScroll
-      );
-
-      if (nextScroll <= scrollArea.scrollTop + 2) {
-        return;
-      }
-
-      scrollArea.scrollTo({
-        top: nextScroll,
-        behavior: 'smooth',
-      });
+    scrollArea.scrollTo({
+      top: nextScrollTop,
+      behavior: 'smooth',
     });
-  }, [
-    checkedItems,
-    isMini,
-    isCompleted,
-    getFirstFullyVisibleItem,
-    isLastVisibleItemCrossingBoundary,
-  ]);
+  }, [isMini, getItemsNotFullyAboveBoundary, getBoundaryTop]);
 
   // =====================================================
   // ITEM CLICK
   // =====================================================
 
   const handleItemClick = (itemId) => {
-    if (isCompleted || checkedItems[itemId]) return;
+    if (isCompleted) return;
+
+    // הגלילה האוטומטית מתבצעת תמיד בלחיצה (רק כשצריך)
+    scrollFirstItemAboveBoundary();
+
+    if (checkedItems[itemId]) return;
 
     if (!hasStarted) {
       setHasStarted(true);
-      onInteractionStart?.();
+
+      // בגרסת mini הלוח לא עולה למעלה ולכן בועת הדיבור נשארת גלויה
+      if (!isMini) {
+        onInteractionStart?.();
+      }
     }
 
     const updatedItems = {
@@ -356,9 +280,7 @@ export default function ChecklistScreen({
       }`}
       dir="rtl"
     >
-
-      {/* קו שקוף */}
-
+      {/* קו גבול תחתון */}
       {!isMini && (
         <div
           ref={boundaryRef}
@@ -368,14 +290,11 @@ export default function ChecklistScreen({
       )}
 
       {/* אזור גלילה */}
-
       <div
         ref={scrollAreaRef}
         className="checklist-scroll-area"
       >
-
         {/* לוח */}
-
         <div
           className={`clipboard-wrapper ${
             isMini ? 'clipboard-mini' : ''
@@ -386,13 +305,9 @@ export default function ChecklistScreen({
               : 'none',
           }}
         >
-
           {/* רשימה */}
-
           <div className="checklist-viewport">
-
             <div className="checklist-items">
-
               {items.map((item, index) => {
                 const isChecked =
                   isCompleted ||
@@ -433,9 +348,7 @@ export default function ChecklistScreen({
                       }
                     }}
                   >
-
                     {/* CHECKBOX */}
-
                     <div
                       className="checkbox-box"
                       style={{
@@ -452,9 +365,7 @@ export default function ChecklistScreen({
                     </div>
 
                     {/* TEXT + IMAGE */}
-
                     <div className="item-text-container">
-
                       <span
                         ref={(element) => {
                           textRefs.current[index] = element;
@@ -471,13 +382,10 @@ export default function ChecklistScreen({
                           className="item-image"
                         />
                       )}
-
                     </div>
-
                   </div>
                 );
               })}
-
             </div>
           </div>
         </div>

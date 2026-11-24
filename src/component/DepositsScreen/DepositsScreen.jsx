@@ -1,7 +1,7 @@
-
 import React, {
   useState,
   useRef,
+  useLayoutEffect,
   useEffect,
   useCallback,
 } from 'react';
@@ -56,6 +56,7 @@ const DepositsScreen = ({
   const finalFrame = content?.finalFrame || {};
   const TOTAL_STEPS = steps.length;
 
+  // חוזרים תמיד בדיוק לנקודה שבה עצרנו
   const safeInitialStep = Math.max(
     0,
     Math.min(initialStep, TOTAL_STEPS)
@@ -67,6 +68,7 @@ const DepositsScreen = ({
   const [dragOffset, setDragOffset] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [filmPosition, setFilmPosition] = useState(0);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
 
   const filmAreaRef = useRef(null);
   const filmAssemblyRef = useRef(null);
@@ -86,7 +88,7 @@ const DepositsScreen = ({
   // מיקום הסרט לפי מרכז הפריים הפעיל
   // =========================================
 
-  const updateFilmPosition = useCallback(() => {
+  const updateFilmPosition = useCallback((animate = false) => {
     const area = filmAreaRef.current;
     const assembly = filmAssemblyRef.current;
 
@@ -107,14 +109,19 @@ const DepositsScreen = ({
 
     const areaCenter = area.clientHeight * 0.43;
 
+    setShouldAnimate(animate);
     setFilmPosition(areaCenter - frameCenter);
   }, []);
 
-  useEffect(() => {
-    updateFilmPosition();
+  // מיקום מיידי לפני הציור הראשון כדי שייפתח ישר על הפריים השמור
+  useLayoutEffect(() => {
+    updateFilmPosition(false);
+  }, [updateFilmPosition]);
 
+  // עדכון מיקום ללא אנימציה בשינוי גודל מסך או טעינת תמונות
+  useEffect(() => {
     const observer = new ResizeObserver(() => {
-      updateFilmPosition();
+      updateFilmPosition(false);
     });
 
     if (filmAreaRef.current) {
@@ -126,7 +133,7 @@ const DepositsScreen = ({
     }
 
     return () => observer.disconnect();
-  }, [activeStep, updateFilmPosition]);
+  }, [updateFilmPosition]);
 
   // =========================================
   // עדכון שלב ושמירת התקדמות
@@ -135,6 +142,7 @@ const DepositsScreen = ({
   const changeStep = (nextStep) => {
     activeStepRef.current = nextStep;
     setActiveStep(nextStep);
+    updateFilmPosition(true);
 
     onProgressChange?.(nextStep);
   };
@@ -152,7 +160,7 @@ const DepositsScreen = ({
 
     changeStep(nextStep);
 
-    // הגעה ראשונה לפריים האחרון
+    // בסיום המשיכה האחרונה מפעילים את כפתור ההמשך הגלובלי
     if (
       nextStep === TOTAL_STEPS &&
       !completionNotifiedRef.current
@@ -287,10 +295,11 @@ const DepositsScreen = ({
       .reverse(),
   ];
 
-  const currentText =
-    activeStep === TOTAL_STEPS
-      ? finalFrame.text
-      : steps[activeStep]?.text;
+  const isFinished = activeStep >= TOTAL_STEPS;
+
+  const currentText = isFinished
+    ? finalFrame.text
+    : steps[activeStep]?.text;
 
   // =========================================
   // RENDER
@@ -313,9 +322,10 @@ const DepositsScreen = ({
           className="film-track-position"
           style={{
             transform: `translate3d(0, ${filmPosition + dragOffset}px, 0)`,
-            transition: isDragging
-              ? 'none'
-              : 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition:
+              isDragging || !shouldAnimate
+                ? 'none'
+                : 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
           <div ref={filmAssemblyRef} className="film-assembly">
@@ -360,14 +370,18 @@ const DepositsScreen = ({
             {/* אזור ההנחיה בתחתית הסרט */}
 
             <div className="film-end-panel">
-              <span>משוך למטה כדי להמשיך</span>
+              {!isFinished && (
+                <>
+                  <span>משוך למטה כדי להמשיך</span>
 
-              <img
-                src={filmHand}
-                alt=""
-                className="film-hand-icon"
-                draggable="false"
-              />
+                  <img
+                    src={filmHand}
+                    alt=""
+                    className="film-hand-icon"
+                    draggable="false"
+                  />
+                </>
+              )}
             </div>
 
           </div>
