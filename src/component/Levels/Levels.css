@@ -1,317 +1,287 @@
-/* ==========================================
-   הגדרות מעטפת ומודאל (Overlay & Card)
-   ========================================== */
-   .levels-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.65);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9990;
-    direction: rtl;
-    font-family: sans-serif;
-    animation: fadeIn 0.3s ease;
-  }
+/* =========================================================
+   כפתור הפתיחה/סגירה העגול (LevelsBtn) - זהה ל-About
+   ========================================================= */
+   .levels-toggle-btn {
+    --btn-size: var(--top-control-size, clamp(44px, min(4.5vw, 6.35vh), 65px));
   
-  .levels-card {
     position: relative;
-    width: 92vw;
-    max-width: 1100px;
-    max-height: 85vh;
-    background-color: #3b2579; /* סגול תואם לעיצוב ה-PDF */
-    border: 4px solid #ffffff;
-    border-radius: 35px;
-    padding: 50px 30px 30px 30px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    overflow-y: auto;
-    box-sizing: border-box;
-  }
-  
-  .levels-header {
-    position: absolute;
-    top: 15px;
-    left: 20px;
-    z-index: 10;
-  }
-  
-  /* ==========================================
-     כפתור הטרגר (LevelsBtn)
-     ========================================== */
-  .levels-toggle-btn {
-    position: fixed;
-    top: 3vh;
-    right: 8vw; /* ממוקם ליד כפתור ה-About שמיקמנו ב-3vw */
-    width: 50px;
-    height: 50px;
-    background-color: #40298a;
-    border: 3px solid #ffffff;
+    width: var(--btn-size);
+    height: var(--btn-size);
+    padding: 0;
+    background-color: rgba(71, 44, 137, 1);
+    border: 1px solid transparent;
     border-radius: 50%;
-    cursor: pointer;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+  
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    z-index: 9995;
-    transition: transform 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    z-index: 10;
+    transition:
+      transform 0.22s ease,
+      box-shadow 0.22s ease,
+      border-color 0.22s ease;
   }
   
   .levels-toggle-btn:hover {
-    transform: scale(1.08);
+    transform: scale(1.05);
   }
   
-  /* איקון 3 פסים */
-  .hamburger-icon {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-    width: 24px;
+  .levels-toggle-btn:active {
+    transform: scale(0.96);
   }
   
-  .hamburger-icon span {
+  .levels-toggle-btn.open {
+    border: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+  }
+  
+  .levels-toggle-icon {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
     display: block;
-    height: 4px;
-    background-color: #ffffff;
-    border-radius: 4px;
-    width: 100%;
+    pointer-events: none;
   }
   
-  /* איקון תיבת יהלום */
-  .chest-icon {
-    position: relative;
-    width: 26px;
-    height: 22px;
+  /* =========================================================
+     מעטפת הרקע (Overlay) - מתחת ל-About
+     ========================================================= */
+  .levels-overlay {
+    --btn-size: var(--top-control-size, clamp(44px, min(4.5vw, 6.35vh), 65px));
+    --controls-top: clamp(14px, 2.4vh, 32px);
+    --controls-right: clamp(16px, 2.2vw, 38px);
+    --controls-gap: clamp(10px, 1.1vw, 20px);
+  
+    /* מיקום מרכז כפתור LevelsBtn (נמצא משמאל ל-About) */
+    --levels-btn-center-top: calc(var(--controls-top) + (var(--btn-size) * 0.5));
+    --levels-btn-center-right: calc(
+      var(--controls-right) + var(--btn-size) + var(--controls-gap) + (var(--btn-size) * 0.5)
+    );
+  
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 10000;
+    direction: rtl;
+    font-family: 'Rubik', sans-serif;
+    animation: levelsFadeIn 0.24s ease;
+  }
+  
+  /* =========================================================
+     המלבן הסגול הנפתח - תואם About ומתאים גובה לכמות השלבים
+     ========================================================= */
+  .levels-card {
+    position: fixed;
+    top: var(--levels-btn-center-top);
+    right: var(--levels-btn-center-right);
+  
+    width: min(
+      clamp(760px, 82vw, 1340px),
+      calc(100vw - (var(--levels-btn-center-right) * 2))
+    );
+    height: auto;
+    max-height: calc(100vh - var(--levels-btn-center-top) - clamp(20px, 4vh, 48px));
+  
+    background-color: rgba(71, 44, 137, 1);
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: clamp(28px, 3.8vw, 60px) 0 clamp(28px, 3.8vw, 60px) clamp(28px, 3.8vw, 60px);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+  
+    padding:
+      clamp(36px, 5vh, 64px)
+      clamp(24px, 3.2vw, 56px)
+      clamp(32px, 4.5vh, 56px)
+      clamp(24px, 3.2vw, 56px);
+  
+    overflow-y: auto;
+    overflow-x: hidden;
+    transform-origin: top right;
+    animation: levelsPanelPop 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  
+  /* =========================================================
+     סידור השלבים בשורות ממורכזות לאמצע (Flex Wrap)
+     ========================================================= */
+  .levels-rows-container {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-  }
-  
-  .chest-base {
-    width: 24px;
-    height: 10px;
-    background-color: #ffffff;
-    border-radius: 2px;
-    margin-top: auto;
-  }
-  
-  .chest-lid {
-    width: 26px;
-    height: 5px;
-    background-color: #ffffff;
-    border-radius: 3px;
-    transform: rotate(-25deg) translateY(-2px);
-    transform-origin: left bottom;
-  }
-  
-  .chest-diamond {
-    position: absolute;
-    top: -4px;
-    color: #00bfff;
-    font-size: 14px;
-    text-shadow: 0 0 4px #00bfff;
-  }
-  
-  /* ==========================================
-     גריד השלבים (Levels Grid)
-     ========================================== */
-  .levels-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px 20px;
-    padding: 10px 0;
+    gap: clamp(16px, 2.2vh, 28px) clamp(18px, 2vw, 34px);
+    width: 100%;
     direction: rtl;
   }
   
-  /* ==========================================
-     פריט שלב (Level Item State Styling)
-     ========================================== */
+  /* =========================================================
+     כרטיס שלב בודד (מבוסס ערכי פיגמה 1440x1024)
+     ========================================================= */
   .level-item {
+    --pill-height: clamp(34px, min(3.05vw, 4.3vh), 50px);
+    --diamond-size: clamp(50px, min(4.7vw, 6.6vh), 76px);
+    --state-border-color: rgba(68, 149, 255, 1);
+    --state-text-color: rgba(19, 38, 84, 1);
+  
     position: relative;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    height: 50px;
+    height: var(--diamond-size);
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    font-family: 'Rubik', sans-serif;
     cursor: pointer;
     user-select: none;
     transition: transform 0.2s ease;
   }
   
-  .level-item:hover {
-    transform: translateY(-2px);
+  .level-item:not(:disabled):hover {
+    transform: translateY(-2px) scale(1.02);
   }
   
-  .level-pill {
-    flex: 1;
-    height: 42px;
-    background-color: #ffffff;
-    border-radius: 25px;
-    display: flex;
-    align-items: center;
-    padding: 0 20px 0 35px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
-    border: 2px solid #3b82f6; /* ברירת מחדל - כחול */
-    transition: all 0.3s ease;
-  }
-  
-  .level-title {
-    font-size: 18px;
-    font-weight: 800;
-    color: #1e3a8a;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  .level-diamond-wrapper {
-    position: absolute;
-    left: -10px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-  }
-  
-  /* --- מצב 1: שלב פעיל (Active / Gold) --- */
-  .level-item.active .level-pill {
-    border-color: #eab308; /* צהוב/זהב */
-  }
-  
-  .level-item.active .level-title {
-    color: #d97706; /* זהב כהה */
-  }
-  
-  /* --- מצב 2: שלב פתוח (Unlocked / Blue) --- */
-  .level-item.unlocked .level-pill {
-    border-color: #3b82f6;
-  }
-  
-  .level-item.unlocked .level-title {
-    color: #1d4ed8;
-  }
-  
-  /* --- מצב 3: שלב נעול (Locked / Grey) --- */
-  .level-item.locked {
+  .level-item:disabled {
     cursor: not-allowed;
-    opacity: 0.85;
   }
   
-  .level-item.locked .level-pill {
-    border-color: #9ca3af;
-    background-color: #f3f4f6;
+  /* --- מצב 1: שלב פתוח / בוצע (כחול) --- */
+  .level-item.unlocked {
+    --state-border-color: rgba(68, 149, 255, 1);
+    --state-text-color: rgba(19, 38, 84, 1);
   }
   
-  .level-item.locked .level-title {
-    color: #6b7280;
+  /* --- מצב 2: שלב נוכחי (צהוב) --- */
+  .level-item.current {
+    --state-border-color: rgba(255, 204, 0, 1);
+    --state-text-color: rgba(255, 204, 0, 1);
   }
   
-  /* ==========================================
-     אומנות היהלומים והמספרים בתוכם
-     ========================================== */
-  .diamond-container {
-    position: relative;
-    width: 55px;
-    height: 50px;
+  /* --- מצב 3: שלב נעול / טרם בוצע (אפור) --- */
+  .level-item.locked {
+    --state-border-color: rgba(124, 131, 146, 1);
+    --state-text-color: rgba(119, 128, 142, 1);
+  }
+  
+  /* =========================================================
+     מלבן הטקסט הלבן (מתרחב לפי אורך הטקסט)
+     ========================================================= */
+  .level-pill {
+    height: var(--pill-height);
+    min-width: clamp(135px, 11.5vw, 220px);
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid var(--state-border-color);
+    border-radius: 81px;
+    box-sizing: border-box;
+  
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
   }
   
-  .diamond-svg {
+  /* בשלב עם יהלום: ריפוד ימני גדול יותר כדי שהיהלום בפינה הימנית לא יסתיר את הטקסט */
+  .level-item.has-diamond .level-pill {
+    padding-right: calc(var(--diamond-size) * 0.92);
+    padding-left: clamp(20px, 1.9vw, 34px);
+  }
+  
+  /* בשלב תרגול (ללא יהלום): ריפוד סימטרי */
+  .level-item.is-practice .level-pill {
+    padding: 0 clamp(24px, 2.2vw, 38px);
+  }
+  
+  .level-title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 600;
+    font-size: clamp(18px, min(2.08vw, 2.9vh), 32px);
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+    color: var(--state-text-color);
+    white-space: nowrap;
+    transition: color 0.25s ease;
+  }
+  
+  /* =========================================================
+     יהלום בפינה הימנית של המלבן + המספר במרכזו
+     ========================================================= */
+  .level-diamond-wrapper {
+    position: absolute;
+    right: calc(var(--diamond-size) * -0.14);
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--diamond-size);
+    height: var(--diamond-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .level-diamond-img {
     width: 100%;
     height: 100%;
-    filter: drop-shadow(0px 3px 4px rgba(0, 0, 0, 0.3));
+    object-fit: contain;
+    display: block;
   }
   
-  .diamond-number {
+  .level-diamond-number {
     position: absolute;
-    font-size: 18px;
-    font-weight: 900;
-    color: #ffffff;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400;
+    font-size: clamp(26px, min(3.33vw, 4.6vh), 50px);
+    line-height: 1;
+    letter-spacing: 0;
+    text-align: center;
+  
+    color: rgba(255, 255, 255, 1);
+    -webkit-text-stroke: clamp(1.5px, 0.16vw, 2.5px) var(--state-border-color);
+    paint-order: stroke fill;
     z-index: 3;
   }
   
-  .diamond-number.gold {
-    color: #ffffff;
-  }
-  
-  .diamond-number.grey {
-    color: #e5e7eb;
-  }
-  
-  /* ניצוצות זהב עבור שלב אקטיבי */
-  .active-sparkle .sparkle {
-    position: absolute;
-    color: #facc15;
-    font-size: 16px;
-    animation: pulseSparkle 1.5s infinite alternate;
-  }
-  
-  .sparkle-top {
-    top: -4px;
-    right: 2px;
-  }
-  
-  .sparkle-bottom {
-    bottom: -4px;
-    left: 2px;
-  }
-  
-  /* ==========================================
-     התאמה רספונסיבית מיוחדת למחשב (Desktop)
-     ========================================== */
-  @media (min-width: 1024px) {
-    .levels-card {
-      padding: 60px 50px 40px 50px;
+  /* =========================================================
+     אנימציות פתיחה
+     ========================================================= */
+  @keyframes levelsFadeIn {
+    from {
+      opacity: 0;
     }
-  
-    .levels-grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: 30px 25px;
+    to {
+      opacity: 1;
     }
+  }
   
+  @keyframes levelsPanelPop {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .levels-toggle-btn,
+    .levels-overlay,
+    .levels-card,
     .level-item {
-      height: 60px;
+      animation: none;
+      transition: none;
     }
-  
-    .level-pill {
-      height: 50px;
-      border-width: 3px;
-    }
-  
-    .level-title {
-      font-size: 21px;
-    }
-  
-    .diamond-container {
-      width: 65px;
-      height: 58px;
-    }
-  
-    .diamond-number {
-      font-size: 22px;
-    }
-  
-    .levels-toggle-btn {
-      width: 60px;
-      height: 60px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .levels-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes pulseSparkle {
-    from { transform: scale(0.8); opacity: 0.6; }
-    to { transform: scale(1.3); opacity: 1; }
   }

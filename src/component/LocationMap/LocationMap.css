@@ -81,7 +81,7 @@
 .arrow-hint-wrapper {
   position: absolute;
   top: calc(-1 * min(2.2vw, 2.9vh));
-  right: calc(-1 * min(5.1vw, 6.8vh));
+  right: calc(-1 * min(6vw, 7.5vh));
   pointer-events: none;
   z-index: 12;
 }

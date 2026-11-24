@@ -1,14 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import idfLogos from '../../assets/idf-logos.png';
 import './About.css';
 
-const About = ({ currentStep = 0, totalSteps = 29 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const About = ({
+  currentStep = 0,
+  totalSteps = 29,
+  isOpen: controlledIsOpen,
+  onToggle,
+  onClose,
+}) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const wrapperRef = useRef(null);
 
+  const isControlled = controlledIsOpen !== undefined;
+  const isOpen = isControlled ? controlledIsOpen : internalIsOpen;
+
   const toggleAbout = () => {
-    setIsOpen((prev) => !prev);
+    if (onToggle) {
+      onToggle();
+    }
+    if (!isControlled) {
+      setInternalIsOpen((prev) => !prev);
+    }
   };
+
+  const closeAbout = useCallback(() => {
+    if (onClose) {
+      onClose();
+    }
+    if (!isControlled) {
+      setInternalIsOpen(false);
+    }
+  }, [isControlled, onClose]);
 
   // סגירה בלחיצה מחוץ לקומפוננטה או במקש Escape
   useEffect(() => {
@@ -16,13 +39,13 @@ const About = ({ currentStep = 0, totalSteps = 29 }) => {
 
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setIsOpen(false);
+        closeAbout();
       }
     };
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        setIsOpen(false);
+        closeAbout();
       }
     };
 
@@ -33,7 +56,7 @@ const About = ({ currentStep = 0, totalSteps = 29 }) => {
       document.removeEventListener('pointerdown', handleClickOutside);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, closeAbout]);
 
   // הלוגו יופיע בכל השלבים חוץ מהראשון (0) והאחרון (אינדקס אחרון במערך או 28)
   const numericStep = Number(currentStep);

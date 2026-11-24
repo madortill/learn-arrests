@@ -1,174 +1,168 @@
 /* =========================================================
-   ייבוא פונט Rubik
+   מעטפת הקומפוננטה - מותאמת רספונסיבית לכל גדלי מחשב
+   (כולל 1280x720, 1366x768, 1440x1024, 1920x1080, 2560x1440)
    ========================================================= */
-   @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap');
+.about-wrapper {
+  --coin-size: var(--top-control-size, clamp(44px, min(4.5vw, 6.35vh), 65px));
+  --panel-width: clamp(220px, min(19vw, 35vh), 370px);
+  --panel-offset-top: calc(var(--coin-size) * 0.52);
+  --panel-offset-right: calc(var(--coin-size) * 0.5);
 
-   /* =========================================================
-      מעטפת הקומפוננטה - מותאמת רספונסיבית לכל גדלי מחשב
-      (כולל 1280x720, 1366x768, 1440x1024, 1920x1080, 2560x1440)
-      ========================================================= */
-   .about-wrapper {
-     --coin-size: var(--top-control-size, clamp(42px, min(3.4vw, 6.2vh), 76px));
-     --panel-width: clamp(220px, min(19vw, 35vh), 370px);
-     --panel-offset-top: calc(var(--coin-size) * 0.52);
-     --panel-offset-right: calc(var(--coin-size) * 0.5);
-   
-     position: relative;
-     width: var(--coin-size);
-     height: var(--coin-size);
-     z-index: 20;
-     direction: rtl;
-     font-family: 'Rubik', sans-serif;
-   }
-   
-   /* =========================================================
-      כפתור המטבע העגול ("i")
-      ========================================================= */
-   .info-coin-btn {
-     position: relative;
-     width: var(--coin-size);
-     height: var(--coin-size);
-     padding: 0;
-     background-color: rgba(71, 44, 137, 1);
-     color: rgba(255, 255, 255, 1);
-     font-family: 'Rubik', sans-serif;
-     font-size: calc(var(--coin-size) * 0.68);
-     font-weight: 600;
-     line-height: 1;
-     border: 1px solid transparent;
-     border-radius: 50%;
-     cursor: pointer;
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-     z-index: 2;
-     user-select: none;
-     transition:
-       transform 0.22s ease,
-       box-shadow 0.22s ease,
-       border-color 0.22s ease;
-    
-   }
-   
-   .info-coin-btn:hover {
-     transform: scale(1.05);
-   }
-   
-   .info-coin-btn:active {
-     transform: scale(0.96);
-   }
-   
-   /* מצב הכפתור לאחר לחיצה */
-   .info-coin-btn.open {
-     border: 1px solid rgba(255, 255, 255, 1);
-     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
-   }
-   
-   /* =========================================================
-      החלונית המורחבת - עם אנימציית פתיחה וסגירה עדינה
-      ========================================================= */
-   .about-dropdown {
-     position: absolute;
-     top: var(--panel-offset-top);
-     right: var(--panel-offset-right);
-     width: var(--panel-width);
-     background-color: rgba(71, 44, 137, 1);
-     color: rgba(255, 255, 255, 1);
-     border: 1px solid rgba(255, 255, 255, 1);
-     border-radius: clamp(20px, 1.8vw, 34px);
-     padding:
-       clamp(32px, 4.4vh, 56px)
-       clamp(18px, 1.8vw, 32px)
-       clamp(18px, 2.5vh, 30px)
-       clamp(18px, 1.8vw, 32px);
-     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-     box-sizing: border-box;
-     z-index: 1;
-   
-     opacity: 0;
-     visibility: hidden;
-     pointer-events: none;
-     transform-origin: top right;
-     transform: scale(0.94) translateY(-6px);
-     transition:
-       opacity 0.24s ease,
-       transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-       visibility 0.24s ease;
-   }
-   
-   .about-dropdown.open {
-     opacity: 1;
-     visibility: visible;
-     pointer-events: auto;
-     transform: scale(1) translateY(0);
-   }
-   
-   /* =========================================================
-      עיצוב הטקסט בתוך המלבן
-      ========================================================= */
-   .about-text {
-     text-align: right;
-     font-family: 'Rubik', sans-serif;
-     color: rgba(255, 255, 255, 1);
-   }
-   
-   .about-text p {
-     margin: clamp(10px, 1.7vh, 22px) 0;
-     font-family: 'Rubik', sans-serif;
-     font-weight: 600;
-     font-size: clamp(16px, min(1.55vw, 2.7vh), 28px);
-     line-height: 1.25;
-     letter-spacing: 0;
-     text-align: right;
-     color: rgba(255, 255, 255, 1);
-   }
-   
-   .about-text p:first-child {
-     margin-top: 0;
-   }
-   
-   .about-text p:last-child {
-     margin-bottom: 0;
-   }
-   
-   .about-text strong {
-     display: block;
-     font-weight: 600;
-     margin-bottom: clamp(2px, 0.4vh, 5px);
-     color: rgba(255, 255, 255, 1);
-   }
-   
-   .about-text span {
-     display: block;
-     font-weight: 600;
-     color: rgba(255, 255, 255, 1);
-   }
-   
-   /* =========================================================
-      לוגואים בתחתית המלבן
-      ========================================================= */
-   .about-logos {
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     margin-top: clamp(16px, 2.4vh, 30px);
-   }
-   
-   .about-idf-logos-img {
-     width: clamp(115px, min(11vw, 19vh), 195px);
-     max-width: 85%;
-     height: auto;
-     object-fit: contain;
-     display: block;
-   }
-   
-   /* =========================================================
-      הפחתת תנועה לנגישות
-      ========================================================= */
-   @media (prefers-reduced-motion: reduce) {
-     .info-coin-btn,
-     .about-dropdown {
-       transition: none;
-     }
-   }
+  position: relative;
+  width: var(--coin-size);
+  height: var(--coin-size);
+  z-index: 50;
+  direction: rtl;
+  font-family: 'Rubik', sans-serif;
+}
+  
+  /* =========================================================
+     כפתור המטבע העגול ("i")
+     ========================================================= */
+  .info-coin-btn {
+    position: relative;
+    width: var(--coin-size);
+    height: var(--coin-size);
+    padding: 0;
+    background-color: rgba(71, 44, 137, 1);
+    color: rgba(255, 255, 255, 1);
+    font-family: 'Rubik', sans-serif;
+    font-size: calc(var(--coin-size) * 0.68);
+    font-weight: 600;
+    line-height: 1;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    z-index: 2;
+    user-select: none;
+    transition:
+      transform 0.22s ease,
+      box-shadow 0.22s ease,
+      border-color 0.22s ease;
+  }
+  
+  .info-coin-btn:hover {
+    transform: scale(1.05);
+  }
+  
+  .info-coin-btn:active {
+    transform: scale(0.96);
+  }
+  
+  /* מצב הכפתור לאחר לחיצה */
+  .info-coin-btn.open {
+    border: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+  }
+  
+  /* =========================================================
+     החלונית המורחבת - עם אנימציית פתיחה וסגירה עדינה
+     ========================================================= */
+  .about-dropdown {
+    position: absolute;
+    top: var(--panel-offset-top);
+    right: var(--panel-offset-right);
+    width: var(--panel-width);
+    background-color: rgba(71, 44, 137, 1);
+    color: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(255, 255, 255, 1);
+    border-radius: clamp(20px, 1.8vw, 34px);
+    padding:
+      clamp(32px, 4.4vh, 56px)
+      clamp(18px, 1.8vw, 32px)
+      clamp(18px, 2.5vh, 30px)
+      clamp(18px, 1.8vw, 32px);
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    z-index: 1;
+  
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform-origin: top right;
+    transform: scale(0.94) translateY(-6px);
+    transition:
+      opacity 0.24s ease,
+      transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+      visibility 0.24s ease;
+  }
+  
+  .about-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+  }
+  
+  /* =========================================================
+     עיצוב הטקסט בתוך המלבן
+     ========================================================= */
+  .about-text {
+    text-align: right;
+    font-family: 'Rubik', sans-serif;
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .about-text p {
+    margin: clamp(10px, 1.7vh, 22px) 0;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 600;
+    font-size: clamp(16px, min(1.55vw, 2.7vh), 28px);
+    line-height: 1.25;
+    letter-spacing: 0;
+    text-align: right;
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .about-text p:first-child {
+    margin-top: 0;
+  }
+  
+  .about-text p:last-child {
+    margin-bottom: 0;
+  }
+  
+  .about-text strong {
+    display: block;
+    font-weight: 600;
+    margin-bottom: clamp(2px, 0.4vh, 5px);
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  .about-text span {
+    display: block;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 1);
+  }
+  
+  /* =========================================================
+     לוגואים בתחתית המלבן
+     ========================================================= */
+  .about-logos {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: clamp(16px, 2.4vh, 30px);
+  }
+  
+  .about-idf-logos-img {
+    width: clamp(115px, min(11vw, 19vh), 195px);
+    max-width: 85%;
+    height: auto;
+    object-fit: contain;
+    display: block;
+  }
+  
+  /* =========================================================
+     הפחתת תנועה לנגישות
+     ========================================================= */
+  @media (prefers-reduced-motion: reduce) {
+    .info-coin-btn,
+    .about-dropdown {
+      transition: none;
+    }
+  }

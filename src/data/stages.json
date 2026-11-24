@@ -11,6 +11,7 @@
   "pages": [
     {
       "step": 0,
+      
       "background": "bg-0",
       "primaryComponent": {
         "type": "BookendScreen",
@@ -21,6 +22,7 @@
     },
     {
       "step": 1,
+      "levelName": "פתיחת יום כללי",
       "background": "bg-1",
       "primaryComponent": {
         "type": "SpeechBubble",
@@ -33,13 +35,14 @@
           },
           "tailTarget": {
             "x": "25%",
-            "y": "30%"
+            "y": "29%"
           }
         }
       }
     },
     {
       "step": 2,
+      "levelName": "קבלת דיווחים",
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -136,6 +139,7 @@
     },
     {
       "step": 3,
+      "levelName": "פריסת מעצרים",
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -217,6 +221,7 @@
     },
     {
       "id": 5,
+      "levelName": "עצור מצ”ח",
       "background": "bg-1",
       "primaryComponent": {
         "type": "FlipCards",
@@ -246,6 +251,7 @@
     },
     {
       "step": 6,
+      "levelName": "צוותי צח”ם",
       "background": "bg-1",
       "primaryComponent": {
         "type": "FlipCards",
@@ -278,6 +284,7 @@
     },
     {
       "step": 7,
+      "levelName": "פריסת מעצרי מצ”ח",
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -361,6 +368,7 @@
     },
     {
       "step": 8,
+      "levelName": "העצור שנלווה",
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -438,6 +446,7 @@
     },
     {
       "id": 10,
+      "levelName": "הערכות לפני יציאה לליוי",
       "background": "bg-1",
       "primaryComponent": {
         "type": "ChecklistScreen",
@@ -494,6 +503,7 @@
     },
     {
       "id": 11,
+      "levelName": "הערכות מצ”ח לפני יציאה לליוי",
       "background": "bg-1",
       "primaryComponent": {
         "type": "ChecklistScreen",
@@ -531,6 +541,7 @@
     },
     {
       "step": 12,
+      "levelName": null,
       "background": "bg-1",
       "primaryComponent": {
         "type": "SpeechBubble",
@@ -554,6 +565,7 @@
     },
     {
       "id": 13,
+      "levelName": "סגל המעצר",
       "background": "bg-2",
       "primaryComponent": {
         "type": "FlipCards",
@@ -605,6 +617,7 @@
     },
     {
       "id": 14,
+      "levelName": "פיקדונות",
       "background": "bg-3",
       "primaryComponent": {
         "type": "DepositsBtn",
@@ -688,6 +701,7 @@
     },
     {
       "id": 16,
+      "levelName": "חיפושים",
       "background": "bg-4",
       "primaryComponent": {
         "type": "ChecklistScreen",
@@ -729,6 +743,7 @@
     },
     {
       "step": 17,
+      "levelName": "אזיקה",
       "background": "bg-3",
       "primaryComponent": {
         "type": "FlipCards",
@@ -760,7 +775,7 @@
     },
     {
       "step": 18,
-      "background": "bg-1",
+      "background": "bg-3",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
@@ -795,6 +810,7 @@
     
     {
       "step": 19,
+      "levelName": "רכב",
       "background": "bg-5",
       "primaryComponent": {
         "type": "ParkingButton",
@@ -959,7 +975,7 @@
     },
     {
       "step": 20,
-      "background": "bg-1",
+      "background": "bg-5",
       "primaryComponent": {
         "type": "Tablet",
         "props": {
@@ -982,6 +998,7 @@
     },
     {
       "id": 21,
+      "levelName": "סיום איסוף",
       "background": "bg-3",
       "primaryComponent": {
         "type": "FlipCards",
@@ -1011,6 +1028,7 @@
     
     {
       "step": 22,
+      "levelName": "בעט בליווי",
       "background": "bg-1",
       "primaryComponent": {
         "type": "DrivingScreen",
@@ -1089,7 +1107,8 @@
       }
     },
     {
-      "step": 25,
+      "step": 24,
+      "levelName": "אחריות המלווים בקבלה",
       "background": "bg-1",
       "primaryComponent": {
         "type": "FlipCards",
@@ -1146,7 +1165,8 @@
     },
     
     {
-      "step": 26,
+      "step": 25,
+      "levelName": "דגשים לקבלה",
       "background": "whiteboard_frames",
       "primaryComponent": {
         "type": "WriteboardScreen",
@@ -1165,7 +1185,8 @@
       }
     },
     {
-      "step": 27,
+      "step": 26,
+      "levelName": "קליטת עצור מצ״ח",
       "background": "bg-1",
       "primaryComponent": {
         "type": "ChecklistScreen",
@@ -1211,7 +1232,7 @@
       }
     },
     {
-      "step": 28,
+      "step": 27,
       "background": "bg-1",
       "primaryComponent": {
         "type": "Tablet",
@@ -1256,7 +1277,7 @@
       }
     },
     {
-      "step": 29,
+      "step": 28,
       "background": "bg-10",
       "primaryComponent": {
         "type": "BookendScreen",
