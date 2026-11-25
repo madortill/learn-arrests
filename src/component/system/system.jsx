@@ -27,6 +27,8 @@ import About from '../About/About';
 import Levels, { LevelsBtn } from '../Levels/Levels';
 import ReturnBtn from '../ReturnBtn/ReturnBtn';
 
+import bgBookend from '../../assets/bg-bookend.png';
+import idfLogos from '../../assets/idf-logos.png';
 import bg1 from '../../assets/backgrounds/bg-1.png';
 import bg2 from '../../assets/backgrounds/bg-2.png';
 import bg3 from '../../assets/backgrounds/bg-3.png';
@@ -36,6 +38,23 @@ import bg6 from '../../assets/backgrounds/bg-6.png';
 import whiteboardFrames from '../../assets/backgrounds/whiteboard_frames.png';
 // כאשר תשני את שם קובץ הדמות, עדכני כאן את השם החדש:
 import characterImg from '../../assets/backgrounds/דמות.png';
+
+// מיפוי אוטומטי של כל קובצי התמונות ב-src/assets לטעינה מוקדמת (Preload)
+const bundledAssetModules = import.meta.glob(
+  '../../assets/**/*.{png,jpg,jpeg,webp,gif,svg}',
+  { eager: true, import: 'default' }
+);
+
+const bundledAssetsByFileName = Object.entries(bundledAssetModules).reduce(
+  (acc, [fullPath, resolvedUrl]) => {
+    const fileName = fullPath.split('/').pop();
+    if (fileName && typeof resolvedUrl === 'string') {
+      acc[fileName] = resolvedUrl;
+    }
+    return acc;
+  },
+  {}
+);
 
 // ==========================================
 // מיפוי קומפוננטות ורקעים
@@ -135,18 +154,130 @@ function extractStageTailTarget(stepData) {
 }
 
 // ==========================================
-// הגדרות מסדרון הדלתות, מעברים ושמירת התקדמות
+// הגדרות מסדרון הדלתות, מעברים, טעינה ושמירת התקדמות
 // ==========================================
 
 const DOORS_ENTRY_STAGE = 23;
 const DOORS_EXIT_STAGE = 28;
 const DOOR_STAGES = [24, 25, 26, 27];
-const TRANSITION_STAGES = [12, 21];
-const LOADING_DURATION_MS = 3000;
+const FIRST_TRANSITION_STAGE = 12;
+const SECOND_TRANSITION_STAGE = 21;
+const TRANSITION_STAGES = [FIRST_TRANSITION_STAGE, SECOND_TRANSITION_STAGE];
+const POST_LOAD_HOLD_MS = 1600; // מוצג לעוד 1.6 שניות גג לאחר סיום הטעינה בפועל
+const MAX_LOAD_TIMEOUT_MS = 7000;
 const PROGRESS_STORAGE_KEY = 'lomda-progress';
+
+const IMAGE_FILE_PATTERN = /\.(png|jpe?g|webp|gif|svg)$/i;
 
 const getStageNumber = (page, index) =>
   Number(page?.step ?? page?.id ?? index + 1);
+
+// סריקת כל שמות קובצי התמונות המוגדרים בתוך שלב ב-stages.json
+function extractImageUrlsFromObject(node, collectedSet) {
+  if (!node) return;
+
+  if (typeof node === 'string') {
+    const trimmed = node.trim();
+    if (IMAGE_FILE_PATTERN.test(trimmed)) {
+      const fileName = trimmed.split('/').pop();
+      const resolvedUrl = bundledAssetsByFileName[fileName];
+      if (resolvedUrl) {
+        collectedSet.add(resolvedUrl);
+      }
+    }
+    return;
+  }
+
+  if (Array.isArray(node)) {
+    node.forEach((item) => extractImageUrlsFromObject(item, collectedSet));
+    return;
+  }
+
+  if (typeof node === 'object') {
+    Object.values(node).forEach((value) =>
+      extractImageUrlsFromObject(value, collectedSet)
+    );
+  }
+}
+
+// איסוף כל הנכסים לטעינה מוקדמת עבור מקטע שלבים ספציפי
+function collectAssetsForSegment(pages, loadingStage) {
+  const urls = new Set();
+
+  const firstTransitionIdx = pages.findIndex(
+    (page, idx) => getStageNumber(page, idx) === FIRST_TRANSITION_STAGE
+  );
+  const secondTransitionIdx = pages.findIndex(
+    (page, idx) => getStageNumber(page, idx) === SECOND_TRANSITION_STAGE
+  );
+
+  let startIndex = 0;
+  let endIndex = pages.length - 1;
+
+  if (loadingStage === 'initial') {
+    startIndex = 0;
+    endIndex = firstTransitionIdx !== -1 ? firstTransitionIdx : pages.length - 1;
+    urls.add(bgBookend);
+    urls.add(idfLogos);
+  } else if (loadingStage === 'transition-1') {
+    startIndex = firstTransitionIdx !== -1 ? firstTransitionIdx + 1 : 0;
+    endIndex =
+      secondTransitionIdx !== -1 ? secondTransitionIdx : pages.length - 1;
+  } else if (loadingStage === 'transition-2') {
+    startIndex = secondTransitionIdx !== -1 ? secondTransitionIdx + 1 : 0;
+    endIndex = pages.length - 1;
+    urls.add(bgBookend);
+    urls.add(idfLogos);
+  }
+
+  const segmentPages = pages.slice(
+    Math.max(0, startIndex),
+    Math.max(0, endIndex + 1)
+  );
+
+  segmentPages.forEach((page) => {
+    const bgKey = page?.background;
+    if (bgKey && backgroundMap[bgKey]) {
+      urls.add(backgroundMap[bgKey]);
+    }
+    if (bgKey && CHARACTER_OVERLAY_BACKGROUNDS.includes(bgKey)) {
+      urls.add(characterImg);
+    }
+    if (page?.primaryComponent?.type === 'BookendScreen') {
+      urls.add(bgBookend);
+      urls.add(idfLogos);
+    }
+
+    extractImageUrlsFromObject(page?.primaryComponent, urls);
+    extractImageUrlsFromObject(page?.secondaryComponent, urls);
+  });
+
+  return Array.from(urls);
+}
+
+// טעינה ופענוח אמיתי של תמונה בודדת בזיכרון הדפדפן
+function preloadSingleImage(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = url;
+
+    const finish = () => {
+      if (typeof img.decode === 'function') {
+        img.decode().catch(() => {}).finally(resolve);
+      } else {
+        resolve();
+      }
+    };
+
+    if (img.complete) {
+      finish();
+      return;
+    }
+
+    img.onload = finish;
+    img.onerror = () => resolve();
+  });
+}
 
 const loadSavedProgress = (totalPages) => {
   try {
@@ -246,10 +377,11 @@ export default function System() {
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [isLevelsOpen, setIsLevelsOpen] = useState(false);
 
-  // מסכי טעינה ומעבר (מדלג על טעינה ראשונית כשחוזרים מהתקדמות שמורה)
-  const [loadingType, setLoadingType] = useState(() =>
+  // מסכי טעינה ומעבר אמיתיים ('initial' | 'transition-1' | 'transition-2' | null)
+  const [loadingStage, setLoadingStage] = useState(() =>
     initialSaved ? null : 'initial'
   );
+  const [loadingProgress, setLoadingProgress] = useState(0);
   const [pendingStep, setPendingStep] = useState(null);
 
   // מסדרון הדלתות (מופיע בין שלב 23 לשלב 24, וכולל את שלבים 24-27)
@@ -360,19 +492,27 @@ export default function System() {
 
   // אינדקסים של מסדרון הדלתות
   const doorsEntryIndex = useMemo(
-    () => pages.findIndex((page, idx) => getStageNumber(page, idx) === DOORS_ENTRY_STAGE),
+    () =>
+      pages.findIndex(
+        (page, idx) => getStageNumber(page, idx) === DOORS_ENTRY_STAGE
+      ),
     [pages]
   );
 
   const doorsExitIndex = useMemo(
-    () => pages.findIndex((page, idx) => getStageNumber(page, idx) === DOORS_EXIT_STAGE),
+    () =>
+      pages.findIndex(
+        (page, idx) => getStageNumber(page, idx) === DOORS_EXIT_STAGE
+      ),
     [pages]
   );
 
   // סטטוס השלמת כל דלת (שלבים 24-27)
   const completedDoorStages = useMemo(() => {
     return DOOR_STAGES.reduce((acc, stageNum) => {
-      const stageIdx = pages.findIndex((page, idx) => getStageNumber(page, idx) === stageNum);
+      const stageIdx = pages.findIndex(
+        (page, idx) => getStageNumber(page, idx) === stageNum
+      );
       acc[stageNum] = stageIdx !== -1 && completedSteps.includes(stageIdx);
       return acc;
     }, {});
@@ -410,10 +550,12 @@ export default function System() {
   const checklistCheckedItems = checklistProgress[currentStep] || {};
   const checklistHasInteracted = checklistStartedSteps.includes(currentStep);
 
-  const tabletSubType = primaryData?.props?.type || primaryData?.props?.tabletType;
+  const tabletSubType =
+    primaryData?.props?.type || primaryData?.props?.tabletType;
   const isTabletStep = primaryData?.type === 'Tablet';
   const isWhatsAppStep = isTabletStep && tabletSubType === 'WhatsAppChat';
-  const isPrisonerWhatsAppStep = isWhatsAppStep && Number(primaryData?.props?.part) === 2;
+  const isPrisonerWhatsAppStep =
+    isWhatsAppStep && Number(primaryData?.props?.part) === 2;
   const isLocationMapStep = isTabletStep && tabletSubType === 'LocationMap';
   const isQuizStep = isTabletStep && tabletSubType === 'QuizScreen';
 
@@ -425,7 +567,8 @@ export default function System() {
     Boolean(currentParkingState.isGateOpened);
   const isParkingModalOpen =
     isParkingStep &&
-    (Boolean(currentParkingState.isLockModalOpen) || Boolean(currentParkingState.activeVehicleId));
+    (Boolean(currentParkingState.isLockModalOpen) ||
+      Boolean(currentParkingState.activeVehicleId));
   const isParkingScreenOpen =
     isParkingStep &&
     (Boolean(currentParkingState.isGateOpened) || isCompleted);
@@ -445,13 +588,11 @@ export default function System() {
     const tailTarget = extractStageTailTarget(stepData);
     const isBg3 = currentBackgroundKey === 'bg-3';
 
-    // ברקע 3 הדמות גדולה יותר (כ-86% מגובה המסך), וברקע 5 נשארת על 75%
     const heightRatio = isBg3 ? 0.86 : 0.75;
     const maxWidthRatio = isBg3 ? 0.5 : 0.44;
     const charHeight = Math.min(vh * heightRatio, vw * maxWidthRatio);
     const charWidth = charHeight * (341 / 850);
 
-    // נקודת ברירת מחדל אם לא הוגדר tailTarget בשלב
     const targetX = tailTarget
       ? parseCoordinateX(tailTarget.x, vw)
       : vw * 0.25;
@@ -459,14 +600,12 @@ export default function System() {
       ? resolveCalibratedTailY(tailTarget.y, vw, vh)
       : (getCalibratedTailYPercent(28, vw, vh) / 100) * vh;
 
-    // מרווח של כמה פיקסלים ימינה מהפה כדי שקצה הבועה לא יגע ישירות בפה
     const mouthGapX = Math.max(12, Math.round(vw * 0.012));
     const mouthGapY = Math.round(vh * 0.004);
 
     const rawLeft = targetX - mouthGapX - charWidth * CHARACTER_MOUTH_ANCHOR.x;
     const rawTop = targetY - mouthGapY - charHeight * CHARACTER_MOUTH_ANCHOR.y;
 
-    // הגבלה עדינה כדי שהדמות לא תיחתך מחוץ לגבולות המסך
     const minTop = isBg3 ? vh * 0.02 : vh * 0.04;
     const clampedLeft = Math.max(
       -charWidth * 0.12,
@@ -485,27 +624,83 @@ export default function System() {
     };
   }, [showCharacterOverlay, viewportSize, stepData, currentBackgroundKey]);
 
-  // טיימר טעינה ראשונית
+  // ==========================================
+  // טעינה מוקדמת אמיתית לפי מקטעים + השהיית סיום עד 2 שניות
+  // ==========================================
+
   useEffect(() => {
-    if (loadingType !== 'initial') return;
-    const timer = setTimeout(() => setLoadingType(null), LOADING_DURATION_MS);
-    return () => clearTimeout(timer);
-  }, [loadingType]);
+    if (!loadingStage) return;
 
-  // טיימר מסך מעבר בין פרקים
-  useEffect(() => {
-    if (loadingType !== 'transition' || pendingStep === null) return;
+    let isCancelled = false;
+    let holdTimer = null;
+    let safetyTimer = null;
 
-    const timer = setTimeout(() => {
-      setMaxUnlockedStep((prev) => Math.max(prev, pendingStep));
-      setCurrentStep(pendingStep);
-      setContinueSignal(0);
-      setPendingStep(null);
-      setLoadingType(null);
-    }, LOADING_DURATION_MS);
+    setLoadingProgress(0);
 
-    return () => clearTimeout(timer);
-  }, [loadingType, pendingStep]);
+    const imageUrls = collectAssetsForSegment(pages, loadingStage);
+    const includeFonts = loadingStage === 'initial' && Boolean(document.fonts?.ready);
+    const totalTasks = imageUrls.length + (includeFonts ? 1 : 0);
+    let completedTasks = 0;
+
+    const finishLoading = () => {
+      if (isCancelled) return;
+      clearTimeout(safetyTimer);
+      setLoadingProgress(100);
+
+      holdTimer = setTimeout(() => {
+        if (isCancelled) return;
+
+        if (loadingStage !== 'initial' && pendingStep !== null) {
+          setMaxUnlockedStep((prev) => Math.max(prev, pendingStep));
+          setCurrentStep(pendingStep);
+          setContinueSignal(0);
+          setPendingStep(null);
+        }
+
+        setLoadingStage(null);
+      }, POST_LOAD_HOLD_MS);
+    };
+
+    const reportTaskDone = () => {
+      if (isCancelled) return;
+      completedTasks += 1;
+      const nextPercent =
+        totalTasks > 0
+          ? Math.min(100, Math.round((completedTasks / totalTasks) * 100))
+          : 100;
+      setLoadingProgress(nextPercent);
+
+      if (completedTasks >= totalTasks) {
+        finishLoading();
+      }
+    };
+
+    if (totalTasks === 0) {
+      finishLoading();
+      return () => {
+        isCancelled = true;
+        clearTimeout(holdTimer);
+      };
+    }
+
+    safetyTimer = setTimeout(() => {
+      finishLoading();
+    }, MAX_LOAD_TIMEOUT_MS);
+
+    if (includeFonts) {
+      document.fonts.ready.catch(() => {}).finally(reportTaskDone);
+    }
+
+    imageUrls.forEach((url) => {
+      preloadSingleImage(url).finally(reportTaskDone);
+    });
+
+    return () => {
+      isCancelled = true;
+      clearTimeout(holdTimer);
+      clearTimeout(safetyTimer);
+    };
+  }, [loadingStage, pages, pendingStep]);
 
   // ==========================================
   // פעולות השלמה וניווט
@@ -564,7 +759,8 @@ export default function System() {
     (updater) => {
       setParkingProgress((prev) => {
         const current = prev[currentStep] || {};
-        const nextState = typeof updater === 'function' ? updater(current) : updater;
+        const nextState =
+          typeof updater === 'function' ? updater(current) : updater;
         return {
           ...prev,
           [currentStep]: nextState,
@@ -589,7 +785,11 @@ export default function System() {
       if (stageNumber === 25 && !completedDoorStages[24]) return;
       if (
         stageNumber === 27 &&
-        !(completedDoorStages[24] && completedDoorStages[25] && completedDoorStages[26])
+        !(
+          completedDoorStages[24] &&
+          completedDoorStages[25] &&
+          completedDoorStages[26]
+        )
       ) {
         return;
       }
@@ -659,8 +859,13 @@ export default function System() {
     }
 
     if (TRANSITION_STAGES.includes(activeStageNumber)) {
+      const nextTransitionStage =
+        activeStageNumber === FIRST_TRANSITION_STAGE
+          ? 'transition-1'
+          : 'transition-2';
+
       setPendingStep(nextStep);
-      setLoadingType('transition');
+      setLoadingStage(nextTransitionStage);
       return;
     }
 
@@ -758,7 +963,7 @@ export default function System() {
     setActiveDoorStage(null);
 
     setPendingStep(null);
-    setLoadingType('initial');
+    setLoadingStage('initial');
   }, [closeFloatingPanels]);
 
   // לחיצה על כפתור ההמשך הגלובלי
@@ -780,8 +985,8 @@ export default function System() {
   // תצוגת מסך טעינה
   // ==========================================
 
-  if (loadingType) {
-    return <LoadingScreen type={loadingType} />;
+  if (loadingStage) {
+    return <LoadingScreen stage={loadingStage} progress={loadingProgress} />;
   }
 
   // ==========================================
@@ -847,10 +1052,7 @@ export default function System() {
         />
 
         {showLevelsBtn && (
-          <LevelsBtn
-            isOpen={isLevelsOpen}
-            onClick={handleToggleLevels}
-          />
+          <LevelsBtn isOpen={isLevelsOpen} onClick={handleToggleLevels} />
         )}
       </div>
 
