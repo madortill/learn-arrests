@@ -14,7 +14,7 @@ import './LocationMap.css';
 // יצירת מפתח ייחודי לכל כרטיסייה ברשימה (תומך גם ב-id משותף לכמה מקומות)
 const getLocationKey = (loc, index) => `${loc.id}_${loc.mainName}_${index}`;
 
-// קיבוץ מיקומים שחולקים את אותה נקודה על המפה (לפי x,y או id זהה)
+// קיבוץ מיקומים שחולקים את אותה נקודה על המפה (לפי x,y)
 const getPinGroupKey = (loc) => `${loc.x}_${loc.y}`;
 
 export default function LocationMap({
@@ -35,6 +35,11 @@ export default function LocationMap({
       pinGroupKey: getPinGroupKey(loc),
     }));
   }, [locations]);
+
+  // רשימת כל הנקודות שיש להן הודעת דגש חשוב אישית
+  const locationsWithImportantPoint = useMemo(() => {
+    return normalizedLocations.filter((loc) => Boolean(loc.importantPoint));
+  }, [normalizedLocations]);
 
   // יצירת רשימת סיכות ייחודיות למפה (סיכה אחת לכל נקודת x,y)
   const mapPins = useMemo(() => {
@@ -68,22 +73,39 @@ export default function LocationMap({
     return [];
   }, [isCompleted, normalizedLocations, savedStepState]);
 
+  const initialConfirmedPopupKeys = useMemo(() => {
+    if (
+      Array.isArray(savedStepState?.confirmedPopupKeys) &&
+      savedStepState.confirmedPopupKeys.length > 0
+    ) {
+      return savedStepState.confirmedPopupKeys;
+    }
+    if (isCompleted && locationsWithImportantPoint.length > 0) {
+      return locationsWithImportantPoint.map((loc) => loc.uniqueKey);
+    }
+    return [];
+  }, [isCompleted, locationsWithImportantPoint, savedStepState]);
+
   const [visitedKeys, setVisitedKeys] = useState(initialVisitedKeys);
+  const [confirmedPopupKeys, setConfirmedPopupKeys] = useState(
+    initialConfirmedPopupKeys
+  );
   const [hasClickedAny, setHasClickedAny] = useState(() =>
     Boolean(
       isCompleted ||
-      savedStepState?.hasClickedAny ||
-      initialVisitedKeys.length > 0
+        savedStepState?.hasClickedAny ||
+        initialVisitedKeys.length > 0
     )
   );
 
-  const [activePopupText, setActivePopupText] = useState(null);
-  const [popupTitle, setPopupTitle] = useState('דגשים חשובים');
+  // תור של הודעות דגש חשוב לאישור (תומך גם במספר מקומות על אותה נקודה)
+  const [popupQueue, setPopupQueue] = useState([]);
   const [isGeneralPopupOpen, setIsGeneralPopupOpen] = useState(false);
 
   const sidebarListRef = useRef(null);
   const prevVisitedCountRef = useRef(initialVisitedKeys.length);
   const completionNotifiedRef = useRef(Boolean(isCompleted));
+  const lastContinueSignalRef = useRef(continueSignal);
 
   // התמונה של "לחץ על המיקום" תמיד על הסיכה הראשונה ברשימה
   const firstPinGroupKey = mapPins[0]?.pinGroupKey ?? null;
@@ -96,7 +118,7 @@ export default function LocationMap({
     return nextPin ? nextPin.pinGroupKey : null;
   });
 
-  // סנכרון התחלתי כאשר רשימת המיקומים נטענת או משתנה
+  // סנכרון התחלתי כאשר רשימת המיקומים נטענת
   useEffect(() => {
     if (!isCompleted && visitedKeys.length === 0) {
       setPulsingPinKey(firstPinGroupKey);
@@ -107,6 +129,16 @@ export default function LocationMap({
     normalizedLocations.length > 0 &&
     normalizedLocations.every((loc) => visitedKeys.includes(loc.uniqueKey));
 
+  const isAllPopupsConfirmed = locationsWithImportantPoint.every((loc) =>
+    confirmedPopupKeys.includes(loc.uniqueKey)
+  );
+
+  const isReadyToComplete =
+    isAllVisited &&
+    isAllPopupsConfirmed &&
+    popupQueue.length === 0 &&
+    !isGeneralPopupOpen;
+
   // תמיכה בחזרה לשלב שכבר הושלם (מבלי לדרוס את סדר הלחיצות הקיים)
   useEffect(() => {
     if (
@@ -115,37 +147,38 @@ export default function LocationMap({
       visitedKeys.length < normalizedLocations.length
     ) {
       setVisitedKeys(normalizedLocations.map((loc) => loc.uniqueKey));
+      setConfirmedPopupKeys(
+        locationsWithImportantPoint.map((loc) => loc.uniqueKey)
+      );
       setHasClickedAny(true);
       setPulsingPinKey(null);
     }
-  }, [isCompleted, normalizedLocations, visitedKeys.length]);
-
-  // הקפצת דגש כללי בלחיצה על "המשך" בסיום (כמו בשלב 3)
-  useEffect(() => {
-    if (
-      continueSignal > 0 &&
-      isAllVisited &&
-      generalImportantPoint &&
-      !isGeneralPopupOpen
-    ) {
-      setPopupTitle('דגשים חשובים');
-      setActivePopupText(generalImportantPoint);
-      setIsGeneralPopupOpen(true);
-    }
   }, [
-    continueSignal,
-    isAllVisited,
-    generalImportantPoint,
-    isGeneralPopupOpen,
+    isCompleted,
+    normalizedLocations,
+    locationsWithImportantPoint,
+    visitedKeys.length,
   ]);
 
-  // דיווח ל-System שכל המיקומים נצפו
+  // הקפצת דגש כללי בלחיצה על כפתור ההמשך הגלובלי בסיום (כמו בשלב 3)
   useEffect(() => {
-    if (isAllVisited && !completionNotifiedRef.current) {
+    if (
+      continueSignal > lastContinueSignalRef.current &&
+      isReadyToComplete &&
+      generalImportantPoint
+    ) {
+      lastContinueSignalRef.current = continueSignal;
+      setIsGeneralPopupOpen(true);
+    }
+  }, [continueSignal, isReadyToComplete, generalImportantPoint]);
+
+  // דיווח ל-System להציג את כפתור ההמשך הגלובלי רק אחרי מעבר על כל הנקודות ואישור כל הודעותיהן
+  useEffect(() => {
+    if (isReadyToComplete && !completionNotifiedRef.current) {
       completionNotifiedRef.current = true;
       onComplete?.();
     }
-  }, [isAllVisited, onComplete]);
+  }, [isReadyToComplete, onComplete]);
 
   // גלילה אוטומטית מטה בכל פעם שנוספים מקומות חדשים לרשימה
   useEffect(() => {
@@ -178,6 +211,7 @@ export default function LocationMap({
     setHasClickedAny(true);
     onSaveStepState?.({
       visitedKeys: nextVisitedKeys,
+      confirmedPopupKeys,
       hasClickedAny: true,
     });
 
@@ -188,36 +222,64 @@ export default function LocationMap({
 
     setPulsingPinKey(nextUnvisitedPin ? nextUnvisitedPin.pinGroupKey : null);
 
-    // בדיקה אם לאחד המקומות בנקודה יש דגש חשוב ספציפי
-    const itemWithImportantPoint = pinGroup.items.find(
-      (item) => item.importantPoint
+    // פתיחת חלוניות דגש חשוב עבור כל המקומות בנקודה שיש להם הודעה
+    const itemsWithImportantPoint = pinGroup.items.filter((item) =>
+      Boolean(item.importantPoint)
     );
-    if (itemWithImportantPoint) {
-      setPopupTitle('דגשים חשובים');
-      setActivePopupText(itemWithImportantPoint.importantPoint);
+    if (itemsWithImportantPoint.length > 0) {
       setIsGeneralPopupOpen(false);
+      setPopupQueue(
+        itemsWithImportantPoint.map((item) => ({
+          uniqueKey: item.uniqueKey,
+          text: item.importantPoint,
+        }))
+      );
     }
   };
 
   // לחיצה על כרטיסייה קיימת ברשימה שבצד
   const handleSidebarItemClick = (loc) => {
     if (loc.importantPoint) {
-      setPopupTitle('דגשים חשובים');
-      setActivePopupText(loc.importantPoint);
       setIsGeneralPopupOpen(false);
+      setPopupQueue([
+        {
+          uniqueKey: loc.uniqueKey,
+          text: loc.importantPoint,
+        },
+      ]);
     }
   };
 
+  // אישור וסגירת חלונית הודעה
   const handleClosePopup = () => {
-    const wasGeneralPopup = isGeneralPopupOpen;
-
-    setActivePopupText(null);
-    setIsGeneralPopupOpen(false);
-
-    if (wasGeneralPopup) {
+    if (isGeneralPopupOpen) {
+      setIsGeneralPopupOpen(false);
       onNext?.();
+      return;
+    }
+
+    const currentPopup = popupQueue[0];
+    if (currentPopup) {
+      const nextConfirmedKeys = confirmedPopupKeys.includes(
+        currentPopup.uniqueKey
+      )
+        ? confirmedPopupKeys
+        : [...confirmedPopupKeys, currentPopup.uniqueKey];
+
+      setConfirmedPopupKeys(nextConfirmedKeys);
+      setPopupQueue((prev) => prev.slice(1));
+
+      onSaveStepState?.({
+        visitedKeys,
+        confirmedPopupKeys: nextConfirmedKeys,
+        hasClickedAny: true,
+      });
     }
   };
+
+  const activePopupText = isGeneralPopupOpen
+    ? generalImportantPoint
+    : popupQueue[0]?.text ?? null;
 
   return (
     <div className="location-map-container">
@@ -343,7 +405,7 @@ export default function LocationMap({
       {/* חלון דגשים חשובים */}
       {activePopupText && (
         <ImportantPoints
-          title={popupTitle}
+          title="דגשים חשובים"
           text={activePopupText}
           icon={warningEmojiIcon}
           onClose={handleClosePopup}

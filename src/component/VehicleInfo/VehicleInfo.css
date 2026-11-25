@@ -5,7 +5,7 @@
   height: 100vh;
   height: 100dvh;
 
-  z-index: 110;
+  z-index: 650;
   isolation: isolate;
 
   display: flex;
@@ -13,49 +13,79 @@
   align-items: flex-start;
   padding-top: clamp(72px, 11vh, 130px);
 
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5);
   box-sizing: border-box;
   direction: rtl;
 }
 
 /* ==========================================
-   תמונת הרכב הנבחר (z-index: 15)
-   תואמת בגודל ובמיקום ל-ParkingScreen (ורכב 3 משוקף)
+   חיצי ניווט קרוסלה - מותאמים לקצוות המסך גם במסכים רחבים
+========================================== */
+
+.vehicle-info-overlay .carousel-nav-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 95;
+}
+
+.vehicle-info-overlay .carousel-nav-arrow.right-arrow {
+  right: clamp(16px, 2.2vw, 44px);
+  left: auto;
+}
+
+.vehicle-info-overlay .carousel-nav-arrow.left-arrow {
+  left: clamp(16px, 2.2vw, 44px);
+  right: auto;
+}
+
+/* ==========================================
+   תמונת הרכב הנבחר
+   כל 4 הרכבים באותו גודל ובאותו מיקום בדיוק כמו ב-ParkingScreen:
+   - רכבים 1 ו-4 מעל הדיב הצהוב (z-index: 10)
+   - רכבים 2 ו-3 מתחת לדיב הצהוב (z-index: 1)
 ========================================== */
 
 .vehicle-active-car-img {
   position: fixed;
-  z-index: 15;
   height: auto;
   object-fit: contain;
   pointer-events: none;
+
+  transform-origin: center bottom;
+  transform: scaleY(var(--parking-vertical-stretch, 1));
 }
 
+/* רכב 1 - מעל הדיב הצהוב */
 .vehicle-active-car-img.car-pos-v1 {
-  bottom: var(--v1-bottom);
-  left: var(--v1-left);
-  width: var(--v1-width);
+  z-index: 10;
+  width: var(--measured-car-width, 26.5vw);
+  right: var(--measured-car-right, 4%);
+  bottom: var(--measured-car-bottom, var(--parking-row-bottom, 23.5%));
 }
 
+/* רכב 2 - באותו גודל ומיקום כמו ב-ParkingScreen, מתחת לדיב הצהוב */
 .vehicle-active-car-img.car-pos-v2 {
-  bottom: var(--v2-bottom);
-  left: var(--v2-left);
-  width: var(--v2-width);
+  z-index: 1;
+  width: var(--measured-car-width, 22vw);
+  right: var(--measured-car-right, 26%);
+  bottom: var(--measured-car-bottom, var(--parking-row-bottom, 23.5%));
 }
 
+/* רכב 3 - באותו גודל ומיקום כמו ב-ParkingScreen, מתחת לדיב הצהוב */
 .vehicle-active-car-img.car-pos-v3 {
-  bottom: var(--v3-bottom);
-  right: var(--v3-right);
-  width: var(--v3-width);
-  transform: scaleX(-1);
+  z-index: 1;
+  width: var(--measured-car-width, 22vw);
+  left: var(--measured-car-left, 26%);
+  bottom: var(--measured-car-bottom, var(--parking-row-bottom, 23.5%));
 }
 
+/* רכב 4 - מעל הדיב הצהוב */
 .vehicle-active-car-img.car-pos-v4 {
-  bottom: var(--v4-bottom);
-  right: var(--v4-right);
-  width: var(--v4-width);
+  z-index: 10;
+  width: var(--measured-car-width, 26.5vw);
+  left: var(--measured-car-left, 4%);
+  bottom: var(--measured-car-bottom, var(--parking-row-bottom, 23.5%));
 }
 
 /* ==========================================
@@ -88,11 +118,11 @@
   box-sizing: border-box;
 }
 
-/* רקע הדיב הצהוב (z-index: 1) */
+/* רקע הדיב הצהוב (z-index: 2 - מעל רכבים 2 ו-3 ומתחת לרכבים 1 ו-4) */
 .vehicle-yellow-bg {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
 
   background: #d4a34b;
   border-radius: 24px;
@@ -100,12 +130,12 @@
   pointer-events: none;
 }
 
-/* כפתור סגירה X בצד ימין */
+/* כפתור סגירה X בצד ימין - מעל כל השכבות כולל ChecklistScreen */
 .vehicle-close-btn {
   position: absolute;
   top: clamp(14px, 1.8vh, 22px);
   right: clamp(16px, 1.6vw, 24px);
-  z-index: 30;
+  z-index: 100;
 
   width: clamp(34px, 2.8vw, 44px);
   height: clamp(34px, 2.8vw, 44px);
@@ -124,6 +154,7 @@
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
+  pointer-events: auto;
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
@@ -135,7 +166,7 @@
 /* זרימת הטקסט שקובעת את גובה הדיב הצהוב */
 .vehicle-text-flow {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
   width: 100%;
   display: flex;
@@ -149,7 +180,7 @@
   pointer-events: none;
 }
 
-/* זרימה אנכית לשקופיות שאינן טקסט: כותרת -> כותרת משנה -> טקסט -> מרווח -> סדר ישיבה */
+/* זרימה אנכית לשקופיות שאינן טקסט */
 .vehicle-slide-overlay-flow {
   position: absolute;
   top: 0;
@@ -166,7 +197,7 @@
 
 .vehicle-header-block {
   position: relative;
-  z-index: 2;
+  z-index: 3;
 
   width: 100%;
   display: flex;
@@ -235,7 +266,7 @@
 }
 
 /* ==========================================
-   שכבת סדר הישיבה (z-index: 25 - מעל תמונת הרכב, עם מרווח ברור מהטקסט)
+   שכבת סדר הישיבה (z-index: 25)
 ========================================== */
 
 .vehicle-seats-layer {
@@ -249,29 +280,41 @@
 }
 
 /* ==========================================
-   שכבת צ'קליסט רגיל במרכז (z-index: 25)
-   שומרת על הפרופורציות הרגילות ומנגנון הגלילה הקיים
+   שכבת צ'קליסט מעל הדיב הצהוב והרכבים (z-index: 30)
+   ומתחת לכפתור הסגירה X (z-index: 100) ולחיצי הניווט (z-index: 95)
 ========================================== */
 
 .vehicle-checklist-fullscreen-layer {
   position: fixed;
   inset: 0;
-  z-index: 25;
+  z-index: 30;
   pointer-events: none;
 }
 
+.vehicle-checklist-fullscreen-layer > *,
+.vehicle-checklist-fullscreen-layer .checklist-container {
+  position: relative;
+  z-index: 30;
+}
+
 .vehicle-checklist-fullscreen-layer .checklist-scroll-area {
+  position: relative;
+  z-index: 30;
   padding-top: clamp(210px, 28vh, 300px);
   padding-bottom: 14vh;
 }
 
 /* ==========================================
-   תרשימי הישיבה (z-index: 25)
+   תרשימי הישיבה
 ========================================== */
 
 .vehicle-diagram-shell {
   position: relative;
   z-index: 25;
+
+  width: min(720px, 78vw);
+  height: clamp(260px, 38vh, 390px);
+  padding: clamp(18px, 2.4vw, 30px) clamp(20px, 2.8vw, 36px);
 
   background: #FAF5F0;
   border-radius: clamp(28px, 3vw, 44px);
@@ -280,10 +323,19 @@
   direction: ltr;
 }
 
+.seats-dynamic-grid {
+  width: 100%;
+  height: 100%;
+
+  display: grid;
+  column-gap: clamp(8px, 1.2vw, 18px);
+  row-gap: clamp(6px, 1vh, 14px);
+}
+
 .seat-card {
   width: 100%;
   height: 100%;
-  min-height: 44px;
+  min-height: 0;
   perspective: 1000px;
   cursor: pointer;
   user-select: none;
@@ -328,15 +380,10 @@
   transform: rotateY(180deg);
 }
 
-.seat-outlined .seat-front,
-.seat-outlined .seat-back {
-  border: 1px solid #7A4B18;
-}
-
 .seat-label-text {
   font-family: 'Rubik', sans-serif;
   font-weight: 500;
-  font-size: clamp(13px, 1.67vw, 24px);
+  font-size: clamp(12px, 1.5vw, 22px);
   line-height: 1.08;
   letter-spacing: 0;
   text-align: center;
@@ -363,74 +410,7 @@
   border-radius: 4px 4px 0 0;
 }
 
-/* 1. תרשים מיניבוס */
-.diagram-minibus {
-  width: min(880px, 84vw);
-  aspect-ratio: 2.2 / 1;
-  max-height: 44vh;
-  padding: clamp(12px, 1.8vw, 22px) clamp(14px, 2vw, 26px);
-}
-
-.minibus-grid {
-  width: 100%;
-  height: 100%;
-
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  grid-template-rows: repeat(8, minmax(0, 1fr));
-  column-gap: clamp(6px, 1vw, 14px);
-  row-gap: clamp(4px, 0.7vh, 10px);
-}
-
-.diagram-minibus .seat-card {
-  min-height: 0;
-}
-
-.diagram-minibus .seat-label-text {
-  font-size: clamp(11px, 1.35vw, 20px);
-}
-
-/* 2. תרשים רכב 9 מקומות */
-.diagram-nine-seater {
-  width: min(620px, 76vw);
-  aspect-ratio: 1.45 / 1;
-  max-height: 44vh;
-  padding: clamp(16px, 2.2vw, 28px) clamp(18px, 2.6vw, 34px);
-}
-
-.nine-seater-grid {
-  width: 100%;
-  height: 100%;
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: clamp(10px, 1.6vw, 22px);
-}
-
-.door-nine-top {
-  left: 81%;
-  transform: translateX(-50%);
-}
-
-.door-nine-bottom-front {
-  left: 81%;
-  transform: translateX(-50%);
-}
-
-.door-nine-bottom-mid {
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-/* 3. תרשים קיה סורנטו */
-.diagram-sorento {
-  width: min(620px, 76vw);
-  aspect-ratio: 1.8 / 1;
-  max-height: 42vh;
-  padding: clamp(16px, 2.2vw, 26px) clamp(20px, 2.8vw, 36px);
-}
-
+/* תרשים קיה סורנטו */
 .sorento-grid {
   width: 100%;
   height: 100%;
@@ -460,23 +440,8 @@
   box-sizing: border-box;
 }
 
-.door-sorento-top {
-  left: 73%;
-  transform: translateX(-50%);
-}
-
-.door-sorento-bottom-front {
-  left: 73%;
-  transform: translateX(-50%);
-}
-
-.door-sorento-bottom-cage {
-  left: 38%;
-  transform: translateX(-50%);
-}
-
 /* ==========================================
-   נקודות ניווט וכפתור חזרה למגרש מחוץ לדיב הצהוב
+   נקודות ניווט מוגדלות וכפתור חזרה למגרש
 ========================================== */
 
 .vehicle-carousel-dots {
@@ -484,22 +449,24 @@
   bottom: clamp(84px, 10.5vh, 118px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 95;
 
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: clamp(12px, 1.1vw, 18px);
 }
 
 .vehicle-carousel-dots span {
-  width: 13px;
-  height: 13px;
+  width: clamp(18px, 1.45vw, 24px);
+  height: clamp(18px, 1.45vw, 24px);
   border-radius: 50%;
   background: #a88133;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .vehicle-carousel-dots span.active {
   background: #fff0c2;
+  transform: scale(1.08);
 }
 
 .vehicle-continue-btn {
@@ -507,7 +474,7 @@
   bottom: clamp(18px, 2.8vh, 36px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 95;
 
   display: inline-flex;
   align-items: center;
@@ -576,9 +543,7 @@
     margin-top: 16px;
   }
 
-  .diagram-minibus,
-  .diagram-nine-seater,
-  .diagram-sorento {
-    max-height: 38vh;
+  .vehicle-diagram-shell {
+    height: clamp(210px, 34vh, 290px);
   }
 }

@@ -1,13 +1,11 @@
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './ParkingScreen.css';
 
 import VehicleInfo from '../VehicleInfo/VehicleInfo';
 import SpeechBubble from '../SpeechBubble/SpeechBubble';
 
-import parkingLotBg from '../../assets/parking/parking_lot_bg.png';
+import parkingLotBg from '../../assets/parking/parking_lot_bg.jpg';
 import lockCornerBtn from '../../assets/parking/padlock.png';
-import checkmarkIcon from '../../assets/checkmark.png';
 
 const parkingAssets = import.meta.glob('../../assets/parking/*', {
   eager: true,
@@ -37,6 +35,10 @@ export default function ParkingScreen({
   onParkingStateChange,
 }) {
   const screenRef = useRef(null);
+  const vehicleBtnRefs = useRef({});
+
+  const [naturalWidths, setNaturalWidths] = useState({});
+  const [vehicleMetrics, setVehicleMetrics] = useState({});
 
   const activeVehicleId = parkingState.activeVehicleId || null;
   const completedVehicles = parkingState.completedVehicles || {};
@@ -46,35 +48,61 @@ export default function ParkingScreen({
   const activeVehicle =
     vehicles.find((vehicle) => vehicle.id === activeVehicleId) || null;
 
-  // התאמת המתיחה האנכית של הרכבים למתיחה של הרקע.
-  // מסך הייחוס: 1440x900.
+  // חישוב מידות ומיקום מדויקים של כל רכב בשורה לצורך סנכרון מלא עם VehicleInfo
+  const measureVehicles = useCallback(() => {
+    const screenEl = screenRef.current;
+    if (!screenEl) return;
+
+    const screenRect = screenEl.getBoundingClientRect();
+    const nextMetrics = {};
+
+    vehicles.forEach((vehicle) => {
+      const btnEl = vehicleBtnRefs.current[vehicle.id];
+      if (!btnEl) return;
+
+      const rect = btnEl.getBoundingClientRect();
+      if (rect.width <= 0) return;
+
+      nextMetrics[vehicle.id] = {
+        width: rect.width,
+        left: rect.left - screenRect.left,
+        right: screenRect.right - rect.right,
+        bottom: screenRect.bottom - rect.bottom,
+      };
+    });
+
+    setVehicleMetrics(nextMetrics);
+  }, [vehicles]);
+
+  // מניעת מתיחה אנכית של הרכבים במסכים גבוהים/ארוכים
   useEffect(() => {
     const updateScreenScale = () => {
       if (!screenRef.current) return;
 
       const widthScale = window.innerWidth / 1440;
-      const heightScale = window.innerHeight / 900;
+      const heightScale = window.innerHeight / 1024;
+      const rawStretch = widthScale > 0 ? heightScale / widthScale : 1;
 
       const verticalStretch =
-        widthScale > 0 ? heightScale / widthScale : 1;
+        rawStretch >= 1 ? 1 : Math.max(rawStretch, 0.92);
 
       screenRef.current.style.setProperty(
         '--parking-vertical-stretch',
         verticalStretch
       );
+
+      measureVehicles();
     };
 
     updateScreenScale();
-
     window.addEventListener('resize', updateScreenScale);
 
     return () => {
       window.removeEventListener('resize', updateScreenScale);
     };
-  }, []);
+  }, [measureVehicles, naturalWidths]);
 
-  // בחירת רכב אקראי אחד בלבד להבהוב.
-  // הבחירה נשמרת ב-parkingState.
+  // בחירת רכב אקראי אחד בלבד להבהוב מתוך הרכבים שטרם הושלמו
   useEffect(() => {
     if (!vehicles.length || !onParkingStateChange) return;
 
@@ -86,10 +114,8 @@ export default function ParkingScreen({
       (vehicle) => vehicle.id === highlightedVehicleId
     );
 
-    // אם הרכב הנוכחי עדיין לא הושלם, משאירים אותו נבחר.
     if (currentHighlightedVehicle) return;
 
-    // אם כל הרכבים הושלמו, אין רכב מהבהב.
     if (!pendingVehicles.length) {
       if (highlightedVehicleId !== null) {
         onParkingStateChange((prev) => ({
@@ -101,7 +127,6 @@ export default function ParkingScreen({
       return;
     }
 
-    // בחירה אקראית מתוך הרכבים שעדיין לא הושלמו.
     const randomIndex = Math.floor(
       Math.random() * pendingVehicles.length
     );
@@ -119,7 +144,21 @@ export default function ParkingScreen({
     onParkingStateChange,
   ]);
 
+  const handleImageLoad = (vehicleId, event) => {
+    const imgNaturalWidth = event.currentTarget.naturalWidth;
+    if (!imgNaturalWidth) return;
+
+    setNaturalWidths((prev) => {
+      if (prev[vehicleId] === imgNaturalWidth) return prev;
+      return {
+        ...prev,
+        [vehicleId]: imgNaturalWidth,
+      };
+    });
+  };
+
   const handleSelectVehicle = (vehicleId) => {
+    measureVehicles();
     onParkingStateChange?.((prev) => ({
       ...prev,
       activeVehicleId: vehicleId,
@@ -189,7 +228,7 @@ export default function ParkingScreen({
         className="parking-lot-bg"
       />
 
-      {/* כפתור פתיחת המנעול מחדש */}
+      {/* כפתור פתיחת המנעול מחדש - בצד ימין אחרי כפתור Levels */}
       <button
         type="button"
         className="parking-lock-corner-btn"
@@ -207,52 +246,76 @@ export default function ParkingScreen({
         />
       )}
 
-      {/* ארבעת הרכבים במגרש */}
-      {vehicles.map((vehicle, index) => {
-        const vehicleImg = getParkingImage(vehicle.image);
-        const isDone = Boolean(completedVehicles[vehicle.id]);
-        const isHighlighted =
-          highlightedVehicleId === vehicle.id && !isDone;
+      {/* שורת הרכבים ממורכזת למרכז ביחס למסך 1440x1024 */}
+      <div className="parking-vehicles-row">
+        {vehicles.map((vehicle, index) => {
+          const vehicleImg = getParkingImage(vehicle.image);
+          const isDone = Boolean(completedVehicles[vehicle.id]);
+          const isHighlighted =
+            !activeVehicle && highlightedVehicleId === vehicle.id && !isDone;
+          const imgNaturalWidth = naturalWidths[vehicle.id];
 
-        return (
-          <button
-            key={vehicle.id}
-            type="button"
-            className={[
-              'parking-vehicle-btn',
-              `vehicle-slot-${index + 1}`,
-              isDone ? 'is-completed' : '',
-              isHighlighted ? 'is-highlighted' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            onClick={() => handleSelectVehicle(vehicle.id)}
-            aria-label={vehicle.name}
-            aria-pressed={activeVehicleId === vehicle.id}
-          >
-            {vehicleImg && (
-              <img
-                src={vehicleImg}
-                alt={vehicle.name}
-                className="parking-vehicle-img"
-              />
-            )}
+          return (
+            <button
+              key={vehicle.id}
+              ref={(el) => {
+                vehicleBtnRefs.current[vehicle.id] = el;
+              }}
+              type="button"
+              style={
+                imgNaturalWidth
+                  ? {
+                      width: `calc(${imgNaturalWidth} / 1440 * 100vw)`,
+                    }
+                  : undefined
+              }
+              className={[
+                'parking-vehicle-btn',
+                `vehicle-slot-${index + 1}`,
+                isDone ? 'is-completed' : '',
+                isHighlighted ? 'is-highlighted' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => handleSelectVehicle(vehicle.id)}
+              aria-label={vehicle.name}
+              aria-pressed={activeVehicleId === vehicle.id}
+            >
+              {vehicleImg && (
+                <img
+                  src={vehicleImg}
+                  alt={vehicle.name}
+                  className="parking-vehicle-img"
+                  onLoad={(e) => handleImageLoad(vehicle.id, e)}
+                />
+              )}
 
-            {isDone && (
-              <img
-                src={checkmarkIcon}
-                alt="הושלם"
-                className="parking-vehicle-check"
-              />
-            )}
-          </button>
-        );
-      })}
+              {/* שכבת זוהר ירוק פנימי החתוכה לצורת הרכב */}
+              {isDone && vehicleImg && (
+                <span
+                  className="parking-vehicle-glow-layer"
+                  style={{
+                    WebkitMaskImage: `url(${vehicleImg})`,
+                    maskImage: `url(${vehicleImg})`,
+                  }}
+                  aria-hidden="true"
+                />
+              )}
+
+              {/* סימון ווי ירוק זהה ל-QuizScreen במרכז הרכב */}
+              <span className="parking-vehicle-check" aria-hidden="true">
+                ✓
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {/* כרטיסיית מידע על הרכב הנבחר */}
       {activeVehicle && (
         <VehicleInfo
           vehicle={activeVehicle}
+          vehicleMetrics={vehicleMetrics[activeVehicle.id] || null}
           vehicleProgress={
             vehicleProgressMap[activeVehicle.id] || {}
           }

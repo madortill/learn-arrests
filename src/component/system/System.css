@@ -3,203 +3,246 @@
 ========================================= */
 
 @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-Regular.ttf') format('truetype');
-   font-weight: 400;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-Medium.ttf') format('truetype');
-   font-weight: 500;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-SemiBold.ttf') format('truetype');
-   font-weight: 600;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-Bold.ttf') format('truetype');
-   font-weight: 700;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-BoldItalic.ttf') format('truetype');
-   font-weight: 700;
-   font-style: italic;
-   font-display: swap;
- }
- 
- /* גיבוי מקומי למשקל 800 עבור כותרות BookendScreen */
- @font-face {
-   font-family: 'Rubik';
-   src: url('../../assets/fonts/Rubik/Rubik-Bold.ttf') format('truetype');
-   font-weight: 800;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Inter';
-   src: url('../../assets/fonts/Inter/Inter_18pt-Light.ttf') format('truetype');
-   font-weight: 300;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Inter';
-   src: url('../../assets/fonts/Inter/Inter_18pt-Regular.ttf') format('truetype');
-   font-weight: 400;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Inter';
-   src: url('../../assets/fonts/Inter/Inter_24pt-Medium.ttf') format('truetype');
-   font-weight: 500;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Inter';
-   src: url('../../assets/fonts/Inter/Inter_24pt-SemiBold.ttf') format('truetype');
-   font-weight: 600;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'Inter';
-   src: url('../../assets/fonts/Inter/Inter_28pt-Bold.ttf') format('truetype');
-   font-weight: 700;
-   font-style: normal;
-   font-display: swap;
- }
- 
- @font-face {
-   font-family: 'DanaYadAlefAlefAlef';
-   src: url('../../assets/fonts/DanaYadAlefAlefAlef-Normal.otf') format('opentype');
-   font-weight: normal;
-   font-style: normal;
-   font-display: swap;
- }
- 
- /* =========================================
-    RESET & FULL-SCREEN LOCK (ללא גלילה)
- ========================================= */
- 
- html,
- body,
- #root {
-   margin: 0;
-   padding: 0;
-   width: 100%;
-   height: 100%;
-   overflow: hidden;
- }
- 
- /* =========================================
-    SYSTEM CONTAINER
- ========================================= */
- 
- .system-container {
-   position: fixed;
-   inset: 0;
-   width: 100vw;
-   height: 100vh;
-   height: 100dvh;
-   overflow: hidden;
- 
-   background-size: cover;
-   background-position: center;
-   background-repeat: no-repeat;
-   direction: rtl;
- }
- 
- /* =========================================
-    TOP-RIGHT CONTROLS (ABOUT + LEVELS BTN)
-    תמיד בצד ימין אחת ליד השנייה בכל גדלי המחשב
- ========================================= */
- 
- /* בתוך System.css */
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* גיבוי מקומי למשקל 800 עבור כותרות BookendScreen */
+@font-face {
+  font-family: 'Rubik';
+  src: url('../../assets/fonts/Rubik/Rubik-Bold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter/Inter_18pt-Light.ttf') format('truetype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter/Inter_18pt-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter/Inter_24pt-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter/Inter_24pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../../assets/fonts/Inter/Inter_28pt-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'DanaYadAlefAlefAlef';
+  src: url('../../assets/fonts/DanaYadAlefAlefAlef-Normal.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================================
+   RESET & FULL-SCREEN LOCK (ללא גלילה)
+========================================= */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* =========================================
+   SYSTEM CONTAINER & BACKGROUNDS
+========================================= */
+
+.system-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  direction: rtl;
+}
+
+/* רקע 1 ורקע 6: ברירת המחדל (cover + center) */
+.system-container.is-bg-1,
+.system-container.is-bg-6 {
+  background-size: cover;
+  background-position: center;
+}
+
+/* רקע 2: תואם למסך הייחוס 1440x1024 (W:1833, H:1374, X:-393, Y:-82)
+   ומרחיב אוטומטית לשמירה על מיקום החייל בצד שמאל ללא חיתוך בכל מסך */
+.system-container.is-bg-2 {
+  background-size: max(127.29vw, calc(134.18dvh * (4 / 3))) auto;
+  background-position:
+    calc((100vw - max(127.29vw, calc(134.18dvh * (4 / 3)))) * 0.999)
+    calc((100dvh - (max(127.29vw, calc(134.18dvh * (4 / 3))) * 0.75)) * 0.234);
+}
+
+/* רקע 3 ורקע 5: רקע מלא + דמות מונחת מעליו */
+.system-container.is-bg-3,
+.system-container.is-bg-5 {
+  background-size: cover;
+  background-position: center;
+}
+
+/* רקע 4: שומר ששום דבר מהחלק העליון של התמונה לא ייחתך ורק הלמטה ייחתך */
+.system-container.is-bg-4 {
+  background-size: cover;
+  background-position: center top;
+}
+
+/* =========================================
+   STAGE CHARACTER OVERLAY (רקעים 3 ו-5)
+   נמצא ב-z-index: 4 כך ש-ParkingScreen (z-index: 25) מכסה אותו לחלוטין
+========================================= */
+
+.system-stage-character {
+  position: absolute;
+  z-index: 4;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.28));
+}
+
+/* =========================================
+   TOP-RIGHT CONTROLS (ABOUT + LEVELS BTN)
+   תמיד בצד ימין אחת ליד השנייה בכל גדלי המחשב
+========================================= */
+
 .system-top-right-controls {
-   --top-control-size: clamp(44px, min(4.5vw, 6.35vh), 65px);
- 
-   position: fixed;
-   top: clamp(14px, 2.4vh, 32px);
-   right: clamp(16px, 2.2vw, 38px);
-   z-index: 10005;
- 
-   display: flex;
-   flex-direction: row;
-   align-items: center;
-   gap: clamp(10px, 1.1vw, 20px);
- 
-   direction: rtl;
-   pointer-events: none;
- }
- 
- .system-top-right-controls > * {
-   pointer-events: auto;
-   flex-shrink: 0;
- }
- 
- /* התאמת LevelsBtn לגודל ולמיקום של סרגל הכלים העליון */
- .system-top-right-controls .levels-toggle-btn {
-   position: relative;
-   top: auto;
-   right: auto;
-   left: auto;
-   bottom: auto;
- 
-   width: var(--top-control-size);
-   height: var(--top-control-size);
-   min-width: var(--top-control-size);
-   box-sizing: border-box;
- }
- 
- /* =========================================
-    MISSING COMPONENT FALLBACK
- ========================================= */
- 
- .system-missing-component {
-   position: absolute;
-   inset: 0;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   gap: 12px;
- 
-   background: rgba(15, 23, 42, 0.85);
-   color: #ffffff;
-   text-align: center;
-   padding: 24px;
-   z-index: 50;
- }
- 
- .system-missing-component h2 {
-   margin: 0;
-   font-size: clamp(22px, 2.2vw, 32px);
- }
- 
- .system-missing-component p {
-   margin: 0;
-   font-size: clamp(16px, 1.4vw, 22px);
-   opacity: 0.9;
- }
+  --top-control-size: clamp(44px, min(4.5vw, 6.35vh), 65px);
+
+  position: fixed;
+  top: clamp(14px, 2.4vh, 32px);
+  right: clamp(16px, 2.2vw, 38px);
+  z-index: 10005;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(10px, 1.1vw, 20px);
+
+  direction: rtl;
+  pointer-events: none;
+}
+
+.system-top-right-controls > * {
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+/* התאמת LevelsBtn לגודל ולמיקום של סרגל הכלים העליון */
+.system-top-right-controls .levels-toggle-btn {
+  position: relative;
+  top: auto;
+  right: auto;
+  left: auto;
+  bottom: auto;
+
+  width: var(--top-control-size);
+  height: var(--top-control-size);
+  min-width: var(--top-control-size);
+  box-sizing: border-box;
+}
+
+/* =========================================
+   MISSING COMPONENT FALLBACK
+========================================= */
+
+.system-missing-component {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  text-align: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.system-missing-component h2 {
+  margin: 0;
+  font-size: clamp(22px, 2.2vw, 32px);
+}
+
+.system-missing-component p {
+  margin: 0;
+  font-size: clamp(16px, 1.4vw, 22px);
+  opacity: 0.9;
+}

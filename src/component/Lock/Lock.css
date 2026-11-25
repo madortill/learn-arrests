@@ -11,9 +11,7 @@
   justify-content: center;
   align-items: center;
 
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.5);
   direction: rtl;
 
   pointer-events: auto;
@@ -157,7 +155,7 @@
   justify-content: center;
   align-items: center;
 
-  z-index: 5;
+  z-index: 15;
   pointer-events: auto;
 }
 
@@ -271,17 +269,17 @@
 }
 
 /* =====================================================
-   חיצי ניווט זהים לפיגמה (1440x1024) - מופיעים רק כשזמינים
+   חיצי ניווט קרוסלה - מותאמים לקצוות המסך גם במסכים רחבים
 ===================================================== */
 
 .carousel-nav-arrow {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 35;
+  z-index: 45;
 
-  width: clamp(46px, 5.69vw, 82px);  /* 82px מתוך 1440px */
-  height: clamp(46px, 5.69vw, 82px); /* 82px */
+  width: clamp(46px, 5.69vw, 82px);
+  height: clamp(46px, 5.69vw, 82px);
   padding: 0;
 
   border: none;
@@ -300,19 +298,21 @@
   pointer-events: auto;
 }
 
-/* חץ חזור (ימין) -> left: 1157px מתוך 1440px => right: 201px (13.96vw) */
+/* חץ חזור (ימין) - קרוב לקצה הימני בכל רוחב מסך */
 .carousel-nav-arrow.right-arrow {
-  right: 13.96vw;
+  right: clamp(16px, 2.2vw, 44px);
+  left: auto;
 }
 
-/* חץ קדימה (שמאל) -> סימטרי משמאל: 201px (13.96vw) */
+/* חץ קדימה (שמאל) - קרוב לקצה השמאלי בכל רוחב מסך */
 .carousel-nav-arrow.left-arrow {
-  left: 13.96vw;
+  left: clamp(16px, 2.2vw, 44px);
+  right: auto;
 }
 
 .carousel-nav-arrow img {
-  width: clamp(28px, 3.47vw, 50px);  /* 50px מתוך 1440px */
-  height: clamp(28px, 3.47vw, 50px); /* 50px */
+  width: clamp(28px, 3.47vw, 50px);
+  height: clamp(28px, 3.47vw, 50px);
   object-fit: contain;
   pointer-events: none;
 }
@@ -326,25 +326,28 @@
   transform: translateY(-50%) scale(1.06);
 }
 
-/* נקודות ניווט */
+/* נקודות ניווט מוגדלות - מראה זהה לחלוטין ל-vehicle-carousel-dots */
 .lock-dots {
   position: relative;
-  z-index: 2;
+  z-index: 45;
+
   display: flex;
-  gap: 10px;
-  margin-top: clamp(10px, 1.5vh, 16px);
+  align-items: center;
+  gap: clamp(12px, 1.1vw, 18px);
+  margin-top: clamp(12px, 1.6vh, 20px);
 }
 
 .lock-dots span {
-  width: 13px;
-  height: 13px;
+  width: clamp(18px, 1.45vw, 24px);
+  height: clamp(18px, 1.45vw, 24px);
   border-radius: 50%;
   background: #a88133;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .lock-dots span.active {
-  background: #f5cf7b;
+  background: #fff0c2;
+  transform: scale(1.08);
 }
 
 @media (max-height: 700px) {
@@ -366,7 +369,6 @@
     line-height: 1.45;
   }
 }
-
 
 /* =====================================================
    מסכים גדולים במיוחד – 2560x1440 ומעלה
@@ -466,15 +468,4 @@
     width: 62px;
     height: 62px;
   }
-
-  .lock-dots {
-    gap: 14px;
-    margin-top: 20px;
-  }
-
-  .lock-dots span {
-    width: 16px;
-    height: 16px;
-  }
 }
-

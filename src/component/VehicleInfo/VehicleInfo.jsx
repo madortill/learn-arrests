@@ -24,82 +24,124 @@ const getParkingImage = (name) => {
   return parkingImageMap[name.split('/').pop().toLowerCase()] || null;
 };
 
-// ==========================================
-// 1. מיניבוס אזרחי - 20 מושבים (7 עמודות × 8 תתי-שורות)
-// ==========================================
-const MINIBUS_SEATS = [
+// ברירות מחדל לסידור המושבים במידה ולא הוגדרו ב-JSON
+const DEFAULT_MINIBUS_SEATS = [
   { id: 'mb_1', label: 'מלווה', col: 1, row: '1 / 3' },
   { id: 'mb_2', label: 'מלווה', col: 1, row: '3 / 5' },
   { id: 'mb_3', label: 'מלווה', col: 1, row: '5 / 7' },
   { id: 'mb_4', label: 'מלווה', col: 1, row: '7 / 9' },
-
   { id: 'mb_5', label: 'כלוא', col: 2, row: '1 / 3' },
   { id: 'mb_6', label: 'כלוא', col: 2, row: '3 / 5' },
-
   { id: 'mb_7', label: 'כלוא', col: 3, row: '1 / 3' },
   { id: 'mb_8', label: 'כלוא', col: 3, row: '3 / 5' },
   { id: 'mb_9', label: 'מלווה', col: 3, row: '7 / 9' },
-
   { id: 'mb_10', label: 'כלוא', col: 4, row: '1 / 3' },
   { id: 'mb_11', label: 'כלוא', col: 4, row: '3 / 5' },
   { id: 'mb_12', label: 'מלווה', col: 4, row: '7 / 9' },
-
   { id: 'mb_13', label: 'כלוא', col: 5, row: '1 / 3' },
   { id: 'mb_14', label: 'כלוא', col: 5, row: '3 / 5' },
   { id: 'mb_15', label: 'מלווה', col: 5, row: '7 / 9' },
-
   { id: 'mb_16', label: 'מלווה', col: 6, row: '1 / 3' },
   { id: 'mb_17', label: 'מלווה', col: 6, row: '3 / 5' },
   { id: 'mb_18', label: 'מלווה', col: 6, row: '7 / 9' },
-
   { id: 'mb_19', label: 'נהג', col: 7, row: '2 / 4' },
   { id: 'mb_20', label: 'מפקד\nמשימה', col: 7, row: '6 / 8' },
 ];
 
-// ==========================================
-// 2. רכב 9 מקומות - 8 מושבים (3×3)
-// ==========================================
-const NINE_SEATER_SEATS = [
+const DEFAULT_NINE_SEATER_SEATS = [
   { id: 'ns_1', label: 'כלוא', col: 1, row: 1 },
   { id: 'ns_2', label: 'כלוא', col: 1, row: 2 },
   { id: 'ns_3', label: 'מלווה', col: 1, row: 3 },
-
   { id: 'ns_4', label: 'מלווה', col: 2, row: 1 },
   { id: 'ns_5', label: 'כלוא', col: 2, row: 2 },
   { id: 'ns_6', label: 'מלווה', col: 2, row: 3 },
-
   { id: 'ns_7', label: 'נהג', col: 3, row: 1 },
   { id: 'ns_8', label: 'מפקד\nמשימה', col: 3, row: 3 },
 ];
 
-// ==========================================
-// 3. קיה סורנטו - 4 מושבים (2×2 עם כלוב מקווקו)
-// ==========================================
-const SORENTO_CAGE_SEATS = [
+const DEFAULT_SORENTO_CAGE_SEATS = [
   { id: 'sr_1', label: 'כלוא' },
   { id: 'sr_2', label: 'כלוא' },
 ];
 
-const SORENTO_FRONT_SEATS = [
+const DEFAULT_SORENTO_FRONT_SEATS = [
   { id: 'sr_3', label: 'נהג' },
   { id: 'sr_4', label: 'מפקד\nמשימה' },
 ];
 
-function getSeatsForLayout(layoutType) {
-  if (layoutType === 'minibus') return MINIBUS_SEATS;
-  if (layoutType === 'nine-seater') return NINE_SEATER_SEATS;
-  if (layoutType === 'sorento') {
-    return [...SORENTO_CAGE_SEATS, ...SORENTO_FRONT_SEATS];
+function getSlideSeatsData(slide) {
+  if (!slide || slide.type !== 'seats') {
+    return {
+      allSeats: [],
+      gridSeats: [],
+      cageSeats: [],
+      frontSeats: [],
+      grid: null,
+      doors: [],
+    };
   }
-  return [];
+
+  const layoutType = slide.layoutType;
+
+  if (layoutType === 'sorento') {
+    const cageSeats = slide.cageSeats || DEFAULT_SORENTO_CAGE_SEATS;
+    const frontSeats = slide.frontSeats || DEFAULT_SORENTO_FRONT_SEATS;
+    const doors = slide.doors || [
+      { position: 'top', left: '73%' },
+      { position: 'bottom', left: '38%' },
+      { position: 'bottom', left: '73%' },
+    ];
+
+    return {
+      allSeats: [...cageSeats, ...frontSeats],
+      gridSeats: [],
+      cageSeats,
+      frontSeats,
+      grid: null,
+      doors,
+    };
+  }
+
+  const defaultSeats =
+    layoutType === 'minibus'
+      ? DEFAULT_MINIBUS_SEATS
+      : layoutType === 'nine-seater'
+      ? DEFAULT_NINE_SEATER_SEATS
+      : [];
+
+  const gridSeats = slide.seats || defaultSeats;
+
+  const defaultGrid =
+    layoutType === 'minibus'
+      ? { cols: 7, rows: 8 }
+      : { cols: 3, rows: 3 };
+
+  const defaultDoors =
+    layoutType === 'minibus'
+      ? [
+          { position: 'top', left: '82%' },
+          { position: 'bottom', left: '82%' },
+        ]
+      : [
+          { position: 'top', left: '81%' },
+          { position: 'bottom', left: '50%' },
+          { position: 'bottom', left: '81%' },
+        ];
+
+  return {
+    allSeats: gridSeats,
+    gridSeats,
+    cageSeats: [],
+    frontSeats: [],
+    grid: slide.grid || defaultGrid,
+    doors: slide.doors || defaultDoors,
+  };
 }
 
-function SeatPill({ seat, isFlipped, onReveal, hasOutline = false }) {
+function SeatPill({ seat, isFlipped, onReveal }) {
   return (
     <div
-      className={`seat-card ${isFlipped ? 'is-flipped' : ''} ${
-        hasOutline ? 'seat-outlined' : ''
-      }`}
+      className={`seat-card ${isFlipped ? 'is-flipped' : ''}`}
       style={
         seat.col
           ? {
@@ -134,6 +176,7 @@ function SeatPill({ seat, isFlipped, onReveal, hasOutline = false }) {
 
 export default function VehicleInfo({
   vehicle,
+  vehicleMetrics = null,
   vehicleProgress = {},
   onVehicleProgressChange,
   onCloseVehicle,
@@ -161,14 +204,11 @@ export default function VehicleInfo({
     checklistItems.length === 0 ||
     checklistItems.every((item) => Boolean(checkedItems[item.id]));
 
-  // בדיקת חשיפת כל המושבים
-  const layoutType = activeSlide.layoutType;
-  const activeSeats =
-    activeSlide.type === 'seats' ? getSeatsForLayout(layoutType) : [];
-
+  // נתוני סדר ישיבה
+  const seatsData = getSlideSeatsData(activeSlide);
   const allSeatsFlipped =
-    activeSeats.length === 0 ||
-    activeSeats.every((seat) => Boolean(flippedSeats[seat.id]));
+    seatsData.allSeats.length === 0 ||
+    seatsData.allSeats.every((seat) => Boolean(flippedSeats[seat.id]));
 
   const isLastSlide = currentSlide === totalSlides - 1;
 
@@ -226,9 +266,25 @@ export default function VehicleInfo({
       ? 'car-pos-v3'
       : 'car-pos-v4';
 
+  // העברת המידות והמיקומים המדויקים מ-ParkingScreen
+  const carDynamicVars = vehicleMetrics
+    ? {
+        '--measured-car-width': `${vehicleMetrics.width}px`,
+        '--measured-car-left': `${vehicleMetrics.left}px`,
+        '--measured-car-right': `${vehicleMetrics.right}px`,
+        '--measured-car-bottom': `${vehicleMetrics.bottom}px`,
+      }
+    : undefined;
+
+  const isSorentoLayout = activeSlide.layoutType === 'sorento';
+
   return (
-    <div className="vehicle-info-overlay" dir="rtl">
-      {/* תמונת הרכב הנבחר (z-index: 15 - מתחת למבנה הרכב ולצ'קליסט) */}
+    <div
+      className="vehicle-info-overlay"
+      style={carDynamicVars}
+      dir="rtl"
+    >
+      {/* תמונת הרכב הנבחר: רכבים 1 ו-4 מעל הדיב הצהוב (z-index: 10), רכבים 2 ו-3 מתחתיו (z-index: 1) */}
       {activeVehicleImgSrc && (
         <img
           src={activeVehicleImgSrc}
@@ -237,7 +293,7 @@ export default function VehicleInfo({
         />
       )}
 
-      {/* חץ חזור (ימין) - מופיע רק כשניתן לחזור */}
+      {/* חץ חזור (ימין) */}
       {canGoPrev && (
         <button
           type="button"
@@ -249,7 +305,7 @@ export default function VehicleInfo({
         </button>
       )}
 
-      {/* חץ קדימה (שמאל) - מופיע רק כשניתן להתקדם */}
+      {/* חץ קדימה (שמאל) */}
       {canGoNext && (
         <button
           type="button"
@@ -264,7 +320,7 @@ export default function VehicleInfo({
       <div className="vehicle-info-stage">
         {/* הדיב הצהוב (1270px במסך 1440x1024) */}
         <div className="vehicle-info-modal">
-          {/* רקע הדיב הצהוב (z-index: 1) */}
+          {/* רקע הדיב הצהוב (z-index: 2 - מעל רכבים 2 ו-3 ומתחת לרכבים 1 ו-4) */}
           <div className="vehicle-yellow-bg" aria-hidden="true" />
 
           {/* כפתור סגירה X בצד ימין */}
@@ -278,7 +334,6 @@ export default function VehicleInfo({
           </button>
 
           {activeSlide.type === 'text' ? (
-            /* במצב טקסט: גובה הדיב הצהוב נקבע לפי כמות הטקסט */
             <div className="vehicle-text-flow">
               <h2 className="vehicle-title">
                 {activeSlide.title || vehicle?.name}
@@ -293,7 +348,6 @@ export default function VehicleInfo({
               )}
             </div>
           ) : (
-            /* בשקופיות צ'קליסט ומבנה רכב: הדיב הצהוב שומר על גובה זהה לשקופית הטקסט */
             <>
               {/* עוגן גובה נסתר הזהה בגובהו לשקופית הטקסט */}
               <div
@@ -313,7 +367,7 @@ export default function VehicleInfo({
                 )}
               </div>
 
-              {/* זרימה אנכית של הכותרת/טקסט ומעליהם/מתחתם מבנה הרכב עם מרווח ברור */}
+              {/* זרימה אנכית של הכותרת/טקסט ומתחתיהם תרשים הישיבה */}
               <div className="vehicle-slide-overlay-flow">
                 <div className="vehicle-header-block">
                   <h2 className="vehicle-title">
@@ -331,52 +385,28 @@ export default function VehicleInfo({
 
                 {activeSlide.type === 'seats' && (
                   <div className="vehicle-seats-layer">
-                    {/* 1. תרשים מיניבוס אזרחי */}
-                    {layoutType === 'minibus' && (
-                      <div className="vehicle-diagram-shell diagram-minibus">
-                        <div className="minibus-grid">
-                          {MINIBUS_SEATS.map((seat) => (
-                            <SeatPill
-                              key={seat.id}
-                              seat={seat}
-                              isFlipped={Boolean(flippedSeats[seat.id])}
-                              onReveal={handleSeatReveal}
-                              hasOutline={true}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    <div
+                      className={`vehicle-diagram-shell ${
+                        isSorentoLayout ? 'is-sorento-layout' : 'is-grid-layout'
+                      }`}
+                    >
+                      {seatsData.doors.map((door, idx) => (
+                        <div
+                          key={idx}
+                          className={`car-door ${
+                            door.position === 'top' ? 'door-top' : 'door-bottom'
+                          }`}
+                          style={{
+                            left: door.left,
+                            transform: 'translateX(-50%)',
+                          }}
+                        />
+                      ))}
 
-                    {/* 2. תרשים רכב 9 מקומות */}
-                    {layoutType === 'nine-seater' && (
-                      <div className="vehicle-diagram-shell diagram-nine-seater">
-                        <div className="car-door door-top door-nine-top" />
-
-                        <div className="nine-seater-grid">
-                          {NINE_SEATER_SEATS.map((seat) => (
-                            <SeatPill
-                              key={seat.id}
-                              seat={seat}
-                              isFlipped={Boolean(flippedSeats[seat.id])}
-                              onReveal={handleSeatReveal}
-                            />
-                          ))}
-                        </div>
-
-                        <div className="car-door door-bottom door-nine-bottom-mid" />
-                        <div className="car-door door-bottom door-nine-bottom-front" />
-                      </div>
-                    )}
-
-                    {/* 3. תרשים רכב קיה סורנטו */}
-                    {layoutType === 'sorento' && (
-                      <div className="vehicle-diagram-shell diagram-sorento">
-                        <div className="car-door door-top door-sorento-top" />
-
+                      {isSorentoLayout ? (
                         <div className="sorento-grid">
                           <div className="sorento-cage-box">
-                            {SORENTO_CAGE_SEATS.map((seat) => (
+                            {seatsData.cageSeats.map((seat) => (
                               <SeatPill
                                 key={seat.id}
                                 seat={seat}
@@ -387,7 +417,7 @@ export default function VehicleInfo({
                           </div>
 
                           <div className="sorento-front-col">
-                            {SORENTO_FRONT_SEATS.map((seat) => (
+                            {seatsData.frontSeats.map((seat) => (
                               <SeatPill
                                 key={seat.id}
                                 seat={seat}
@@ -397,11 +427,29 @@ export default function VehicleInfo({
                             ))}
                           </div>
                         </div>
-
-                        <div className="car-door door-bottom door-sorento-bottom-cage" />
-                        <div className="car-door door-bottom door-sorento-bottom-front" />
-                      </div>
-                    )}
+                      ) : (
+                        <div
+                          className="seats-dynamic-grid"
+                          style={{
+                            gridTemplateColumns: `repeat(${
+                              seatsData.grid?.cols || 3
+                            }, minmax(0, 1fr))`,
+                            gridTemplateRows: `repeat(${
+                              seatsData.grid?.rows || 3
+                            }, minmax(0, 1fr))`,
+                          }}
+                        >
+                          {seatsData.gridSeats.map((seat) => (
+                            <SeatPill
+                              key={seat.id}
+                              seat={seat}
+                              isFlipped={Boolean(flippedSeats[seat.id])}
+                              onReveal={handleSeatReveal}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -410,7 +458,7 @@ export default function VehicleInfo({
         </div>
       </div>
 
-      {/* צ'קליסט רגיל במרכז בגודלו הטבעי עם מנגנון הגלילה הקיים */}
+      {/* צ'קליסט מעל הכל בכל מצב */}
       {activeSlide.type === 'checklist' && (
         <div className="vehicle-checklist-fullscreen-layer">
           <ChecklistScreen
@@ -423,7 +471,7 @@ export default function VehicleInfo({
         </div>
       )}
 
-      {/* 3 נקודות הקרוסלה - מחוץ לדיב הצהוב */}
+      {/* נקודות הקרוסלה מוגדלות */}
       {totalSlides > 1 && (
         <div className="vehicle-carousel-dots">
           {slides.map((_, dotIndex) => (
@@ -435,7 +483,7 @@ export default function VehicleInfo({
         </div>
       )}
 
-      {/* כפתור חזרה למגרש - מחוץ לדיב הצהוב */}
+      {/* כפתור חזרה למגרש */}
       {showBackToLotButton && (
         <button
           type="button"
@@ -456,7 +504,7 @@ export default function VehicleInfo({
         <SpeechBubble
           {...activeSlide.speechBubble}
           centered={true}
-          zIndex={40}
+          zIndex={95}
         />
       )}
     </div>

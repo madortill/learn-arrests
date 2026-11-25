@@ -2,10 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import './WriteboardScreen.css';
 
 import blueMarker from '../../assets/blue_marker.png';
+import whiteboardImg from '../../assets/whiteboard.png';
+
+const REVEAL_THRESHOLD = 0.75;
 
 /* =========================================
    REVEAL AREA
-   אזור חשיפה באמצעות תנועת הטוש
+   אזור חשיפה באמצעות תנועת הטוש (עבור הקוביות)
 ========================================= */
 
 const RevealArea = ({
@@ -13,18 +16,14 @@ const RevealArea = ({
   className = '',
   onComplete,
   resetKey,
-  showGuideLine = false,
   initialCompleted = false,
 }) => {
-  const areaRef = useRef(null);
   const canvasRef = useRef(null);
-  const previousPoint = useRef(null);
+  const previousPointRef = useRef(null);
   const completedRef = useRef(Boolean(initialCompleted));
 
   const [maskUrl, setMaskUrl] = useState('');
   const [isComplete, setIsComplete] = useState(Boolean(initialCompleted));
-  const [hasStarted, setHasStarted] = useState(Boolean(initialCompleted));
-  const [guideStyle, setGuideStyle] = useState({});
 
   /* =========================================
      סנכרון מצב שמור מהמערכת
@@ -34,74 +33,42 @@ const RevealArea = ({
     if (initialCompleted) {
       completedRef.current = true;
       setIsComplete(true);
-      setHasStarted(true);
     }
   }, [initialCompleted]);
 
   /* =========================================
-     מדידת הטקסט ומיקום הקו המקדים
+     איפוס בעת החלפת נתוני השלב
   ========================================= */
 
   useEffect(() => {
-    if (!showGuideLine) return;
-
-    const area = areaRef.current;
-    if (!area) return;
-
-    const textElement = area.querySelector('.footer-text-content');
-    if (!textElement) return;
-
-    const updateGuideLine = () => {
-      const areaRect = area.getBoundingClientRect();
-      const textRect = textElement.getBoundingClientRect();
-
-      if (!areaRect.width || !textRect.width) return;
-
-      const fontSize = parseFloat(
-        window.getComputedStyle(textElement).fontSize
-      );
-
-      // רווח קטן בין הטקסט לבין הקו
-      const lineGap = fontSize * 0.18;
-
-      setGuideStyle({
-        width: `${textRect.width}px`,
-        left: `${textRect.left - areaRect.left}px`,
-        top: `${textRect.bottom - areaRect.top + lineGap}px`,
-      });
-    };
-
-    updateGuideLine();
-
-    const observer = new ResizeObserver(updateGuideLine);
-
-    observer.observe(area);
-    observer.observe(textElement);
-
-    return () => observer.disconnect();
-  }, [showGuideLine, resetKey]);
+    const completed = Boolean(initialCompleted);
+    completedRef.current = completed;
+    previousPointRef.current = null;
+    setIsComplete(completed);
+    setMaskUrl('');
+  }, [resetKey, initialCompleted]);
 
   /* =========================================
-     יצירת מסכת החשיפה
+     יצירת מסכת החשיפה והתאמה לשינוי גודל מסך
   ========================================= */
 
   useEffect(() => {
-    if (initialCompleted) return;
+    if (initialCompleted || isComplete) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const initializeCanvas = () => {
       const rect = canvas.getBoundingClientRect();
-
       if (!rect.width || !rect.height) return;
 
       canvas.width = Math.round(rect.width);
       canvas.height = Math.round(rect.height);
 
       const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-      // שחור = מוסתר
+      // שחור = מוסתר במסכת luminance
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -114,23 +81,10 @@ const RevealArea = ({
     observer.observe(canvas);
 
     return () => observer.disconnect();
-  }, [resetKey, initialCompleted]);
+  }, [resetKey, initialCompleted, isComplete]);
 
   /* =========================================
-     איפוס בעת החלפת נתוני השלב
-  ========================================= */
-
-  useEffect(() => {
-    completedRef.current = Boolean(initialCompleted);
-    previousPoint.current = null;
-
-    setIsComplete(Boolean(initialCompleted));
-    setHasStarted(Boolean(initialCompleted));
-    setMaskUrl('');
-  }, [resetKey, initialCompleted]);
-
-  /* =========================================
-     חשיפה באמצעות הטוש
+     חשיפה באמצעות תנועת הטוש
   ========================================= */
 
   const handlePointerMove = (event) => {
@@ -139,123 +93,80 @@ const RevealArea = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // ברגע שמתחילים לחשוף, הקו המקדים נעלם
-    if (showGuideLine) {
-      setHasStarted(true);
-    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const ctx = canvas.getContext('2d');
-
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    const brushRadius = Math.min(
-      50,
-      Math.max(25, rect.height * 0.48)
-    );
+    const brushRadius = Math.min(50, Math.max(25, rect.height * 0.48));
 
     ctx.beginPath();
-
     ctx.moveTo(
-      previousPoint.current?.x ?? x,
-      previousPoint.current?.y ?? y
+      previousPointRef.current?.x ?? x,
+      previousPointRef.current?.y ?? y
     );
-
     ctx.lineTo(x, y);
-
     ctx.lineWidth = brushRadius * 2;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.strokeStyle = '#fff';
-
     ctx.stroke();
 
-    previousPoint.current = { x, y };
+    previousPointRef.current = { x, y };
 
     /* =====================================
        בדיקת אחוז השטח שנחשף
     ===================================== */
 
-    const imageData = ctx.getImageData(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
-
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const pixels = imageData.data;
 
     let revealedPixels = 0;
     let totalPixels = 0;
 
-    // דגימה של כל 4 פיקסלים
+    // דגימה של כל 4 פיקסלים לביצועים מיטביים
     for (let i = 0; i < pixels.length; i += 16) {
       totalPixels++;
-
       if (pixels[i] > 0) {
         revealedPixels++;
       }
     }
 
-    const revealPercentage = revealedPixels / totalPixels;
+    const revealPercentage = totalPixels > 0 ? revealedPixels / totalPixels : 0;
 
-    // מעל 75% חשיפה - השלמת האזור
-    if (revealPercentage >= 0.75) {
+    if (revealPercentage >= REVEAL_THRESHOLD) {
       completedRef.current = true;
-
       setIsComplete(true);
-
-      previousPoint.current = null;
-
+      previousPointRef.current = null;
       onComplete?.();
-
       return;
     }
 
-    // עדכון מסכת החשיפה
     setMaskUrl(canvas.toDataURL());
   };
 
   return (
     <div
-      ref={areaRef}
       className={`reveal-area ${className} ${
         isComplete ? 'reveal-complete' : ''
       }`}
       onPointerMove={handlePointerMove}
       onPointerLeave={() => {
-        previousPoint.current = null;
+        previousPointRef.current = null;
       }}
     >
-      {/* תוכן החשיפה */}
-
       <div
         className={`reveal-content ${
           maskUrl || isComplete ? 'reveal-ready' : ''
         }`}
         style={{
-          '--reveal-mask': maskUrl
-            ? `url("${maskUrl}")`
-            : 'none',
+          '--reveal-mask': maskUrl ? `url("${maskUrl}")` : 'none',
         }}
       >
         {children}
       </div>
-
-      {/* הקו המקדים של הערת הסיום */}
-
-      {showGuideLine && (
-        <span
-          className={`footer-guide-line ${
-            hasStarted || isComplete ? 'guide-hidden' : ''
-          }`}
-          style={guideStyle}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* שכבת הציור */}
 
       <canvas
         ref={canvasRef}
@@ -287,14 +198,25 @@ const WriteboardScreen = ({
   const [completedAreas, setCompletedAreas] = useState(
     () => savedStepState?.completedAreas || {}
   );
-  const completionSent = useRef(Boolean(isCompleted));
+  const completionSentRef = useRef(Boolean(isCompleted));
 
   /* =========================================
-     סימון אזור שהושלם ושמירה ב-System
+     סנכרון בעת מעבר בין שלבי לוח
+  ========================================= */
+
+  useEffect(() => {
+    setCompletedAreas(savedStepState?.completedAreas || {});
+    completionSentRef.current = Boolean(isCompleted);
+  }, [whiteboardData, savedStepState, isCompleted]);
+
+  /* =========================================
+     סימון קובייה שהושלמה ושמירה במערכת
   ========================================= */
 
   const handleAreaComplete = (areaId) => {
     setCompletedAreas((prev) => {
+      if (prev[areaId]) return prev;
+
       const next = {
         ...prev,
         [areaId]: true,
@@ -304,24 +226,23 @@ const WriteboardScreen = ({
     });
   };
 
-  const totalAreas =
-    bulletPoints.length + (footerNote.trim() ? 1 : 0);
-
-  const completedCount = Object.values(completedAreas).filter(
-    Boolean
+  // רק הקוביות נדרשות לחשיפה; הערת הסיום גלויה מההתחלה
+  const totalAreas = bulletPoints.length;
+  const completedCount = bulletPoints.filter(
+    (_, index) => Boolean(completedAreas[`bullet-${index}`])
   ).length;
 
   /* =========================================
-     השלמת השלב
+     דיווח השלמת שלב
   ========================================= */
 
   useEffect(() => {
     if (
       totalAreas > 0 &&
       completedCount === totalAreas &&
-      !completionSent.current
+      !completionSentRef.current
     ) {
-      completionSent.current = true;
+      completionSentRef.current = true;
       onComplete?.();
     }
   }, [completedCount, totalAreas, onComplete]);
@@ -334,75 +255,62 @@ const WriteboardScreen = ({
         '--marker-cursor': `url("${blueMarker}") 0 32, crosshair`,
       }}
     >
-      <main className="whiteboard-content">
+      {/* מסגרת פרופורציונלית השומרת שהלוח לעולם לא ייצא מגבולות המסך */}
+      <div className="whiteboard-stage">
+        <img
+          src={whiteboardImg}
+          alt=""
+          className="whiteboard-bg-image"
+          draggable={false}
+          aria-hidden="true"
+        />
 
-        {/* =================================
-            כותרת ותת כותרת
-        ================================= */}
+        {/* אזור התוכן ממוקם בדיוק בתוך המשטח הלבן של הלוח */}
+        <main className="whiteboard-content">
+          {/* כותרת ותת כותרת */}
+          <header className="whiteboard-heading">
+            <h2>{title}</h2>
 
-        <header className="whiteboard-heading">
-          <h2>{title}</h2>
-
-          <div className="whiteboard-subtitle">
-            <p>{subtitle}</p>
-            <img src={blueMarker} alt="" />
-          </div>
-        </header>
-
-        {/* =================================
-            שלוש הקוביות
-        ================================= */}
-
-        <section className="bullets-section">
-          {bulletPoints.map((point, index) => {
-            const areaId = `bullet-${index}`;
-
-            return (
-              <div className="bullet-row" key={areaId}>
-                <RevealArea
-                  className="bullet-box"
-                  resetKey={whiteboardData}
-                  initialCompleted={Boolean(
-                    isCompleted || completedAreas[areaId]
-                  )}
-                  onComplete={() => handleAreaComplete(areaId)}
-                >
-                  <p className="bullet-text">
-                    {point}
-                  </p>
-                </RevealArea>
-
-                <span className="bullet-number">
-                  {index + 1}
-                </span>
+            {subtitle && (
+              <div className="whiteboard-subtitle">
+                <p>{subtitle}</p>
+                <img src={blueMarker} alt="" aria-hidden="true" />
               </div>
-            );
-          })}
-        </section>
-
-        {/* =================================
-            הערת סיום
-        ================================= */}
-
-        {footerNote.trim() && (
-          <RevealArea
-            className="footer-section"
-            resetKey={whiteboardData}
-            showGuideLine
-            initialCompleted={Boolean(
-              isCompleted || completedAreas.footer
             )}
-            onComplete={() => handleAreaComplete('footer')}
-          >
-            <p className="footer-text">
-              <span className="footer-text-content">
-                {footerNote}
-              </span>
-            </p>
-          </RevealArea>
-        )}
+          </header>
 
-      </main>
+          {/* שלוש הקוביות לחשיפה */}
+          <section className="bullets-section" aria-label="דגשים">
+            {bulletPoints.map((point, index) => {
+              const areaId = `bullet-${index}`;
+
+              return (
+                <div className="bullet-row" key={areaId}>
+                  <span className="bullet-number">{index + 1}</span>
+
+                  <RevealArea
+                    className="bullet-box"
+                    resetKey={whiteboardData}
+                    initialCompleted={Boolean(
+                      isCompleted || completedAreas[areaId]
+                    )}
+                    onComplete={() => handleAreaComplete(areaId)}
+                  >
+                    <p className="bullet-text">{point}</p>
+                  </RevealArea>
+                </div>
+              );
+            })}
+          </section>
+
+          {/* הערת סיום - חשופה מההתחלה ללא אפקט טוש וללא קו מקדים */}
+          {footerNote.trim() && (
+            <footer className="footer-section">
+              <p className="footer-text">{footerNote}</p>
+            </footer>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

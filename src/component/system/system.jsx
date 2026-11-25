@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useLayoutEffect,
+} from 'react';
 
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import stages from '../../data/stages.json';
@@ -26,7 +32,10 @@ import bg2 from '../../assets/backgrounds/bg-2.png';
 import bg3 from '../../assets/backgrounds/bg-3.png';
 import bg4 from '../../assets/backgrounds/bg-4.png';
 import bg5 from '../../assets/backgrounds/bg-5.png';
+import bg6 from '../../assets/backgrounds/bg-6.png';
 import whiteboardFrames from '../../assets/backgrounds/whiteboard_frames.png';
+// כאשר תשני את שם קובץ הדמות, עדכני כאן את השם החדש:
+import characterImg from '../../assets/backgrounds/דמות.png';
 
 // ==========================================
 // מיפוי קומפוננטות ורקעים
@@ -51,8 +60,79 @@ const backgroundMap = {
   'bg-3': bg3,
   'bg-4': bg4,
   'bg-5': bg5,
+  'bg-6': bg6,
   whiteboard_frames: whiteboardFrames,
 };
+
+const CHARACTER_OVERLAY_BACKGROUNDS = ['bg-3', 'bg-5'];
+
+// נקודת הפה בתוך תמונת הדמות (באחוזים מרוחב וגובה תמונת הדמות)
+const CHARACTER_MOUTH_ANCHOR = {
+  x: 0.65,
+  y: 0.115,
+};
+
+// יחס מסך הייחוס (1440x1024) לתיאום מיקום זנב בועת הדיבור
+const REFERENCE_ASPECT_RATIO = 1440 / 1024;
+
+// ==========================================
+// חישוב מיקום רספונסיבי לדמות מול קצה בועת הדיבור
+// ==========================================
+
+function getCalibratedTailYPercent(basePercent, width, height) {
+  if (!width || !height) return basePercent;
+
+  const aspectRatio = width / height;
+  const deltaRatio = aspectRatio - REFERENCE_ASPECT_RATIO;
+  const offset = deltaRatio * 13.8;
+  const calibrated = basePercent - offset;
+
+  return Math.max(0, Math.min(100, calibrated));
+}
+
+function parseCoordinateX(value, totalWidth) {
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return 0;
+
+  const trimmed = value.trim();
+  if (trimmed.endsWith('%')) {
+    return (parseFloat(trimmed) / 100) * totalWidth;
+  }
+  return parseFloat(trimmed) || 0;
+}
+
+function resolveCalibratedTailY(rawY, width, height) {
+  if (rawY === undefined || rawY === null || rawY === '') {
+    return (getCalibratedTailYPercent(30, width, height) / 100) * height;
+  }
+
+  if (typeof rawY === 'string' && rawY.trim().endsWith('%')) {
+    const basePercent = parseFloat(rawY);
+    return (getCalibratedTailYPercent(basePercent, width, height) / 100) * height;
+  }
+
+  if (typeof rawY === 'number') {
+    return (getCalibratedTailYPercent(rawY, width, height) / 100) * height;
+  }
+
+  return parseFloat(rawY) || 0;
+}
+
+function extractStageTailTarget(stepData) {
+  if (!stepData) return null;
+
+  if (stepData.secondaryComponent?.type === 'SpeechBubble') {
+    const target = stepData.secondaryComponent.props?.tailTarget;
+    if (target) return target;
+  }
+
+  if (stepData.primaryComponent?.type === 'SpeechBubble') {
+    const target = stepData.primaryComponent.props?.tailTarget;
+    if (target) return target;
+  }
+
+  return null;
+}
 
 // ==========================================
 // הגדרות מסדרון הדלתות, מעברים ושמירת התקדמות
@@ -128,6 +208,24 @@ export default function System() {
     () => loadSavedProgress(pages.length),
     [pages.length]
   );
+
+  // גודל חלון נוכחי לחישוב רספונסיבי מדויק של הדמות מול בועת הדיבור
+  const [viewportSize, setViewportSize] = useState(() => ({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1440,
+    height: typeof window !== 'undefined' ? window.innerHeight : 1024,
+  }));
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ניווט והתקדמות
   const [currentStep, setCurrentStep] = useState(
@@ -288,6 +386,7 @@ export default function System() {
   const stepData = pages[currentStep];
   const isEndScreen = !stepData;
   const activeStageNumber = getStageNumber(stepData, currentStep);
+  const currentBackgroundKey = !isEndScreen ? stepData?.background : null;
   const primaryData = stepData?.primaryComponent;
   const secondaryData = stepData?.secondaryComponent;
   const PrimaryComponent = componentMap[primaryData?.type];
@@ -320,9 +419,71 @@ export default function System() {
 
   const isParkingStep = primaryData?.type === 'ParkingButton';
   const currentParkingState = parkingProgress[currentStep] || {};
+  const isParkingInteracted =
+    Boolean(currentParkingState.hasInteracted) ||
+    Boolean(currentParkingState.isLockModalOpen) ||
+    Boolean(currentParkingState.isGateOpened);
   const isParkingModalOpen =
     isParkingStep &&
     (Boolean(currentParkingState.isLockModalOpen) || Boolean(currentParkingState.activeVehicleId));
+  const isParkingScreenOpen =
+    isParkingStep &&
+    (Boolean(currentParkingState.isGateOpened) || isCompleted);
+
+  // הצגת הדמות ברקעים 3 ו-5 (מוסתרת כאשר ParkingScreen פתוח או כשנפתח המנעול בחניה)
+  const showCharacterOverlay =
+    !isEndScreen &&
+    !isDoorsScreenOpen &&
+    CHARACTER_OVERLAY_BACKGROUNDS.includes(currentBackgroundKey) &&
+    !(isParkingStep && (isParkingScreenOpen || isParkingModalOpen));
+
+  // חישוב מיקום וגודל הדמות עבור רקעים 3 ו-5 (מוגדלת יותר ברקע 3 בלבד)
+  const characterOverlayStyle = useMemo(() => {
+    if (!showCharacterOverlay) return undefined;
+
+    const { width: vw, height: vh } = viewportSize;
+    const tailTarget = extractStageTailTarget(stepData);
+    const isBg3 = currentBackgroundKey === 'bg-3';
+
+    // ברקע 3 הדמות גדולה יותר (כ-86% מגובה המסך), וברקע 5 נשארת על 75%
+    const heightRatio = isBg3 ? 0.86 : 0.75;
+    const maxWidthRatio = isBg3 ? 0.5 : 0.44;
+    const charHeight = Math.min(vh * heightRatio, vw * maxWidthRatio);
+    const charWidth = charHeight * (341 / 850);
+
+    // נקודת ברירת מחדל אם לא הוגדר tailTarget בשלב
+    const targetX = tailTarget
+      ? parseCoordinateX(tailTarget.x, vw)
+      : vw * 0.25;
+    const targetY = tailTarget
+      ? resolveCalibratedTailY(tailTarget.y, vw, vh)
+      : (getCalibratedTailYPercent(28, vw, vh) / 100) * vh;
+
+    // מרווח של כמה פיקסלים ימינה מהפה כדי שקצה הבועה לא יגע ישירות בפה
+    const mouthGapX = Math.max(12, Math.round(vw * 0.012));
+    const mouthGapY = Math.round(vh * 0.004);
+
+    const rawLeft = targetX - mouthGapX - charWidth * CHARACTER_MOUTH_ANCHOR.x;
+    const rawTop = targetY - mouthGapY - charHeight * CHARACTER_MOUTH_ANCHOR.y;
+
+    // הגבלה עדינה כדי שהדמות לא תיחתך מחוץ לגבולות המסך
+    const minTop = isBg3 ? vh * 0.02 : vh * 0.04;
+    const clampedLeft = Math.max(
+      -charWidth * 0.12,
+      Math.min(vw - charWidth * 0.88, rawLeft)
+    );
+    const clampedTop = Math.max(
+      minTop,
+      Math.min(vh - charHeight * 0.92, rawTop)
+    );
+
+    return {
+      left: `${Math.round(clampedLeft)}px`,
+      top: `${Math.round(clampedTop)}px`,
+      height: `${Math.round(charHeight)}px`,
+      width: `${Math.round(charWidth)}px`,
+    };
+  }, [showCharacterOverlay, viewportSize, stepData, currentBackgroundKey]);
 
   // טיימר טעינה ראשונית
   useEffect(() => {
@@ -472,19 +633,16 @@ export default function System() {
   const handleNextStep = useCallback(() => {
     markStepCompleted(currentStep);
 
-    // מתוך אחד מחדרי הדלתות (24-27) חוזרים תמיד למסדרון הדלתות
     if (activeDoorStage !== null) {
       handleReturnToDoors();
       return;
     }
 
-    // יציאה ממסדרון הדלתות לאחר סיום כל 4 הדלתות
     if (isDoorsScreenOpen) {
       handleLeaveDoors();
       return;
     }
 
-    // בסיום שלב 23 עוברים למצב הדלתות (בין 23 ל-24)
     if (activeStageNumber === DOORS_ENTRY_STAGE) {
       setIsDoorsScreenOpen(true);
       setMaxUnlockedStep((prev) => Math.max(prev, currentStep));
@@ -549,7 +707,7 @@ export default function System() {
     handleReturnToDoors,
   ]);
 
-  // בחירת שלב ממפת השלבים (פתוח לכל שלב שהמשתמש כבר ביקר בו)
+  // בחירת שלב ממפת השלבים
   const handleSelectStep = useCallback(
     (stepIndex) => {
       if (!visitedSteps.includes(stepIndex)) return;
@@ -647,19 +805,37 @@ export default function System() {
     secondaryData?.type === 'SpeechBubble' &&
     !(isChecklistStep && checklistHasInteracted) &&
     (!isDepositsScreenOpen || primaryData?.type !== 'DepositsBtn') &&
-    !(isParkingStep && Boolean(currentParkingState.isGateOpened));
+    !(isParkingStep && isParkingInteracted);
 
   const backgroundStyle =
-    !isEndScreen && backgroundMap[stepData?.background]
-      ? { backgroundImage: `url(${backgroundMap[stepData.background]})` }
+    !isEndScreen && currentBackgroundKey && backgroundMap[currentBackgroundKey]
+      ? { backgroundImage: `url(${backgroundMap[currentBackgroundKey]})` }
       : undefined;
+
+  const containerClasses = [
+    'system-container',
+    currentBackgroundKey ? `is-${currentBackgroundKey}` : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   // ==========================================
   // רינדור המסך
   // ==========================================
 
   return (
-    <div className="system-container" style={backgroundStyle}>
+    <div className={containerClasses} style={backgroundStyle}>
+      {/* דמות על גבי הרקע בשלבים עם bg-3 או bg-5 */}
+      {showCharacterOverlay && (
+        <img
+          src={characterImg}
+          alt=""
+          aria-hidden="true"
+          className="system-stage-character"
+          style={characterOverlayStyle}
+        />
+      )}
+
       {/* סרגל עליון ימני: About ראשון מימין ו-LevelsBtn משמאלו */}
       <div className="system-top-right-controls">
         <About
@@ -681,7 +857,7 @@ export default function System() {
       {/* כפתור חזור */}
       {showReturnBtn && <ReturnBtn onClick={handlePreviousStep} />}
 
-      {/* חלונית מפת השלבים (במצב דלתות currentStep הוא null כך שאין שלב מסומן כנוכחי) */}
+      {/* חלונית מפת השלבים */}
       {showLevelsBtn && (
         <Levels
           steps={pages}
@@ -698,7 +874,7 @@ export default function System() {
         <BookendScreen isStart={false} onRestart={handleRestart} />
       )}
 
-      {/* מסדרון הדלתות (מופיע בין שלב 23 לשלב 24, וכולל בתוכו את בועת הדיבור) */}
+      {/* מסדרון הדלתות */}
       {!isEndScreen && isDoorsScreenOpen && (
         <DoorsScreen
           completedStages={completedDoorStages}

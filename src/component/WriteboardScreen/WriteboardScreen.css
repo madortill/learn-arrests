@@ -1,20 +1,23 @@
-
 /* =========================================
    MAIN CONTAINER
+   תופס את כל המסך ונמצא מתחת לכפתורי המערכת
 ========================================= */
 
 .whiteboard-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
 
   overflow: hidden;
   background: transparent;
 
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  z-index: 10;
 
   cursor: var(--marker-cursor);
   user-select: none;
@@ -22,33 +25,62 @@
 }
 
 /* =========================================
-   CONTENT FRAME
-   רזולוציית בסיס: 1440x1024
-   גודל בסיס: 1171x646
+   WHITEBOARD STAGE (יחס תמונה 4:3)
+   מתאים את עצמו לרוחב ולגובה של כל מסך מחשב
+   מבלי לחרוג מגבולות המסך לעולם
+========================================= */
+
+.whiteboard-stage {
+  position: relative;
+
+  width: min(96vw, calc(96dvh * (4 / 3)));
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  max-height: 100%;
+
+  flex-shrink: 0;
+}
+
+.whiteboard-bg-image {
+  position: absolute;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* =========================================
+   INNER WHITE SURFACE
+   קואורדינטות המשטח הלבן הפנימי בתוך מסגרת הלוח
 ========================================= */
 
 .whiteboard-content {
   position: absolute;
 
-  width: min(81.3vw, 114.36vh);
-  aspect-ratio: 1171 / 646;
-
-  top: 5.5%;
-  left: 45%;
-  transform: translateX(-50%);
+  top: 6.5%;
+  left: 9.4%;
+  width: 81.2%;
+  height: 66.6%;
 
   container-type: inline-size;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* =========================================
-   HEADING
+   HEADING & SUBTITLE
 ========================================= */
 
 .whiteboard-heading {
   position: absolute;
-  top: 2.5%;
-  left: 15%;
-  width: 80%;
+  top: 2.2%;
+  left: 6%;
+  width: 88%;
 
   display: flex;
   flex-direction: column;
@@ -63,18 +95,13 @@
   margin: 0;
 
   color: #096ADB;
-
   font-family: 'Rubik', sans-serif;
-  font-size: 8.2cqw;
+  font-size: 7.2cqw;
   font-weight: 600;
-  line-height: 0.95;
+  line-height: 0.98;
 
   text-align: center;
 }
-
-/* =========================================
-   SUBTITLE
-========================================= */
 
 .whiteboard-subtitle {
   width: 100%;
@@ -82,18 +109,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.683cqw;
+  gap: 0.7cqw;
 
-  margin-top: 1.025cqw;
+  margin-top: 0.85cqw;
 }
 
 .whiteboard-subtitle p {
   margin: 0;
 
   color: #096ADB;
-
   font-family: 'Rubik', sans-serif;
-  font-size: 4.7cqw;
+  font-size: 4.1cqw;
   font-weight: 400;
   line-height: 1.15;
 
@@ -101,7 +127,7 @@
 }
 
 .whiteboard-subtitle img {
-  width: 5.72cqw;
+  width: 4.8cqw;
   height: auto;
 
   object-fit: contain;
@@ -115,31 +141,43 @@
 .bullets-section {
   position: absolute;
 
-  top: 34.7%;
+  top: 26.5%;
   left: 5%;
   width: 90%;
-  height: 46.3%;
+  height: 51%;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 8%;
+  gap: 2.2cqw;
 }
 
 /* =========================================
-   BULLET ROW
+   BULLET ROW (מספר מימין + קובייה משמאל)
 ========================================= */
 
 .bullet-row {
-  position: relative;
-
-  width: 93%;
-  height: 31%;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
 
   display: flex;
+  flex-direction: row;
   align-items: center;
+  gap: 1.2cqw;
+}
 
+.bullet-number {
+  width: 3.8cqw;
   flex-shrink: 0;
+
+  color: #096ADB;
+  font-family: 'Rubik', sans-serif;
+  font-size: 5cqw;
+  font-weight: 600;
+  line-height: 1;
+
+  text-align: center;
 }
 
 /* =========================================
@@ -149,11 +187,13 @@
 .bullet-box {
   position: relative;
 
-  width: 100%;
+  flex: 1;
   height: 100%;
+  min-width: 0;
 
-  border: 0.427cqw solid #096ADB;
-  border-radius: 0.854cqw;
+  border: 0.42cqw solid #096ADB;
+  border-radius: 0.85cqw;
+  box-sizing: border-box;
 
   display: flex;
   justify-content: center;
@@ -165,11 +205,12 @@
 .bullet-text {
   width: 100%;
   margin: 0;
+  padding: 0.4cqw 1.4cqw;
+  box-sizing: border-box;
 
   color: #096ADB;
-
   font-family: 'Rubik', sans-serif;
-  font-size: 2.904cqw;
+  font-size: 2.75cqw;
   font-weight: 400;
   line-height: 1.2;
 
@@ -178,124 +219,47 @@
 }
 
 /* =========================================
-   BULLET NUMBER
-========================================= */
-
-.bullet-number {
-  position: absolute;
-
-  right: -5.125cqw;
-  top: 50%;
-  transform: translateY(-50%);
-
-  width: 3.843cqw;
-
-  color: #096ADB;
-
-  font-family: 'Rubik', sans-serif;
-  font-size: 5.467cqw;
-  font-weight: 600;
-  line-height: 1;
-
-  text-align: center;
-}
-
-/* =========================================
-   FOOTER SECTION
+   FOOTER SECTION (חשוף מההתחלה)
 ========================================= */
 
 .footer-section {
   position: absolute;
 
-  top: 88%;
-  left: -5%;
-  width: 80%;
-  height: 13%;
+  top: 80.5%;
+  left: 5%;
+  width: 90%;
+  height: 16.5%;
 
   display: flex;
   justify-content: center;
   align-items: center;
 
-  padding: 0.171cqw 0.427cqw;
-
+  padding: 0.3cqw 0.8cqw;
+  box-sizing: border-box;
   overflow: hidden;
 }
-
-/* =========================================
-   FOOTER TEXT
-========================================= */
 
 .footer-text {
   width: 100%;
   margin: 0;
 
   color: #096ADB;
-
   font-family: 'Rubik', sans-serif;
-  font-size: 2.904cqw;
+  font-size: 2.75cqw;
   font-weight: 700;
   font-style: italic;
   line-height: 1.2;
 
   text-align: center;
   direction: rtl;
-
-  text-decoration: none;
-}
-
-/* הטקסט הפנימי משמש גם למדידת רוחב הקו */
-
-.footer-text-content {
-  display: inline-block;
-  max-width: 100%;
 }
 
 /* =========================================
-   FOOTER CONTENT POSITION
-========================================= */
-
-.footer-section .reveal-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding-top: 2cqw;
-  box-sizing: border-box;
-}
-
-/* =========================================
-   DYNAMIC FOOTER GUIDE LINE
-   קו מקדים באורך הטקסט בפועל
-========================================= */
-
-.footer-guide-line {
-  position: absolute;
-
-  height: 0.256cqw;
-
-  background: #096ADB;
-  border-radius: 0.256cqw;
-
-  z-index: 3;
-  pointer-events: none;
-
-  opacity: 1;
-  transition: opacity 0.15s ease;
-}
-
-/* הקו נעלם בתחילת החשיפה */
-
-.footer-guide-line.guide-hidden {
-  opacity: 0;
-}
-
-/* =========================================
-   REVEAL EFFECT
+   REVEAL EFFECT (עבור הקוביות בלבד)
 ========================================= */
 
 .reveal-area {
   position: relative;
-
   cursor: var(--marker-cursor);
   touch-action: pan-y;
 }
@@ -306,6 +270,10 @@
 
   width: 100%;
   height: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   -webkit-mask-image: var(--reveal-mask);
   mask-image: var(--reveal-mask);
@@ -324,16 +292,6 @@
   visibility: hidden;
 }
 
-/* תוכן הקוביות */
-
-.bullet-box .reveal-content {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* שכבת הציור */
-
 .reveal-canvas {
   position: absolute;
   inset: 0;
@@ -345,98 +303,7 @@
   pointer-events: none;
 }
 
-/* חשיפה מלאה */
-
 .reveal-area.reveal-complete .reveal-content {
   -webkit-mask-image: none;
   mask-image: none;
-}
-
-/* =========================================
-   LOW HEIGHT DESKTOP
-   1366x768 / 1280x720
-========================================= */
-
-@media (max-height: 800px) and (min-width: 1101px) {
-  .whiteboard-content {
-    width: min(81.3vw, 113vh);
-  }
-}
-
-/* =========================================
-   LARGE DESKTOP
-   1920x1080
-========================================= */
-
-@media (min-width: 1600px) and (min-height: 950px) and (max-width: 2199px) {
-  .whiteboard-content {
-    width: min(76vw, 139vh);
-    top: 0%;
-  }
-
-  .footer-section {
-    top: 88%;
-    left: 5%;
-    width: 100%;
-    height: 13%;
-
-    padding: 0.171cqw 0.427cqw;
-  }
-
-  .footer-text {
-    white-space: nowrap;
-    font-size: 2.5cqw;
-  }
-}
-
-/* =========================================
-   ULTRA WIDE / HIGH RESOLUTION
-   2560x1440 ומעלה
-========================================= */
-
-@media (min-width: 2200px) {
-  .whiteboard-content {
-    width: min(74vw, 139vh);
-    top: 0%;
-  }
-
-  .footer-section {
-    top: 88%;
-    left: 5%;
-    width: 100%;
-    height: 13%;
-
-    padding: 0.171cqw 0.427cqw;
-  }
-
-  .footer-text {
-    white-space: nowrap;
-    font-size: 2.5cqw;
-  }
-}
-
-/* =========================================
-   WIDE BUT LOW HEIGHT
-   1920x911
-========================================= */
-
-@media (min-width: 1600px) and (max-height: 949px) and (max-width: 2199px) {
-  .whiteboard-content {
-    width: min(70.2vw, 148vh);
-    top: 0%;
-  }
-
-  .footer-section {
-    top: 88%;
-    left: 5%;
-    width: 100%;
-    height: 13%;
-
-    padding: 0.171cqw 0.427cqw;
-  }
-
-  .footer-text {
-    white-space: nowrap;
-    font-size: 2.5cqw;
-  }
 }

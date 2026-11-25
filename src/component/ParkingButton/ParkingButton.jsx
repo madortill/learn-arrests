@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './ParkingButton.css';
 
 import Lock from '../Lock/Lock';
@@ -9,6 +8,9 @@ import padlock from '../../assets/parking/padlock.png';
 
 export default function ParkingButton({
   onComplete,
+  onInteractionStart,
+  currentStep,
+  hasInteracted = false,
   isCompleted = false,
   lockSlides = [],
   vehicles = [],
@@ -16,6 +18,10 @@ export default function ParkingButton({
   parkingState = {},
   onParkingStateChange,
 }) {
+  const [hasStarted, setHasStarted] = useState(
+    hasInteracted || isCompleted
+  );
+
   const isGateOpened = Boolean(
     parkingState.isGateOpened || isCompleted
   );
@@ -24,7 +30,26 @@ export default function ParkingButton({
     parkingState.isLockModalOpen
   );
 
+  useEffect(() => {
+    setHasStarted(hasInteracted || isCompleted);
+  }, [currentStep]);
+
+  useEffect(() => {
+    if (hasInteracted || isCompleted) {
+      setHasStarted(true);
+    }
+  }, [hasInteracted, isCompleted]);
+
+  const triggerInteractionStart = () => {
+    if (!hasStarted) {
+      setHasStarted(true);
+      onInteractionStart?.();
+    }
+  };
+
   const handleOpenInitialLock = () => {
+    triggerInteractionStart();
+
     onParkingStateChange?.((prev) => ({
       ...prev,
       isLockModalOpen: true,
@@ -32,6 +57,8 @@ export default function ParkingButton({
   };
 
   const handleOpenGate = () => {
+    triggerInteractionStart();
+
     onParkingStateChange?.((prev) => ({
       ...prev,
       isGateOpened: true,
