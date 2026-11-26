@@ -219,6 +219,10 @@
   justify-content: center;
 }
 
+.map-pin-marker.sidebar-hovered {
+  z-index: 14;
+}
+
 .pin-icon {
   width: clamp(22px, min(2.15vw, 2.95vh), 34px);
   height: clamp(22px, min(2.15vw, 2.95vh), 34px);
@@ -233,6 +237,11 @@
 
 .pin-icon.pulsing {
   animation: pulsePoint 1s cubic-bezier(0.4, 0, 0.6, 1) infinite alternate;
+}
+
+.pin-icon.sidebar-hovered {
+  animation: none;
+  transform: scale(1.32);
 }
 
 /* חץ הכוונה — מכוון לסיכה ונשאר בתוך גבולות המפה הגלויה */

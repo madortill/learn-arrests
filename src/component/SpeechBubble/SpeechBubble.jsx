@@ -216,6 +216,10 @@ export default function SpeechBubble({
     isCompleted || !typeAnimation ? text : ''
   );
 
+  const [isTypingFinished, setIsTypingFinished] = useState(
+    Boolean(isCompleted || !typeAnimation)
+  );
+
   const [geometry, setGeometry] = useState({
     path: '',
     width: 0,
@@ -253,6 +257,7 @@ export default function SpeechBubble({
 
     if (isCompleted || !typeAnimation) {
       setDisplayedText(text);
+      setIsTypingFinished(true);
       completeOnce();
       return;
     }
@@ -260,8 +265,10 @@ export default function SpeechBubble({
     completedTextRef.current = null;
     const characters = Array.from(text);
     setDisplayedText('');
+    setIsTypingFinished(false);
 
     if (!characters.length) {
+      setIsTypingFinished(true);
       completeOnce();
       return;
     }
@@ -276,6 +283,7 @@ export default function SpeechBubble({
       if (currentIndex < characters.length) {
         timer = setTimeout(typeNextCharacter, TYPING_SPEED);
       } else {
+        setIsTypingFinished(true);
         completeOnce();
       }
     };
@@ -366,6 +374,7 @@ export default function SpeechBubble({
     'speech-bubble-layer',
     centered ? 'is-centered' : '',
     isStepOne ? 'is-step-1' : 'is-default-step',
+    isTypingFinished ? 'is-typing-finished' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -402,7 +411,7 @@ export default function SpeechBubble({
       >
         <div className="speech-content">
           {/* טקסט למדידת גובה ורוחב הבועה */}
-          <p className="speech-measure-text">
+          <p className="speech-measure-text" aria-hidden="true">
             {text ? renderFormattedText(text) : ' '}
           </p>
 

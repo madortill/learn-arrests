@@ -97,6 +97,7 @@ export default function LocationMap({
         initialVisitedKeys.length > 0
     )
   );
+  const [hoveredPinGroupKey, setHoveredPinGroupKey] = useState(null);
 
   // תור של הודעות דגש חשוב לאישור (תומך גם במספר מקומות על אותה נקודה)
   const [popupQueue, setPopupQueue] = useState([]);
@@ -307,6 +308,12 @@ export default function LocationMap({
                   hasImportantPoint ? 'has-warning' : ''
                 }`}
                 onClick={() => handleSidebarItemClick(loc)}
+                onMouseEnter={() => setHoveredPinGroupKey(loc.pinGroupKey)}
+                onMouseLeave={() =>
+                  setHoveredPinGroupKey((prev) =>
+                    prev === loc.pinGroupKey ? null : prev
+                  )
+                }
                 role={hasImportantPoint ? 'button' : undefined}
                 tabIndex={hasImportantPoint ? 0 : undefined}
                 onKeyDown={(e) => {
@@ -355,6 +362,8 @@ export default function LocationMap({
             );
             const isPulsing = pinGroup.pinGroupKey === pulsingPinKey;
             const isFirstPin = pinGroup.pinGroupKey === firstPinGroupKey;
+            const isHoveredFromSidebar =
+              pinGroup.pinGroupKey === hoveredPinGroupKey;
             const combinedLabel = pinGroup.items
               .map((item) => item.mainName)
               .join(' / ');
@@ -364,7 +373,7 @@ export default function LocationMap({
                 key={pinGroup.pinGroupKey}
                 className={`map-pin-marker ${
                   isVisited ? 'visited' : 'unvisited'
-                }`}
+                } ${isHoveredFromSidebar ? 'sidebar-hovered' : ''}`}
                 style={{
                   top: `${pinGroup.y}%`,
                   left: `${pinGroup.x}%`,
@@ -382,7 +391,9 @@ export default function LocationMap({
                 <img
                   src={isVisited ? pinVisitedIcon : pinUnvisitedIcon}
                   alt={combinedLabel}
-                  className={`pin-icon ${isPulsing ? 'pulsing' : ''}`}
+                  className={`pin-icon ${isPulsing ? 'pulsing' : ''} ${
+                    isHoveredFromSidebar ? 'sidebar-hovered' : ''
+                  }`}
                   draggable="false"
                 />
 

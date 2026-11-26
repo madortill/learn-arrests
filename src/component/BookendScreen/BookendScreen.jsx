@@ -5,7 +5,7 @@ import './BookendScreen.css';
 
 export default function BookendScreen({ isStart, onNext, onRestart }) {
   const dividerElement = (
-    <div className="bookend-divider">
+    <div className="bookend-divider" aria-hidden="true">
       <div className="divider-line divider-line-left" />
 
       <div className="divider-diamond">
@@ -62,7 +62,7 @@ export default function BookendScreen({ isStart, onNext, onRestart }) {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       {/* שכבת כהות עדינה ברקע */}
-      <div className="bookend-overlay"></div>
+      <div className="bookend-overlay" aria-hidden="true"></div>
 
       {/* לוגואים בצד שמאל למעלה */}
       <div className="bookend-top-left">
@@ -70,6 +70,7 @@ export default function BookendScreen({ isStart, onNext, onRestart }) {
           src={logosImage}
           alt="לוגואים"
           className="idf-logos-img"
+          draggable="false"
         />
       </div>
 
@@ -91,8 +92,10 @@ export default function BookendScreen({ isStart, onNext, onRestart }) {
             </div>
 
             <button
+              type="button"
               className="bookend-btn"
               onClick={onNext}
+              draggable="false"
             >
               בואו נתחיל את היום
             </button>
@@ -115,8 +118,10 @@ export default function BookendScreen({ isStart, onNext, onRestart }) {
             </h1>
 
             <button
+              type="button"
               className="bookend-btn"
               onClick={onRestart}
+              draggable="false"
             >
               לתחילת הלומדה
             </button>

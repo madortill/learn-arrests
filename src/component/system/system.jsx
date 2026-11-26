@@ -163,8 +163,11 @@ const DOOR_STAGES = [24, 25, 26, 27];
 const FIRST_TRANSITION_STAGE = 12;
 const SECOND_TRANSITION_STAGE = 21;
 const TRANSITION_STAGES = [FIRST_TRANSITION_STAGE, SECOND_TRANSITION_STAGE];
-const POST_LOAD_HOLD_MS = 1600; // מוצג לעוד 1.6 שניות גג לאחר סיום הטעינה בפועל
-const MAX_LOAD_TIMEOUT_MS = 7000;
+
+const INITIAL_POST_LOAD_HOLD_MS = 1200; // השהיה קצרה (מתחת ל-2 שניות) בסיום הטעינה הראשונית
+const VEHICLE_MIN_DISPLAY_MS = 3000; // במצב הרכב — תמיד מוצג לפחות 3 שניות
+const VEHICLE_POST_LOAD_HOLD_MS = 800; // השהיה קצרה אם הטעינה עצמה לקחה מעל 3 שניות
+const MAX_LOAD_TIMEOUT_MS = 8000;
 const PROGRESS_STORAGE_KEY = 'lomda-progress';
 
 const IMAGE_FILE_PATTERN = /\.(png|jpe?g|webp|gif|svg)$/i;
@@ -625,7 +628,7 @@ export default function System() {
   }, [showCharacterOverlay, viewportSize, stepData, currentBackgroundKey]);
 
   // ==========================================
-  // טעינה מוקדמת אמיתית לפי מקטעים + השהיית סיום עד 2 שניות
+  // טעינה מוקדמת אמיתית + מינימום 3 שניות במצב הרכב
   // ==========================================
 
   useEffect(() => {
@@ -634,11 +637,14 @@ export default function System() {
     let isCancelled = false;
     let holdTimer = null;
     let safetyTimer = null;
+    const loadStartTime = Date.now();
+    const isVehicleTransition = loadingStage !== 'initial';
 
     setLoadingProgress(0);
 
     const imageUrls = collectAssetsForSegment(pages, loadingStage);
-    const includeFonts = loadingStage === 'initial' && Boolean(document.fonts?.ready);
+    const includeFonts =
+      loadingStage === 'initial' && Boolean(document.fonts?.ready);
     const totalTasks = imageUrls.length + (includeFonts ? 1 : 0);
     let completedTasks = 0;
 
@@ -647,10 +653,18 @@ export default function System() {
       clearTimeout(safetyTimer);
       setLoadingProgress(100);
 
+      const elapsed = Date.now() - loadStartTime;
+      const holdDuration = isVehicleTransition
+        ? Math.max(
+            Math.max(0, VEHICLE_MIN_DISPLAY_MS - elapsed),
+            VEHICLE_POST_LOAD_HOLD_MS
+          )
+        : INITIAL_POST_LOAD_HOLD_MS;
+
       holdTimer = setTimeout(() => {
         if (isCancelled) return;
 
-        if (loadingStage !== 'initial' && pendingStep !== null) {
+        if (isVehicleTransition && pendingStep !== null) {
           setMaxUnlockedStep((prev) => Math.max(prev, pendingStep));
           setCurrentStep(pendingStep);
           setContinueSignal(0);
@@ -658,7 +672,7 @@ export default function System() {
         }
 
         setLoadingStage(null);
-      }, POST_LOAD_HOLD_MS);
+      }, holdDuration);
     };
 
     const reportTaskDone = () => {

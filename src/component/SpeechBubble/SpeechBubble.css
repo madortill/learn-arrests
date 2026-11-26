@@ -16,6 +16,8 @@
   font-family: 'Rubik', sans-serif;
 
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
   overflow: visible;
 
   box-sizing: border-box;
@@ -120,6 +122,8 @@
 .speech-measure-text {
   visibility: hidden;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .speech-visible-text {
@@ -128,6 +132,29 @@
 
   visibility: visible;
   pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* =========================================
+   TEXT SELECTION (ONLY AFTER TYPING FINISHES)
+========================================= */
+
+.speech-bubble-layer.is-typing-finished .speech-visible-text {
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.speech-bubble-layer.is-typing-finished .speech-visible-text::selection,
+.speech-bubble-layer.is-typing-finished .speech-visible-text *::selection {
+  color: #472C89;
+  background-color: #FFFFFF;
+}
+
+.speech-bubble-layer.is-typing-finished .speech-visible-text .speech-checkmark::selection {
+  color: #472C89;
+  background-color: #F8B533;
 }
 
 /* =========================================
